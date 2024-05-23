@@ -1,14 +1,13 @@
-from typing import List
+from typing import Optional
 
-from fastapi import FastAPI, Form, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Form, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
-from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
+from starlette.staticfiles import StaticFiles
 import uvicorn
+from itsdangerous import URLSafeSerializer, BadSignature
 
 from Database import autorization, registration, find_techniks, get_user, create_order, get_orders_doctor, \
     get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id
@@ -19,6 +18,11 @@ app.mount("/css", StaticFiles(directory="templates/css"), name="css")
 app.mount("/js", StaticFiles(directory="templates/js"), name="js")
 app.mount("/images", StaticFiles(directory="templates/images"), name="images")
 
+templates = Jinja2Templates(directory="templates")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account")
+
+SECRET_KEY = "your-secret-key"
+serializer = URLSafeSerializer(SECRET_KEY)
 
 
 class UserAuthorization(BaseModel):
@@ -26,25 +30,16 @@ class UserAuthorization(BaseModel):
     password: str
 
 
-templates = Jinja2Templates(directory="templates")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account/enter")
+def create_session(user_id: str):
+    return serializer.dumps({"user_id": user_id})
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    user = get_user(token)  # (id, fio, ...)
-    if user[0] == token:
-        return user
-    raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-
-# @app.post("/token", response_class=UserAuthorization)
-# async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-#     email = form_data.username
-#     password = form_data.password
-#     user = autorization(email,password)
-#     if not user:
-#         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-#     return {"access_token":user[0],"token_type":"bearer"}
+def read_session(session_cookie: str):
+    try:
+        data = serializer.loads(session_cookie)
+        return data.get("user_id")
+    except BadSignature:
+        return None
 
 
 @app.get("/authorization", response_class=HTMLResponse)
@@ -62,58 +57,36 @@ async def regist(request: Request):
     return templates.TemplateResponse("registration.html", {"request": request})
 
 
-# @app.post("/check", response_class=HTMLResponse)
-# async def check_login_password(user : UserAuthorization):
-#     email = user.email
-#     password =user.password
-#     print(email, password)
-#     res = autorization(email, password)
-#     if res == True:
-#         return templates.TemplateResponse("technik_personal_account.html")
-#     else:
-#         return templates.TemplateResponse("wrong_authorization.html")
-
-
 @app.route("/account", methods=['GET', 'POST'])
-async def account(request: Request,current_user: dict = Depends(get_current_user)):
-    if current_user is not None:
-        if current_user[5] == "doctor":
-            orders = get_orders_doctor(current_user[0])
-            done = []
-            fitting_done = []
-            not_done = []
-            for order in orders:
-                if order[9] == 0 and order[12] == 0:
-                    not_done.append(order)
-                elif order[9] == 0 and order[12] == 1:
-                    fitting_done.append(order)
-                else:
-                    done.append(order)
+async def account(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is not None:
+        user = get_user(user_id)
+        if user[5] == "doctor":
+            orders = get_orders_doctor(user[0])
+        else:
+            orders = get_orders_technik(user[0])
+
+        done = [order for order in orders if order[9] == 1]
+        fitting_done = [order for order in orders if order[9] == 0 and order[12] == 1]
+        not_done = [order for order in orders if order[9] == 0 and order[12] == 0]
+
+        if user[5] == "doctor":
             return templates.TemplateResponse("doctor_personal_account.html",
                                               {
                                                   "request": request,
-                                                  'fio': current_user[1],
+                                                  'fio': user[1],
                                                   "done": done,
                                                   "fitting_done": fitting_done,
                                                   "not_done": not_done
                                               })
         else:
-            orders = get_orders_technik(current_user[0])
-            done = []
-            fitting_done = []
-            not_done = []
-            for order in orders:
-                if order[9] == 0 and order[12] == 0:
-                    not_done.append(order)
-                elif order[9] == 0 and order[12] == 1:
-                    fitting_done.append(order)
-                else:
-                    done.append(order)
             return templates.TemplateResponse(
                 "technik_personal_account.html",
                 {
                     "request": request,
-                    'fio': current_user[1],
+                    'fio': user[1],
                     "done": done,
                     "fitting_done": fitting_done,
                     "not_done": not_done
@@ -123,13 +96,16 @@ async def account(request: Request,current_user: dict = Depends(get_current_user
 
 
 @app.post("/account/enter", response_class=HTMLResponse)
-async def check_login_password(form_data: OAuth2PasswordRequestForm = Depends()):
-    global current_user
+async def check_login_password(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     email = form_data.username
     password = form_data.password
-    print(email, password)
     res = autorization(email, password)
-    return RedirectResponse(url="/account")
+    if res:
+        session = create_session(res[0])
+        response = RedirectResponse(url="/account")
+        response.set_cookie(key="session", value=session)
+        return response
+    return templates.TemplateResponse("wrong_authorization.html", {"request": request})
 
 
 @app.post("/registration", response_class=HTMLResponse)
@@ -137,14 +113,14 @@ async def regist(request: Request, fio: str = Form(...), username: str = Form(..
                  email: str = Form(...), password: str = Form(...), speciality: str = Form(...),
                  repeat_password: str = Form(...)):
     res = registration(fio, username, email, password, speciality, repeat_password)
-    if res == False:
+    if not res:
         return templates.TemplateResponse("registration.html", {"request": request})
     else:
         return templates.TemplateResponse("authorization.html", {"request": request})
 
 
 @app.get("/order/create", response_class=HTMLResponse)
-async def regist(request: Request):
+async def create_order_form(request: Request):
     techniks = find_techniks()
     selected_tooth = []
     return templates.TemplateResponse("create_order.html", {
@@ -163,11 +139,12 @@ async def regist(request: Request):
 async def add_order(request: Request, patient: str = Form(...), formula: str = Form(...),
                     type: str = Form(...), comment: str = Form(""), fitting: str = Form(...),
                     deadline: str = Form(...), technik: str = Form(...), color_letter: str = Form(...),
-                    color_number: str = Form(...),current_user: dict = Depends(get_current_user)):
-    doctor = get_user(current_user[0])
+                    color_number: str = Form(...)):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    doctor = get_user(user_id)
     techniks = find_techniks()
 
-    selected_tooth = []
     create_order(patient, formula, type, comment, fitting, deadline, int(technik), doctor[0],
                  color_letter, color_number)
     return templates.TemplateResponse("create_order.html", {
@@ -175,7 +152,7 @@ async def add_order(request: Request, patient: str = Form(...), formula: str = F
         "success": True,
         "first_row": first_row,
         "second_row": second_row,
-        "selected_tooth": selected_tooth,
+        "selected_tooth": [],
         "job_types": types,
         "color_letter": color_letter,
         "color_number": color_number,
@@ -187,8 +164,10 @@ async def add_order(request: Request, patient: str = Form(...), formula: str = F
 async def update_order(request: Request, order_id: int, patient: str = Form(...), formula: str = Form(...),
                        type: str = Form(...), comment: str = Form(""), fitting: str = Form(...),
                        deadline: str = Form(...), technik: str = Form(...), color_letter: str = Form(...),
-                       color_number: str = Form(...),current_user: dict = Depends(get_current_user)):
-    doctor = get_user(current_user[0])
+                       color_number: str = Form(...)):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    doctor = get_user(user_id)
     techniks = find_techniks()
 
     update_order_by_id(patient, formula, type, comment, fitting, deadline, int(technik), doctor[0],
@@ -210,11 +189,15 @@ async def update_order(request: Request, order_id: int, patient: str = Form(...)
 
 
 @app.get("/order/get/{order_id}", response_class=HTMLResponse)
-async def get_order(request: Request, order_id: int,current_user: dict = Depends(get_current_user)):
+async def get_order(request: Request, order_id: int):
     order = get_order_by_id(order_id)
     selected_tooth = list(map(int, order[2].split(", ")))
 
-    if current_user[5] == "doctor":
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    user = get_user(user_id)
+
+    if user[5] == "doctor":
         techniks = find_techniks()
         return templates.TemplateResponse("edit_order.html", {
             "request": request,
@@ -226,7 +209,6 @@ async def get_order(request: Request, order_id: int,current_user: dict = Depends
             "color_number": color_number,
             "techniks": techniks,
             "order": order
-
         })
     else:
         doctor = get_user(order[6])
@@ -248,7 +230,7 @@ async def save_done_order(request: Request, order_id: int, done: str = Form('off
 
 
 @app.post("/order/done/fitting/{order_id}")
-async def save_done_order(request: Request, order_id: int, fitting_done: str = Form('off')):
+async def save_done_fitting_order(request: Request, order_id: int, fitting_done: str = Form('off')):
     fitting_done = 1 if fitting_done == 'on' else 0
     update_order_done(order_id, fitting_done=fitting_done)
     return RedirectResponse(url="/account")
@@ -260,5 +242,12 @@ async def delete_order(request: Request, order_id: int):
     return RedirectResponse(url="/account")
 
 
+@app.get("/logout")
+async def logout(request: Request):
+    response = RedirectResponse(url="/")
+    response.delete_cookie("session")
+    return response
+
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=80, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

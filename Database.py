@@ -21,7 +21,7 @@ def autorization(email, password):
         f"select * from user where email='{email}' and password= '{password}'").fetchall()  # [(id, fio...),]
     if check:
         print("Успешно авторизирован")
-        return check
+        return check[0]
     else:
         print("Неверный логин или пароль")
         return False
