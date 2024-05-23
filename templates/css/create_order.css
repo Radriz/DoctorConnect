@@ -1,0 +1,31 @@
+.button-tooth{
+    background-color:transparent;
+    border:2px solid #d8d7db;
+    border-radius:10px;
+    width:5.4%;
+
+    font-size:100%;
+}
+.button-tooth img{
+    max-width:100px;
+    width:100%;
+}
+
+.button-tooth:hover{
+    background-color:#f2f3f7
+
+}
+@media screen and (max-width: 600px) {
+    .button-tooth {
+        font-size: 60%;
+    }
+}
+
+.success {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    width: 50%;
+    margin-bottom: 20px;
+}

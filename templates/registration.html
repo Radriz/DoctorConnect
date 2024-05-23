@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+</head>
+<body>
+<h1>Регистрация</h1>
+<form method="post" action="/registration">
+
+    <label>ФИО:</label>
+    <input name="fio"><br><br>
+
+    <label>Никнейм:</label>
+    <input name="username"><br><br>
+
+    <label>Почта:</label>
+    <input name="email"><br><br>
+
+    <label>Пароль:</label>
+    <input type="password" name="password"><br><br>
+
+    <label>Повторить пароль:</label>
+    <input type="password" name="repeat_password"><br><br>
+
+    <label for="speciality">Выберите специальность:</label>
+        <select id="speciality" name="speciality">
+            <option value="doctor">Врач</option>
+            <option value="technik">Зубной техник</option>
+        </select>
+
+    <input type="submit" value="Зарегистрировать">
+</form>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр заказа</title>
+    <link rel="stylesheet" href="/css/create_order.css">
+</head>
+
+<body>
+
+<h1>Просмотр заказа</h1>
+<form method="get" action="/account">
+    <input type="submit" value="Личный кабинет">
+</form>
+
+
+<label>ФИО пациента:</label>
+<input name="patient" value="{{order[1]}}"><br><br>
+{% for tooth in first_row %}
+    {% if tooth in selected_tooth %}
+        <button style="background-color:#7ef78b" class="button-tooth">
+            <img src="/images/tooth.png" alt="Tooth"><br>
+            {{tooth}}
+        </button>
+    {% else %}
+        <button class="button-tooth">
+            <img src="/images/tooth.png" alt="Tooth"><br>
+            {{tooth}}
+        </button>
+    {% endif %}
+{% endfor %}
+<br>
+{% for tooth in second_row %}
+    {% if tooth in selected_tooth %}
+        <button style="background-color:#7ef78b" class="button-tooth">
+            <img src="/images/tooth.png" alt="Tooth"><br>
+            {{tooth}}
+        </button>
+    {% else %}
+        <button class="button-tooth">
+            <img src="/images/tooth.png" alt="Tooth"><br>
+            {{tooth}}
+        </button>
+    {% endif %}
+{% endfor %}
+<br><br>
+
+
+<label>Вид работы:</label>
+<input type="text" name="type" value="{{order[3]}}"><br><br>
+<label>Цвет конструкции:</label>
+<input type="text" name="color" value="{{order[11]}}{{order[13]}}"><br><br>
+<label>Комментарии:</label>
+<input type="text" name="comment" value="{{order[8]}}"><br><br>
+<label>Дата примерка:</label>
+<input type="date" name="fitting" value="{{order[4]}}"><br><br>
+<label>Дата сдачи работы:</label>
+<input type="date" name="deadline" value="{{order[5]}}"><br><br>
+<label for="doctor">Доктор:</label>
+<input id="doctor" type="text" name="doctor" value="{{doctor[1]}}"><br><br>
+
+<form id="fitting_done_form" method="post" action="/order/done/fitting/{{order[0]}}">
+
+      <input type="checkbox" name="fitting_done" id="fitting_done" {% if order[12] %} checked {% endif %}>
+      <label for="fitting_done">Готова к примерке</label>
+</form>
+
+<form id="done_form" method="post" action="/order/done/{{order[0]}}">
+      <input type="checkbox" name="done" id="done"  {% if order[9] %} checked {% endif %}>
+      <label for="done">Заказ выполнен</label>
+</form>
+
+<script src="/js/show_order.js"></script>
+</body>
+</html>

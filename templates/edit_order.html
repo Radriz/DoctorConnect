@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Изменение заказа</title>
+    <link rel="stylesheet" href="/css/create_order.css">
+</head>
+
+<body>
+
+<h1>Изменение заказа</h1>
+<form method="get" action="/account">
+    <input type="submit" value="Личный кабинет">
+</form>
+{% if success %}
+<div class="success">
+    <h2>Заказ сохранен успешно</h2>
+</div>
+{% endif %}
+<form id="order_form" method="post" action="/order/update/{{order[0]}}">
+
+    <label>ФИО пациента:</label>
+    <input value="{{order[1]}}" name="patient" required><br><br>
+    {% for tooth in first_row %}
+    {% if tooth in selected_tooth %}
+    <button style="background-color:#7ef78b" class="button-tooth">
+        <img src="/images/tooth.png" alt="Tooth"><br>
+        {{tooth}}
+    </button>
+    {% else %}
+    <button class="button-tooth">
+        <img src="/images/tooth.png" alt="Tooth"><br>
+        {{tooth}}
+    </button>
+    {% endif %}
+    {% endfor %}
+    <br>
+    {% for tooth in second_row %}
+    {% if tooth in selected_tooth %}
+    <button style="background-color:#7ef78b" class="button-tooth">
+        <img src="/images/tooth.png" alt="Tooth"><br>
+        {{tooth}}
+    </button>
+    {% else %}
+    <button class="button-tooth">
+        <img src="/images/tooth.png" alt="Tooth"><br>
+        {{tooth}}
+    </button>
+    {% endif %}
+    {% endfor %}
+    <br><br>
+
+
+    <label>Вид работы:</label>
+    <select id="type" name="type">
+        {% for type in job_types %}
+        <option {% if order[3]== type %} selected {% endif %} value="{{type}}">{{type}}</option>
+        {% endfor %}
+
+    </select><br><br>
+    <label>Цвет конструкции:</label>
+    <select id="color_letter" name="color_letter">
+        {% for color in color_letter %}
+        <option {% if order[11]== color %} selected {% endif %} value="{{color}}">{{color}}</option>
+        {% endfor %}
+    </select>
+    <select id="color_number" name="color_number">
+        {% for number in color_number %}
+        <option {% if order[13]== number %} selected {% endif %} value="{{number}}">{{number}}</option>
+        {% endfor %}
+    </select><br><br>
+    <label>Комментарии:</label>
+    <input type="text" name="comment" value="{{order[8]}}"><br><br>
+    <label>Дата примерка:</label>
+    <input type="date" name="fitting" value="{{order[4]}}"><br><br>
+    <label>Дата сдачи работы:</label>
+    <input type="date" name="deadline" value="{{order[5]}}" required><br><br>
+    <label for="technik">Выберите техника:</label>
+    <select id="technik" name="technik">
+        {% for technik in techniks %}
+        <option {% if order[7] == technik.name %} selected {% endif %} value="{{technik.id}}">{{technik.name}}
+        </option>
+        {% endfor %}
+    </select><br><br>
+    <input id="submit" type="submit" value="Сохранить">
+</form>
+<form id="order_form_delete" method="post" action="/order/delete/{{order[0]}}">
+     <input id="delete" type="submit" value="Удалить">
+</form>
+<script src="/js/edit_order.js"></script>
+</body>
+</html>
