@@ -10,7 +10,8 @@ import uvicorn
 from itsdangerous import URLSafeSerializer, BadSignature
 
 from Database import autorization, registration, find_techniks, get_user, create_order, get_orders_doctor, \
-    get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id
+    get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id, procedure_type, \
+    name_procedure
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
@@ -132,6 +133,18 @@ async def create_order_form(request: Request):
         "job_types": types,
         "color_letter": color_letter,
         "color_number": color_number
+    })
+
+@app.get("/order/plan", response_class=HTMLResponse)
+async def plan(request: Request):
+    types = procedure_type()
+    names = name_procedure(types[0])
+    return templates.TemplateResponse("plan.html",{
+        "request": request,
+        "first_row": first_row,
+        "second_row": second_row,
+        "job_types": types,
+        "names": names
     })
 
 

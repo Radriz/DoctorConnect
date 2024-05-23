@@ -125,4 +125,17 @@ def update_order_by_id(patient, formula, type, comment, fitting, deadline, techn
         where id = {order_id}""")
     connection.commit()
 
+def procedure_type():
+    type = cursor.execute(
+        f"select type from procedure").fetchall() # [("",), ("",), ]
+    type = list(set(type))
+    updt_types = [t[0] for t in type]
+    return updt_types
+
+def name_procedure(type):
+    x =  f"""select name from procedure where type = '{type}'"""
+    name = cursor.execute(x).fetchall()
+    updt_name = [n[0] for n in name]
+    return updt_name
+
 

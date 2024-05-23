@@ -12,70 +12,61 @@
 <form method="get" action="/account">
     <input type="submit" value="Личный кабинет">
 </form>
+<form id="procedure_form" method="post" action="/order/plan">
+<label>ФИО пациента:</label>
+<input name="patient" required><br><br>
+{% for tooth in first_row %}
+{% if tooth in selected_tooth %}
+<button style="background-color:#7ef78b" class="button-tooth">
+    <img src="/images/tooth.png" alt="Tooth"><br>
+    {{tooth}}
+</button>
+{% else %}
+<button class="button-tooth">
+    <img src="/images/tooth.png" alt="Tooth"><br>
+    {{tooth}}
+</button>
+{% endif %}
+{% endfor %}
+<br>
+{% for tooth in second_row %}
+{% if tooth in selected_tooth %}
+<button style="background-color:#7ef78b" class="button-tooth">
+    <img src="/images/tooth.png" alt="Tooth"><br>
+    {{tooth}}
+</button>
+{% else %}
+<button class="button-tooth">
+    <img src="/images/tooth.png" alt="Tooth"><br>
+    {{tooth}}
+</button>
+{% endif %}
+{% endfor %}
+<br><br>
 
-    <label>ФИО пациента:</label>
-    <input name="patient" required><br><br>
-    {% for tooth in first_row %}
-    {% if tooth in selected_tooth %}
-    <button style="background-color:#7ef78b" class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% else %}
-    <button class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% endif %}
+
+<label>Направление:</label>
+<select id="type" name="type">
+    {% for type in job_types %}
+    <option value="{{type}}">{{type}}</option>
     {% endfor %}
-    <br>
-    {% for tooth in second_row %}
-    {% if tooth in selected_tooth %}
-    <button style="background-color:#7ef78b" class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% else %}
-    <button class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% endif %}
+
+</select>
+<label>Процедура:</label>
+<select id="name" name="name">
+    {% for name in names %}
+    <option value="{{name}}">{{name}}</option>
     {% endfor %}
-    <br><br>
+
+</select><br><br>
+<button class="button-create">
+    Добавить процедуру
+</button>
+<br><br>
 
 
-    <label>Вид работы:</label>
-    <select id="type" name="type">
-        {% for type in job_types %}
-        <option value="{{type}}">{{type}}</option>
-        {% endfor %}
 
-    </select><br><br>
-    <label>Цвет конструкции:</label>
-    <select id="color_letter" name="color_letter">
-        {% for color in color_letter %}
-        <option value="{{color}}">{{color}}</option>
-        {% endfor %}
-    </select>
-    <select id="color_number" name="color_number">
-        {% for number in color_number %}
-        <option value="{{number}}">{{number}}</option>
-        {% endfor %}
-    </select><br><br>
-    <label>Комментарии:</label>
-    <input type="text" name="comment" value=""><br><br>
-    <label>Дата примерка:</label>
-    <input type="date" name="fitting"><br><br>
-    <label>Дата сдачи работы:</label>
-    <input type="date" name="deadline" required><br><br>
-    <label for="technik">Выберите техника:</label>
-    <select id="technik" name="technik">
-        {% for technik in techniks %}
-        <option value="{{technik.id}}">{{technik.name}}</option>
-        {% endfor %}
-    </select><br><br>
-    <input id="submit" type="submit" value="Создать">
+<input id="submit" type="submit" value="Создать">
 
 
 </form>
