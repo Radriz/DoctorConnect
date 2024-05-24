@@ -50,7 +50,7 @@ async def read_item(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def initial(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return RedirectResponse(url="/authorization")
 
 
 @app.get("/registration", response_class=HTMLResponse)
