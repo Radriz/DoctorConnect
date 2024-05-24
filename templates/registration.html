@@ -2,34 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .register-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        .register-container img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        .register-container label {
+            text-align:left;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .register-container input[type="text"],
+        .register-container input[type="password"],
+        .register-container input[type="email"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+
+         .register-container a{
+            display: block;
+             text-align:left;
+             margin-bottom: 10px;
+             font-size: 16px;
+             color: black;
+             text-decoration: none;
+             pointer: cursor;
+         }
+
+        .register-container select {
+            width: calc(100% - 0px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+        .register-container input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .register-container input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-<h1>Регистрация</h1>
-<form method="post" action="/registration">
+<div class="register-container">
+    <img src="/images/logo.png" alt="Logo">
+    <h1>Регистрация</h1>
+    <form method="post" action="/registration">
+        <label for="fio">ФИО:</label>
+        <input type="text" id="fio" name="fio">
 
-    <label>ФИО:</label>
-    <input name="fio"><br><br>
+        <label for="username">Никнейм:</label>
+        <input type="text" id="username" name="username">
 
-    <label>Никнейм:</label>
-    <input name="username"><br><br>
+        <label for="email">Почта:</label>
+        <input type="email" id="email" name="email">
 
-    <label>Почта:</label>
-    <input name="email"><br><br>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password">
 
-    <label>Пароль:</label>
-    <input type="password" name="password"><br><br>
+        <label for="repeat_password">Повторить пароль:</label>
+        <input type="password" id="repeat_password" name="repeat_password">
 
-    <label>Повторить пароль:</label>
-    <input type="password" name="repeat_password"><br><br>
-
-    <label for="speciality">Выберите специальность:</label>
+        <label for="speciality">Выберите специальность:</label>
         <select id="speciality" name="speciality">
             <option value="doctor">Врач</option>
             <option value="technik">Зубной техник</option>
         </select>
-
-    <input type="submit" value="Зарегистрировать">
-</form>
+        <a href="/authorization">Уже есть аккаунт</a>
+        <input type="submit" value="Зарегистрировать">
+    </form>
+</div>
 </body>
 </html>
