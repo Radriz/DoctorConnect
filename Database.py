@@ -1,13 +1,21 @@
 import sqlite3
-
+import hashlib
 connection = sqlite3.connect("Database.db")
 cursor = connection.cursor()
 
 
-def registration(fio, username, email, password, speciality, repeat_password):
+def hash_password(password):
+    h = hashlib.md5(password.encode())
+    p = h.hexdigest()
+    return p
+
+
+
+def registration(fio, email, password, speciality, repeat_password):
     if password.lower() == repeat_password.lower():
+        password = hash_password(password)
         cursor.execute(
-            f"insert into User(fio,username,email, password,speciality) Values('{fio}','{username}','{email}','{password}','{speciality}')")
+            f"insert into User(fio,email, password,speciality) Values('{fio}','{email}','{password}','{speciality}')")
         connection.commit()
         print('Пользователь зарегистрирован!')
         return True
@@ -17,14 +25,16 @@ def registration(fio, username, email, password, speciality, repeat_password):
 
 
 def autorization(email, password):
-    check = cursor.execute(
-        f"select * from user where email='{email}' and password= '{password}'").fetchall()  # [(id, fio...),]
-    if check:
-        print("Успешно авторизирован")
-        return check[0]
-    else:
-        print("Неверный логин или пароль")
-        return False
+    h2 = hashlib.md5(password.encode())
+    checks = cursor.execute(
+        f"select * from user where email='{email}'").fetchall()  # [(id, fio...),]
+    for check in checks:
+        if check[4] == h2.hexdigest():
+            print("Успешно авторизирован")
+            return check
+        else:
+            print("Неверный логин или пароль")
+            return False
 
 
 class Technik:

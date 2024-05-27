@@ -31,7 +31,7 @@ class UserAuthorization(BaseModel):
     password: str
 
 
-def create_session(user_id: str):
+def create_session(user_id):
     return serializer.dumps({"user_id": user_id})
 
 
@@ -110,10 +110,10 @@ async def check_login_password(request: Request, form_data: OAuth2PasswordReques
 
 
 @app.post("/registration", response_class=HTMLResponse)
-async def regist(request: Request, fio: str = Form(...), username: str = Form(...),
+async def regist(request: Request, fio: str = Form(...),
                  email: str = Form(...), password: str = Form(...), speciality: str = Form(...),
                  repeat_password: str = Form(...)):
-    res = registration(fio, username, email, password, speciality, repeat_password)
+    res = registration(fio, email, password, speciality, repeat_password)
     if not res:
         return templates.TemplateResponse("registration.html", {"request": request})
     else:
@@ -263,4 +263,10 @@ async def logout(request: Request):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app",
+                host="0.0.0.0",
+                port=443,
+                reload=True,
+                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
