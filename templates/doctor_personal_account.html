@@ -3,95 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <title>Личный кабинет</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #00CED1;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #00CED1;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        form input[type="submit"] {
+            background-color:#00CED1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #00CED1;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        tr.yellow {
+            background-color: yellow;
+        }
+        tr.green {
+            background-color: #7ef78b;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-<h1>Личный кабинет</h1>
-<h2>Добро пожаловать, {{fio}}!</h2>
-<form method="get" action="/logout">
-    <input type="submit" value="Выход">
-</form>
-<form method="get" action="/order/create">
-    <input type="submit" value="Создать заказ">
-</form>
-<form method="get" action="/order/plan">
-    <input type="submit" value="Создать план лечения">
-</form>
+<header>
+    <h1>Личный кабинет</h1>
+</header>
+<div class="container">
+    <h2>Добро пожаловать, {{fio}}!</h2>
+    <form method="get" action="/logout">
+        <input type="submit" value="Выход">
+    </form>
+    <form method="get" action="/order/create">
+        <input type="submit" value="Создать заказ">
+    </form>
+    <form method="get" action="/order/plan">
+        <input type="submit" value="Создать план лечения">
+    </form>
 
 
-<h2>Невыполненные заказы</h2>
-<table border="1">
-    <tr>
-        <th>ФИО пациента</th>
-        <th>Зубная формула</th>
-        <th>Вид работы</th>
-        <th>Дата сдачи работы</th>
-        <th>Техник</th>
-        <th>Изменить</th>
 
-
-    </tr>
-
-    {% for order in not_done %}
-    <tr>
-        <td>{{order[1]}}</td>
-        <td>{{order[2]}}</td>
-        <td>{{order[3]}}</td>
-        <td>{{order[5]}}</td>
-        <td>{{order[7]}}</td>
-        <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
-    </tr>
-    {% endfor %}
-</table><br><br>
-<h2>Отправлены на примерку</h2>
-<table border="1">
-    <tr>
-        <th>ФИО пациента</th>
-        <th>Зубная формула</th>
-        <th>Вид работы</th>
-        <th>Дата сдачи работы</th>
-        <th>Техник</th>
-        <th>Изменить</th>
-
-
-    </tr>
-
-    {% for order in fitting_done %}
-    <tr style="background-color:yellow">
-
-        <td>{{order[1]}}</td>
-        <td>{{order[2]}}</td>
-        <td>{{order[3]}}</td>
-        <td>{{order[5]}}</td>
-        <td>{{order[7]}}</td>
-        <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
-    </tr>
-    {% endfor %}
-</table><br><br>
-<h2>Выполненные заказы</h2>
-<table border="1">
-    <tr>
-        <th>ФИО пациента</th>
-        <th>Зубная формула</th>
-        <th>Вид работы</th>
-        <th>Дата сдачи работы</th>
-        <th>Техник</th>
-        <th>Изменить</th>
-
-
-    </tr>
-
-    {% for order in done %}
-    <tr style="background-color:#7ef78b">
-        <td>{{order[1]}}</td>
-        <td>{{order[2]}}</td>
-        <td>{{order[3]}}</td>
-        <td>{{order[5]}}</td>
-        <td>{{order[7]}}</td>
-        <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
-    </tr>
-    {% endfor %}
-</table>
-
-
+    <h2>Невыполненные заказы</h2>
+    <table>
+        <tr>
+            <th>ФИО пациента</th>
+            <th>Зубная формула</th>
+            <th>Вид работы</th>
+            <th>Дата сдачи работы</th>
+            <th>Техник</th>
+            <th>Изменить</th>
+        </tr>
+        {% for order in not_done %}
+        <tr>
+            <td>{{order[1]}}</td>
+            <td>{{order[2]}}</td>
+            <td>{{order[3]}}</td>
+            <td>{{order[5]}}</td>
+            <td>{{order[7]}}</td>
+            <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
+        </tr>
+        {% endfor %}
+    </table><br><br>
+    <h2>Отправлены на примерку</h2>
+    <table>
+        <tr>
+            <th>ФИО пациента</th>
+            <th>Зубная формула</th>
+            <th>Вид работы</th>
+            <th>Дата сдачи работы</th>
+            <th>Техник</th>
+            <th>Изменить</th>
+        </tr>
+        {% for order in fitting_done %}
+        <tr class="yellow">
+            <td>{{order[1]}}</td>
+            <td>{{order[2]}}</td>
+            <td>{{order[3]}}</td>
+            <td>{{order[5]}}</td>
+            <td>{{order[7]}}</td>
+            <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
+        </tr>
+        {% endfor %}
+    </table><br><br>
+    <h2>Выполненные заказы</h2>
+    <table>
+        <tr>
+            <th>ФИО пациента</th>
+            <th>Зубная формула</th>
+            <th>Вид работы</th>
+            <th>Дата сдачи работы</th>
+            <th>Техник</th>
+            <th>Изменить</th>
+        </tr>
+        {% for order in done %}
+        <tr class="green">
+            <td>{{order[1]}}</td>
+            <td>{{order[2]}}</td>
+            <td>{{order[3]}}</td>
+            <td>{{order[5]}}</td>
+            <td>{{order[7]}}</td>
+            <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 </body>
 </html>
