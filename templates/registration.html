@@ -15,19 +15,19 @@
             <h1>Регистрация</h1>
             <form method="post" action="/registration">
                 <label for="fio">ФИО:</label>
-                <input type="text" id="fio" name="fio">
+                <input type="text" id="fio" name="fio" required>
 
                 <label for="email">Почта:</label>
-                <input type="email" id="email" name="email">
+                <input type="email" id="email" name="email" required>
 
                 <label for="password">Пароль:</label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required>
 
                 <label for="repeat_password">Повторить пароль:</label>
-                <input type="password" id="repeat_password" name="repeat_password">
+                <input type="password" id="repeat_password" name="repeat_password" required>
 
                 <label for="speciality">Выберите специальность:</label>
-                <select id="speciality" name="speciality">
+                <select id="speciality" name="speciality" required>
                     <option value="doctor">Врач</option>
                     <option value="technik">Зубной техник</option>
                 </select>

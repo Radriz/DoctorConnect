@@ -18,9 +18,9 @@
             <h1>Вход в личный кабинет</h1>
             <form method="post" action="/account/enter">
                 <label for="username">Логин:</label>
-                <input type="text" id="username" name="username">
+                <input type="text" id="username" name="username" required>
                 <label for="password">Пароль:</label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required>
                 {% if wrong_password %}
                 <label class="wrong_pass">Неверный логин или пароль попробуйте еще раз</label><br>
                 {% endif %}
