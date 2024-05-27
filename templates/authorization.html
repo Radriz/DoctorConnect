@@ -14,6 +14,9 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
         }
+        .wrong_pass{
+            color:red;
+        }
         .login-container {
             background-color: #fff;
             padding: 20px;
@@ -60,6 +63,9 @@
         <input type="text" id="username" name="username">
         <label for="password">Пароль:</label>
         <input type="password" id="password" name="password">
+        {% if wrong_password %}
+        <label class="wrong_pass">Неверный логин или пароль попробуйте еще раз</label><br>
+        {% endif %}
         <input type="submit" value="Войти">
     </form><br>
     <form method="get" action="/registration">

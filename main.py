@@ -50,7 +50,7 @@ async def read_item(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def initial(request: Request):
-    return RedirectResponse(url="/authorization")
+    return RedirectResponse(url="/account")
 
 
 @app.get("/registration", response_class=HTMLResponse)
@@ -93,7 +93,7 @@ async def account(request: Request):
                     "not_done": not_done
                 })
 
-    return templates.TemplateResponse("authorization.html", {"request": request})
+    return RedirectResponse(url="/authorization")
 
 
 @app.post("/account/enter", response_class=HTMLResponse)
@@ -106,7 +106,7 @@ async def check_login_password(request: Request, form_data: OAuth2PasswordReques
         response = RedirectResponse(url="/account")
         response.set_cookie(key="session", value=session)
         return response
-    return templates.TemplateResponse("wrong_authorization.html", {"request": request})
+    return templates.TemplateResponse("authorization.html", {"request": request, "wrong_password":True})
 
 
 @app.post("/registration", response_class=HTMLResponse)
@@ -257,16 +257,16 @@ async def delete_order(request: Request, order_id: int):
 
 @app.get("/logout")
 async def logout(request: Request):
-    response = RedirectResponse(url="/")
+    response = RedirectResponse(url="/authorization")
     response.delete_cookie("session")
     return response
 
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                port=443,
-                reload=True,
-                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # uvicorn.run("main:app",
+    #             host="0.0.0.0",
+    #             port=443,
+    #             reload=True,
+    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
