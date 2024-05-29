@@ -143,9 +143,8 @@ def procedure_type():
     return updt_types
 
 def name_procedure(type):
-    x =  f"""select name from procedure where type = '{type}'"""
+    x =  f"""select * from procedure where type = '{type}'"""
     name = cursor.execute(x).fetchall()
-    updt_name = [n[0] for n in name]
-    return updt_name
+    return name
 
 

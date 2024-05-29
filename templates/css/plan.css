@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1 {
+    color: #333;
+}
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 1700px;
+    margin-top: 20px;
+}
+label {
+    font-weight: bold;
+    display: block;
+}
+input[type="text"], select {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.button-tooth {
+    background-color: transparent;
+    border: 2px solid #d8d7db;
+    border-radius: 10px;
+    width: 5.4%;
+    font-size: 100%;
+    display: inline-block;
+    margin: 5px;
+    padding: 10px;
+}
+.button-tooth img {
+    max-width: 100px;
+    width: 100%;
+}
+.button-tooth:hover {
+    background-color: #f2f3f7;
+}
+.procedure_block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.procedure_block .left {
+    display: flex;
+    align-items: center;
+}
+.procedure_block .right {
+    display: flex;
+    align-items: center;
+}
+.procedure_block .left label {
+    margin-left: 10px;
+}
+.procedure_block button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.procedure_block button:hover {
+    background-color: #e0e0e0;
+}
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+@media screen and (max-width: 600px) {
+    .button-tooth {
+        font-size: 60%;
+        width: 10%;
+    }
+    input[type="text"], select {
+        width: calc(100% - 22px);
+    }
+    .procedure_block {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .procedure_block .left, .procedure_block .right {
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+.success {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    width: 50%;
+    margin-bottom: 20px;
+}

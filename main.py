@@ -138,14 +138,23 @@ async def create_order_form(request: Request):
 @app.get("/order/plan", response_class=HTMLResponse)
 async def plan(request: Request):
     types = procedure_type()
-    names = name_procedure(types[0])
     return templates.TemplateResponse("plan.html",{
         "request": request,
         "first_row": first_row,
         "second_row": second_row,
-        "job_types": types,
-        "names": names
+        "job_types": types
     })
+@app.get("/procedure/{type}")
+async def get_name_procedure_by_type(request: Request, type: str):
+    names = name_procedure(type)
+    procedures = {"procedure":[]}
+    for name in names:
+        procedure = {}
+        procedure["id"] = name[0]
+        procedure["name"] = name[2]
+        procedure["price"] = name[3]
+        procedures["procedure"].append(procedure)
+    return procedures
 
 
 @app.post("/order/create", response_class=HTMLResponse)
@@ -263,10 +272,10 @@ async def logout(request: Request):
 
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                port=443,
-                reload=True,
-                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # uvicorn.run("main:app",
+    #             host="0.0.0.0",
+    #             port=443,
+    #             reload=True,
+    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
