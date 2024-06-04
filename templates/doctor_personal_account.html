@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
     <style>
         body {
@@ -10,16 +11,40 @@
             padding: 0;
             background-color: #f4f4f4;
             color: #333;
+            font-family: Georgia, serif;
         }
         header {
-            background-color: #00CED1;
-            color: white;
+            background-color: white;
+            color: #333;
             padding: 10px 0;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            font-family: Georgia, serif;
         }
-        h1 {
-            margin: 0;
+        header h1 {
+            margin-left: 10%;
+            display: flex;
+            align-items: center;
+            font-size: 2.3vh;
         }
+        header img {
+            margin-right: 20px;
+        }
+        header form {
+            margin-right: 10%;
+        }
+        header form input[type="submit"] {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 2vh;
+        }
+
         .container {
             width: 80%;
             margin: 20px auto;
@@ -28,20 +53,40 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         h2 {
-            color: #00CED1;
+            color: black;
         }
-        form {
+        .actions {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
-        form input[type="submit"] {
-            background-color:#00CED1;
+
+        .actions form {
+            width: 48%;
+        }
+
+        .actions input[type="submit"] {
+            background-color: rgb(3,182,236);
             color: white;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 3vh;
+            width: 100%;
+            white-space: normal;
+            text-align: center;
+            height: 20vh;
+            font-weight: bold;
         }
+
+        @media (min-width: 768px) {
+            .actions input[type="submit"] {
+                font-size: 4vh;
+            }
+        }
+
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -81,21 +126,24 @@
 </head>
 <body>
 <header>
-    <h1>Личный кабинет</h1>
-</header>
-<div class="container">
-    <h2>Добро пожаловать, {{fio}}!</h2>
+    <h1>
+        <img src="/images/logo.png" alt="Логотип" width="100" height="65">
+        Личный кабинет
+    </h1>
     <form method="get" action="/logout">
         <input type="submit" value="Выход">
     </form>
-    <form method="get" action="/order/create">
-        <input type="submit" value="Создать заказ">
-    </form>
-    <form method="get" action="/order/plan">
-        <input type="submit" value="Создать план лечения">
-    </form>
-
-
+</header>
+<div class="container">
+    <h2>Добро пожаловать, {{fio}}!</h2>
+    <div class="actions">
+        <form method="get" action="/order/create" style="display: inline;">
+            <input type="submit" value="Создать заказ">
+        </form>
+        <form method="get" action="/order/plan" style="display: inline;">
+            <input type="submit" value="Создать план лечения">
+        </form>
+    </div>
 
     <h2>Невыполненные заказы</h2>
     <table>
