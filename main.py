@@ -66,8 +66,24 @@ async def account(request: Request):
         user = get_user(user_id)
         if user[5] == "doctor":
             orders = get_orders_doctor(user[0])
+            for i in range(len(orders)):
+                orders[i] = list(orders[i])
+                data = orders[i][5].split("-")
+                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
+                technik = get_user(orders[i][7])
+                orders[i][7] = technik[1]
+
         else:
             orders = get_orders_technik(user[0])
+            for i in range(len(orders)):
+                orders[i] = list(orders[i])
+                data = orders[i][5].split("-")
+                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
+                doctor = get_user(orders[i][6])
+                if doctor[6] is not None:
+                    orders[i][6] = f"{doctor[1]} ({doctor[6]})"
+                else:
+                    orders[i][6] = f"{doctor[1]}"
 
         done = [order for order in orders if order[9] == 1]
         fitting_done = [order for order in orders if order[9] == 0 and order[12] == 1]
@@ -272,10 +288,10 @@ async def logout(request: Request):
 
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                port=443,
-                reload=True,
-                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # uvicorn.run("main:app",
+    #             host="0.0.0.0",
+    #             port=443,
+    #             reload=True,
+    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")

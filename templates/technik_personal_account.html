@@ -3,91 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <title>Личный кабинет</title>
+    <link rel="stylesheet" href="/css/technik_personal_account.css">
 </head>
 <body>
-<h1>Личный кабинет</h1>
-<h2>Добро пожаловать, {{fio}}!</h2>
-<form method="get" action="/">
-    <input type="submit" value="Выход">
-
-</form>
-<h2>Невыполненные заказы</h2>
-<table border="1">
-    <tr>
-        <th>ФИО пациента</th>
-        <th>Зубная формула</th>
-        <th>Вид работы</th>
-        <th>Дата сдачи работы</th>
-        <th>Врач</th>
-        <th>Подробнее</th>
-
-
-    </tr>
-
-    {% for order in not_done %}
-    <tr>
-        <td>{{order[1]}}</td>
-        <td>{{order[2]}}</td>
-        <td>{{order[3]}}</td>
-        <td>{{order[5]}}</td>
-        <td>{{order[6]}}</td>
-        <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
-    </tr>
-    {% endfor %}
-</table><br><br>
-<h2>Отправлены на примерку</h2>
-<table border="1">
-    <tr>
-        <th>ФИО пациента</th>
-        <th>Зубная формула</th>
-        <th>Вид работы</th>
-        <th>Дата сдачи работы</th>
-        <th>Врач</th>
-        <th>Подробнее</th>
-
-
-    </tr>
-
-    {% for order in fitting_done %}
-    <tr style="background-color:yellow">
-
-        <td>{{order[1]}}</td>
-        <td>{{order[2]}}</td>
-        <td>{{order[3]}}</td>
-        <td>{{order[5]}}</td>
-        <td>{{order[6]}}</td>
-        <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
-    </tr>
-    {% endfor %}
-</table><br><br>
-<h2>Выполненные заказы</h2>
-<table border="1">
-    <tr>
-        <th>ФИО пациента</th>
-        <th>Зубная формула</th>
-        <th>Вид работы</th>
-        <th>Дата сдачи работы</th>
-        <th>Врач</th>
-        <th>Подробнее</th>
-
-
-    </tr>
-
-    {% for order in done %}
-    <tr style="background-color:#7ef78b">
-        <td>{{order[1]}}</td>
-        <td>{{order[2]}}</td>
-        <td>{{order[3]}}</td>
-        <td>{{order[5]}}</td>
-        <td>{{order[6]}}</td>
-        <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
-    </tr>
-    {% endfor %}
-</table>
-
-
-
-
-
+<header>
+    <h1>Личный кабинет</h1>
+    <form method="get" action="/logout">
+        <input type="submit" value="Выход">
+    </form>
+</header>
+<div class="container">
+    <h2>Добро пожаловать, {{fio}}!</h2>
+    <div class="table-container">
+        <h2>Невыполненные заказы</h2>
+        <table>
+            <tr>
+                <th>Врач</th>
+                <th>ФИО пациента</th>
+                <th>Зубная формула</th>
+                <th>Вид работы</th>
+                <th>Дата сдачи работы</th>
+                <th>Подробнее</th>
+            </tr>
+            {% for order in not_done %}
+            <tr>
+                <td>{{order[6]}}</td>
+                <td>{{order[1]}}</td>
+                <td>{{order[2]}}</td>
+                <td>{{order[3]}}</td>
+                <td>{{order[5]}}</td>
+                <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="table-container">
+        <h2>Отправлены на примерку</h2>
+        <table>
+            <tr>
+                <th>Врач</th>
+                <th>ФИО пациента</th>
+                <th>Зубная формула</th>
+                <th>Вид работы</th>
+                <th>Дата сдачи работы</th>
+                <th>Подробнее</th>
+            </tr>
+            {% for order in fitting_done %}
+            <tr class="yellow">
+                <td>{{order[6]}}</td>
+                <td>{{order[1]}}</td>
+                <td>{{order[2]}}</td>
+                <td>{{order[3]}}</td>
+                <td>{{order[5]}}</td>
+                <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="table-container">
+        <h2>Выполненные заказы</h2>
+        <table>
+            <tr>
+                <th>Врач</th>
+                <th>ФИО пациента</th>
+                <th>Зубная формула</th>
+                <th>Вид работы</th>
+                <th>Дата сдачи работы</th>
+                <th>Подробнее</th>
+            </tr>
+            {% for order in done %}
+            <tr class="green">
+                <td>{{order[6]}}</td>
+                <td>{{order[1]}}</td>
+                <td>{{order[2]}}</td>
+                <td>{{order[3]}}</td>
+                <td>{{order[5]}}</td>
+                <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 </body>
 </html>
