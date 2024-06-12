@@ -26,8 +26,10 @@ buttonTooth.forEach(function(button) {
         event.preventDefault();
    });
 });
+
 document.addEventListener('DOMContentLoaded', function() {
     buttonTooth.forEach(function(button) {
+        console.log(button.style.backgroundColor);
         if (button.style.backgroundColor == "rgb(126, 247, 139)"){
          toothNumbers.push(button.innerText.trim())
         }

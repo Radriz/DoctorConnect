@@ -26,6 +26,14 @@
             <label>ФИО пациента:</label>
             <input type="text" name="patient" required><br><br>
         </div>
+        <div class="form-group">
+            <label for="technik">Выберите техника:</label>
+            <select id="technik" name="technik">
+                {% for technik in techniks %}
+                <option value="{{technik.id}}">{{technik.name}}</option>
+                {% endfor %}
+            </select><br><br>
+        </div>
         <div class="tooth-selection-container">
             <div class="tooth-selection">
                 {% for tooth in first_row %}
@@ -86,14 +94,7 @@
             <label>Дата сдачи работы:</label>
             <input type="date" name="deadline" required><br><br>
         </div>
-        <div class="form-group">
-            <label for="technik">Выберите техника:</label>
-            <select id="technik" name="technik">
-                {% for technik in techniks %}
-                <option value="{{technik.id}}">{{technik.name}}</option>
-                {% endfor %}
-            </select><br><br>
-        </div>
+
         <input id="submit" type="submit" value="Создать" class="create">
     </form>
 </div>
