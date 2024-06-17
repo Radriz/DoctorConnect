@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi import FastAPI, Form, Depends, HTTPException, Request
+from fastapi.openapi.models import Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
@@ -29,6 +30,18 @@ serializer = URLSafeSerializer(SECRET_KEY)
 class UserAuthorization(BaseModel):
     email: str
     password: str
+
+
+class Order(BaseModel):
+    patient: str
+    formula: str
+    type: str
+    comment: str
+    fitting: str
+    deadline: str
+    technik: str
+    color_letter: str
+    color_number: str
 
 
 def create_session(user_id):
@@ -122,7 +135,7 @@ async def check_login_password(request: Request, form_data: OAuth2PasswordReques
         response = RedirectResponse(url="/account")
         response.set_cookie(key="session", value=session)
         return response
-    return templates.TemplateResponse("authorization.html", {"request": request, "wrong_password":True})
+    return templates.TemplateResponse("authorization.html", {"request": request, "wrong_password": True})
 
 
 @app.post("/registration", response_class=HTMLResponse)
@@ -151,19 +164,22 @@ async def create_order_form(request: Request):
         "color_number": color_number
     })
 
+
 @app.get("/order/plan", response_class=HTMLResponse)
 async def plan(request: Request):
     types = procedure_type()
-    return templates.TemplateResponse("plan.html",{
+    return templates.TemplateResponse("plan.html", {
         "request": request,
         "first_row": first_row,
         "second_row": second_row,
         "job_types": types
     })
+
+
 @app.get("/procedure/{type}")
 async def get_name_procedure_by_type(request: Request, type: str):
     names = name_procedure(type)
-    procedures = {"procedure":[]}
+    procedures = {"procedure": []}
     for name in names:
         procedure = {}
         procedure["id"] = name[0]
@@ -174,28 +190,24 @@ async def get_name_procedure_by_type(request: Request, type: str):
 
 
 @app.post("/order/create", response_class=HTMLResponse)
-async def add_order(request: Request, patient: str = Form(...), formula: str = Form(...),
-                    type: str = Form(...), comment: str = Form(""), fitting: str = Form(...),
-                    deadline: str = Form(...), technik: str = Form(...), color_letter: str = Form(...),
-                    color_number: str = Form(...)):
+async def add_order(request: Request, order: Order):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie)
     doctor = get_user(user_id)
-    techniks = find_techniks()
 
-    create_order(patient, formula, type, comment, fitting, deadline, int(technik), doctor[0],
-                 color_letter, color_number)
-    return templates.TemplateResponse("create_order.html", {
-        "request": request,
-        "success": True,
-        "first_row": first_row,
-        "second_row": second_row,
-        "selected_tooth": [],
-        "job_types": types,
-        "color_letter": color_letter,
-        "color_number": color_number,
-        "techniks": techniks,
-    })
+    create_order(
+        order.patient,
+        order.formula,
+        order.type,
+        order.comment,
+        order.fitting,
+        order.deadline,
+        int(order.technik),
+        doctor[0],
+        order.color_letter,
+        order.color_number
+    )
+    return Response(content = "Успешно!", status_code=200, type="application/text")
 
 
 @app.post("/order/update/{order_id}", response_class=HTMLResponse)
@@ -288,10 +300,10 @@ async def logout(request: Request):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    # uvicorn.run("main:app",
-    #             host="0.0.0.0",
-    #             port=443,
-    #             reload=True,
-    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app",
+                host="0.0.0.0",
+                port=443,
+                reload=True,
+                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")

@@ -10,6 +10,7 @@ body {
     font-size: 20px;
 }
 hr{
+    width: 100%;
     border: 1px solid black;
 
 }
@@ -104,16 +105,18 @@ input[type="submit"]:hover {
 }
 
 .tooth-selection-container {
-    position: relative;
+    overflow-x: auto;
+    white-space: nowrap;
+
 }
 
 .tooth-selection {
-    display: flex;
-    flex-wrap: wrap;
+    display: flex
+    flex-wrap: nowrap;
     justify-content: space-around;
     margin-bottom: 20px;
     margin-top: 20px;
-    position: relative;
+    position:sticky;
 }
 
 .separator {
@@ -123,14 +126,15 @@ input[type="submit"]:hover {
     position: absolute;
     left: 50%;
     top: -20px; /* Adjust the top position to ensure the separator spans both rows */
-    z-index: 0;
+    z-index: +1;
+    y-index: +1;
 }
 
 .button-tooth {
     background-color: transparent;
     border: 2px solid #d8d7db;
     border-radius: 10px;
-    width: 5.4%;
+    width: 100px;
     font-size: 100%;
     padding: 10px;
     cursor: pointer;
@@ -153,13 +157,59 @@ input[type="submit"]:hover {
     border-color: #4CAF50;
 }
 
-@media screen and (max-width: 600px) {
-    .button-tooth {
-        font-size: 60%;
-        width: 10%;
-    }
+@media screen and (max-width: 900px) {
+
 
     .container {
         padding: 10px;
     }
+}
+
+
+/* Стили для order-block */
+.order-block {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Стили для кнопки удаления */
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+/* Стили для кнопки добавления */
+.add-order-button {
+    text-align: center;
+    margin-top: 30px;
+
+}
+
+.add-order-button button {
+    margin-bottom: 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.add-order-button button:hover {
+    background: #0056b3;
 }

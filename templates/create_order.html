@@ -21,19 +21,19 @@
         <h2>Заказ отправлен успешно</h2>
     </div>
     {% endif %}
-    <form id="order_form" method="post" action="/order/create">
-        <div class="form-group">
-            <label>ФИО пациента:</label>
-            <input type="text" name="patient" required><br><br>
-        </div>
-        <div class="form-group">
-            <label for="technik">Выберите техника:</label>
-            <select id="technik" name="technik">
-                {% for technik in techniks %}
-                <option value="{{technik.id}}">{{technik.name}}</option>
-                {% endfor %}
-            </select><br><br>
-        </div>
+    <div class="form-group">
+        <label>ФИО пациента:</label>
+        <input id="fio" type="text" name="patient" required><br><br>
+    </div>
+    <div class="form-group">
+        <label for="technik">Выберите техника:</label>
+        <select id="technik" name="technik">
+            {% for technik in techniks %}
+            <option value="{{technik.id}}">{{technik.name}}</option>
+            {% endfor %}
+        </select><br><br>
+    </div>
+    <div id="order-container" class="order-block">
         <div class="tooth-selection-container">
             <div class="tooth-selection">
                 {% for tooth in first_row %}
@@ -84,19 +84,26 @@
         </div>
         <div class="form-group">
             <label>Комментарии:</label>
-            <input type="text" name="comment" value=""><br><br>
+            <input id="text" type="text" name="comment" value=""><br><br>
         </div>
         <div class="form-group">
             <label>Дата примерка:</label>
-            <input type="date" name="fitting"><br><br>
+            <input id="date_fitting" type="date" name="fitting"><br><br>
         </div>
         <div class="form-group">
             <label>Дата сдачи работы:</label>
-            <input type="date" name="deadline" required><br><br>
+            <input id="date_deadline" type="date" name="deadline" required><br><br>
         </div>
+        <div class="delete-button">
+            <button class="delete-btn" onclick="deleteOrderBlock(this)">×</button>
+        </div>
+    </div>
 
-        <input id="submit" type="submit" value="Создать" class="create">
-    </form>
+    <div id="add-order" class="add-order-button">
+        <button onclick="addOrderBlock()">Добавить работу</button>
+    </div>
+
+    <input id="submit" type="submit" value="Создать" class="create">
 </div>
 <script src="/js/create_order.js"></script>
 </body>
