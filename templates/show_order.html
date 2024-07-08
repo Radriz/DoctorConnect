@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Просмотр заказа</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/create_order.css">
+    <link rel="stylesheet" href="/css/edit_order.css">
+
 </head>
 
 <body>
@@ -18,9 +19,9 @@
     </form>
 
     <div class="form-group">
-        <label>ФИО пациента:</label>
-        <input name="patient" value="{{order[1]}}"><br><br>
-    </div>
+            <label>ФИО пациента:</label>
+            <input type="text" value="{{order[1]}}" name="patient" required><br><br>
+        </div>
 
     <div class="tooth-selection-container">
         <div class="tooth-selection">
@@ -77,16 +78,17 @@
         <label for="doctor">Доктор:</label>
         <input id="doctor" type="text" name="doctor" value="{{doctor[1]}}"><br><br>
     </div>
-
+    <div class="button-group">
     <form id="fitting_done_form" method="post" action="/order/done/fitting/{{order[0]}}">
         <input type="checkbox" name="fitting_done" id="fitting_done" {% if order[12] %} checked {% endif %}>
-        <label for="fitting_done">Готова к примерке</label>
+        <label class="button-action" for="fitting_done">Готова к примерке</label>
     </form>
 
     <form id="done_form" method="post" action="/order/done/{{order[0]}}">
         <input type="checkbox" name="done" id="done"  {% if order[9] %} checked {% endif %}>
-        <label for="done">Заказ выполнен</label>
+        <label class="button-action" for="done">Заказ выполнен</label>
     </form>
+</div>
 </div>
 
 <script src="/js/show_order.js"></script>

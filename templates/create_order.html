@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Создание заказа</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/create_order.css">
+    <link rel="stylesheet" href="/css/edit_order.css">
+    <link rel="stylesheet" href="/css/tooth.css">
 </head>
 
 <body>
@@ -40,10 +41,17 @@
                 {% if tooth == 21 %}
                 <div class="separator"></div>
                 {% endif %}
-                <button class="button-tooth {% if tooth in selected_tooth %}selected{% endif %}">
+                {% if tooth in selected_tooth %}
+                <button style="background-color:#7ef78b" class="button-tooth">
                     <img src="/images/tooth.png" alt="Tooth"><br>
                     {{tooth}}
                 </button>
+                {% else %}
+                <button class="button-tooth">
+                    <img src="/images/tooth.png" alt="Tooth"><br>
+                    {{tooth}}
+                </button>
+                {% endif %}
                 {% endfor %}
             </div>
             <hr>
@@ -52,10 +60,17 @@
                 {% if tooth == 31 %}
                 <div class="separator"></div>
                 {% endif %}
-                <button class="button-tooth {% if tooth in selected_tooth %}selected{% endif %}">
+                {% if tooth in selected_tooth %}
+                <button style="background-color:#7ef78b" class="button-tooth">
                     <img src="/images/tooth.png" alt="Tooth"><br>
                     {{tooth}}
                 </button>
+                {% else %}
+                <button class="button-tooth">
+                    <img src="/images/tooth.png" alt="Tooth"><br>
+                    {{tooth}}
+                </button>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -103,7 +118,7 @@
         <button onclick="addOrderBlock()">Добавить работу</button>
     </div>
 
-    <input id="submit" type="submit" value="Создать" class="create">
+    <input id="submit" type="submit" value="Создать" class="personal">
 </div>
 <script src="/js/create_order.js"></script>
 </body>

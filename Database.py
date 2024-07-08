@@ -142,9 +142,71 @@ def procedure_type():
     updt_types = [t[0] for t in type]
     return updt_types
 
-def name_procedure(type):
-    x =  f"""select * from procedure where type = '{type}'"""
+def name_procedure(type,subtype):
+    x =  f"""select * from procedure where type = '{type}' and subtype= '{subtype}'"""
     name = cursor.execute(x).fetchall()
     return name
+
+def get_subtype_by_type(type):
+    subtype = cursor.execute(
+        f"""select subtype from procedure where type = '{type}'"""
+    ).fetchall()
+    subtype_list = list(set([sub[0] for sub in subtype ]))
+    return subtype_list
+
+def get_template_procedure(type,user_id):
+    templates = cursor.execute(
+        f"""select template.id,template.name, procedure.id,
+        procedure.name,procedure.subtype,procedure.price,user_procedure.id,user_procedure.name,
+        user_procedure.price,template_procedure.amount from template
+        left join template_procedure on template_procedure.template_id = template.id 
+        left join procedure on template_procedure.procedure_id = procedure.id
+        left join user_procedure on template_procedure.user_procedure_id = user_procedure.id
+        where (procedure.type = '{type}' or user_procedure.type = '{type}')
+        and (template.user_id = {user_id} or template.user_id is null) order by template_procedure.id"""
+    ).fetchall()
+    return templates
+
+def create_template_procedure(template_name,user_id):
+    id = cursor.execute(
+        f"""insert into template(name,user_id) 
+            Values('{template_name}',{user_id}) returning id""").fetchone()
+    connection.commit()
+    return id[0]
+
+def delete_template_procedure_by_id(id,user_id):
+    cursor.execute(
+        f"""delete from template where id = {id} and user_id={user_id}""")
+    connection.commit()
+def add_procedure_to_template(name,type,price,template_id,amount):
+    user_procedure_id = cursor.execute(
+        f"""insert into user_procedure(name,type,price) 
+              Values('{name}','{type}',{price}) returning id""").fetchone()
+    connection.commit()
+    print(template_id, user_procedure_id, amount)
+    cursor.execute(
+        f"""insert into template_procedure(template_id, user_procedure_id, amount) 
+                  Values({template_id},{user_procedure_id[0]},{amount})""")
+    connection.commit()
+
+def edit_user_procedure(id,name,type,price):
+    cursor.execute(
+        f"""update user_procedure set name = '{name}',
+            type = '{type}',
+            price = '{price}'
+            where id = {id}""")
+    connection.commit()
+
+def delete_user_procedure(id):
+    cursor.execute(
+        f"""delete from user_procedure where id = {id}""")
+    connection.commit()
+
+def update_amount_procedure_template(procedure_id,template_id,amount):
+    cursor.execute(
+        f"""update template_procedure set amount = {amount}
+                where user_procedure_id = {procedure_id} and 
+                template_id = {template_id} """)
+    connection.commit()
 
 

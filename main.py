@@ -12,7 +12,9 @@ from itsdangerous import URLSafeSerializer, BadSignature
 
 from Database import autorization, registration, find_techniks, get_user, create_order, get_orders_doctor, \
     get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id, procedure_type, \
-    name_procedure
+    name_procedure, get_subtype_by_type, get_template_procedure, create_template_procedure, \
+    delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
+    update_amount_procedure_template
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
@@ -42,6 +44,18 @@ class Order(BaseModel):
     technik: str
     color_letter: str
     color_number: str
+
+
+class TemplateProcedure(BaseModel):
+    template_name: str
+
+
+class Procedure(BaseModel):
+    name: str
+    type: str
+    price: int
+    template_id: int
+    amount: int
 
 
 def create_session(user_id):
@@ -176,9 +190,9 @@ async def plan(request: Request):
     })
 
 
-@app.get("/procedure/{type}")
-async def get_name_procedure_by_type(request: Request, type: str):
-    names = name_procedure(type)
+@app.get("/procedure/get/{type}/{subtype}")
+async def get_name_procedure_by_type(request: Request, type: str, subtype: str):
+    names = name_procedure(type, subtype)
     procedures = {"procedure": []}
     for name in names:
         procedure = {}
@@ -207,7 +221,7 @@ async def add_order(request: Request, order: Order):
         order.color_letter,
         order.color_number
     )
-    return Response(content = "Успешно!", status_code=200, type="application/text")
+    return Response(content="Успешно!", status_code=200, type="application/text")
 
 
 @app.post("/order/update/{order_id}", response_class=HTMLResponse)
@@ -272,6 +286,72 @@ async def get_order(request: Request, order_id: int):
         })
 
 
+@app.get("/procedure/subtype/{type}")
+async def get_subtype(request: Request, type: str):
+    return get_subtype_by_type(type)
+
+
+@app.get("/procedure/template/get/{type}")
+async def get_subtype(request: Request, type: str):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    templates = get_template_procedure(type, user_id)
+    templates_dict = {}
+    # {1:
+    # {"name" : "Лечение прямого кариеса", "price" : 7500, "procedure" :[
+    # {""}, {}, {}
+    # ]  }
+    for template in templates:
+        if template[0] not in templates_dict:
+            templates_dict[template[0]] = {"name": template[1], "price": 0, "procedure": []}
+
+        templates_dict[template[0]]["procedure"].append({
+            "id": template[2] if template[2] is not None else template[6],
+            "type": "template" if template[2] is not None else 'user',
+            "name": template[3] if template[3] is not None else template[7],
+            "price": template[5] if template[5] is not None else template[8],
+            "amount": template[9]
+        })
+        templates_dict[template[0]]["price"] += template[5] if template[5] is not None else template[8]
+    return templates_dict
+
+
+@app.post("/procedure/template/create/")
+async def save_template(request: Request, templateProcedure: TemplateProcedure):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    new_template = create_template_procedure(templateProcedure.template_name, user_id)
+    return {'id': new_template}
+
+
+@app.post("/procedure/user/")
+async def procedure(request: Request, procedure: Procedure):
+    add_procedure_to_template(procedure.name, procedure.type, procedure.price, procedure.template_id, procedure.amount)
+    return {"result": 'Done'}
+
+@app.put("/procedure/user/{id}")
+async def procedure(request: Request,id: int, procedure: Procedure):
+    edit_user_procedure(id, procedure.name, procedure.type, procedure.price)
+    print(id, procedure.template_id,procedure.amount)
+    update_amount_procedure_template(id, procedure.template_id,procedure.amount)
+    return {"result": 'Done'}
+
+@app.delete("/procedure/user/{id}")
+async def procedure(request: Request,id: int):
+    delete_user_procedure(id)
+    return {"result": 'Done'}
+
+
+@app.delete("/procedure/template/{template_id}")
+async def save_template(request: Request, template_id: int):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    delete_template_procedure_by_id(template_id, user_id)
+    return {"result": 'Done'}
+
+
 @app.post("/order/done/{order_id}")
 async def save_done_order(request: Request, order_id: int, done: str = Form('off')):
     done = 1 if done == 'on' else 0
@@ -300,10 +380,10 @@ async def logout(request: Request):
 
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                port=443,
-                reload=True,
-                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # uvicorn.run("main:app",
+    #             host="0.0.0.0",
+    #             port=443,
+    #             reload=True,
+    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")

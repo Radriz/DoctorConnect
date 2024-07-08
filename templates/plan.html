@@ -2,65 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>=Создание плана лечения</title>
+    <title>Создание плана лечения</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/plan.css">
+    <link rel="stylesheet" href="/css/tooth.css">
 </head>
 
 <body>
 
 <h1>Создание заказа</h1>
-<form method="get" action="/account">
-    <input type="submit" value="Личный кабинет">
-</form>
-<form id="procedure_form" method="post" action="/order/plan">
-    <label>ФИО пациента:</label>
-    <input name="patient" required><br><br>
-    {% for tooth in first_row %}
-    {% if tooth in selected_tooth %}
-    <button style="background-color:#7ef78b" class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% else %}
-    <button class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% endif %}
-    {% endfor %}
-    <br>
-    {% for tooth in second_row %}
-    {% if tooth in selected_tooth %}
-    <button style="background-color:#7ef78b" class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% else %}
-    <button class="button-tooth">
-        <img src="/images/tooth.png" alt="Tooth"><br>
-        {{tooth}}
-    </button>
-    {% endif %}
-    {% endfor %}
-    <br><br>
+<div class="plan" id="procedure_form">
+    <form method="get" action="/account">
+        <input class="personal" type="submit" value="Личный кабинет">
+    </form>
+    <label class = "label">ФИО пациента:</label>
+    <input type="text" name="patient" required>
+    <div id="procedure-container" class="procedure-block">
+        <div class="scroll-container">
+            <div class="tooth-selection-container">
+                <div class="tooth-selection">
+                    {% for tooth in first_row %}
+                    {% if tooth == 21 %}
+                    <div class="separator"></div>
+                    {% endif %}
+                    {% if tooth in selected_tooth %}
+                    <button style="background-color:#7ef78b" class="button-tooth">
+                        <img src="/images/tooth.png" alt="Tooth"><br>
+                        {{tooth}}
+                    </button>
+                    {% else %}
+                    <button class="button-tooth">
+                        <img src="/images/tooth.png" alt="Tooth"><br>
+                        {{tooth}}
+                    </button>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="tooth-selection">
+                    {% for tooth in second_row %}
+                    {% if tooth == 31 %}
+                    <div class="separator"></div>
+                    {% endif %}
+                    {% if tooth in selected_tooth %}
+                    <button style="background-color:#7ef78b" class="button-tooth">
+                        <img src="/images/tooth.png" alt="Tooth"><br>
+                        {{tooth}}
+                    </button>
+                    {% else %}
+                    <button class="button-tooth">
+                        <img src="/images/tooth.png" alt="Tooth"><br>
+                        {{tooth}}
+                    </button>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
+        <label class = "label">Направление:</label>
+        <select id="procedure-select" name="type">
+            <option value="None" disabled selected hidden>Выбрать направление</option>
+            {% for type in job_types %}
+            <option value="{{type}}">{{type}}</option>
+            {% endfor %}
+        </select>
+        <div class="button-group">
+            <button id="template" type="submit" onclick="addTemplate()" class="button-action">Готовый прайс</button>
+            <button id="manual" type="submit" class="button-action">Собрать вручную</button>
+        </div>
+        <select id="sub-procedure" name="type" style="display: none">
 
-    <label>Направление:</label>
-    <select id="procedure-select" name="type">
-         <option value="None">Выбрать направление</option>
-        {% for type in job_types %}
-        <option value="{{type}}">{{type}}</option>
-        {% endfor %}
+            <option value="None" disabled selected hidden>Выбрать поднаправление</option>
 
-    </select><br><br>
+        </select>
 
-    <div id="all_procedure">
+        <div id="all_procedure">
 
+        </div>
+        <div class="delete-button">
+            <button class="delete-btn" onclick="deleteOrderBlock(this)">×</button>
+        </div>
+    </div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+            <button onclick="addNewField()">Добавить услугу</button>
+            <button id = "saveProcedures">Сохранить</button>
+        </div>
     </div>
 
-    <input id="submit" type="submit" value="Создать">
-</form>
+    <div id="add-order" class="add-procedure-button">
+        <button onclick="addOrderBlock()">Добавить работу</button>
+      </div>
+
+    <input id="submit" type="submit" value="Создать" class="personal">
+</div>
 <script src="/js/create_order.js"></script>
 <script src="/js/plan.js"></script>
+
 </body>
 </html>

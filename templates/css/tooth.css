@@ -1,0 +1,67 @@
+hr {
+    border: 1px solid black;
+    width: 1650px;
+}
+
+.scroll-container {
+    overflow-x: auto; /* Включаем горизонтальную прокрутку */
+    overflow-y: hidden; /* Скрываем вертикальную прокрутку */
+    white-space: nowrap; /* Запрещаем перенос строк внутри контейнера */
+    margin-bottom: 10px;
+}
+
+.tooth-selection {
+    display: inline-block;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    position: sticky;
+}
+
+
+
+
+.separator {
+    width: 2px;
+    background-color: #000;
+    height: calc(100% + 40px); /* Adjust the height to ensure the separator spans both rows */
+    position: absolute;
+    left: 50%;
+    top: -20px; /* Adjust the top position to ensure the separator spans both rows */
+    z-index: 0;
+}
+
+.button-tooth {
+    background-color: transparent;
+    border: 2px solid #d8d7db;
+    border-radius: 10px;
+    width: 92px;
+    font-size: 100%;
+    margin: 5px;
+    padding: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.button-tooth img {
+    max-width: 100px;
+    width: 100%;
+}
+
+.button-tooth:hover {
+    background-color: #f2f3f7;
+}
+
+.button-tooth.selected {
+    background-color: #7ef78b;
+    border-color: #4CAF50;
+}
+
+@media screen and (max-width: 600px) {
+    .button-tooth {
+        width: 50px;
+    }
+     hr {
+        border: 1px solid black;
+        width: 1020px;
+    }
+}
