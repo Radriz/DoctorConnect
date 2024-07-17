@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выпадающий список с фотографиями</title>
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 80px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content img {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            border: 1px solid black;
+            border-radius: 20px;
+        }
+
+        .dropdown-content div {
+            padding: 8px 16px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown button img {
+            width: 50px;
+            height: auto;
+        }
+        .dropdown button {
+            background-color: white;
+            border: 1px solid black;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dropdown">
+        <button id="dropdownButton">
+            Выбрать фотографию
+        </button>
+        <div class="dropdown-content" id="dropdownContent">
+            <div>
+                <img src="images/stickers/core_tab.png" alt="Фото 1" onclick="selectImage(event.target.src)">
+            </div>
+            <div>
+                <img src="images/stickers/implant.png" alt="Фото 2" onclick="selectImage(event.target.src)">
+            </div>
+            <div>
+                <img src="images/stickers/seal.png" alt="Фото 3" onclick="selectImage(event.target.src)">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownContent = document.getElementById('dropdownContent');
+
+        dropdownButton.addEventListener('click', function() {
+            dropdownContent.classList.toggle('show');
+        });
+
+        function selectImage(selectedImage) {
+            dropdownButton.innerHTML = `<img src="${selectedImage}" alt="Selected Image">`;
+            dropdownContent.classList.remove('show');
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('#dropdownButton') && !event.target.matches('#dropdownButton img')) {
+                if (dropdownContent.classList.contains('show')) {
+                    dropdownContent.classList.remove('show');
+                }
+            }
+        }
+        selectImage('images/stickers/core_tab.png')
+    </script>
+</body>
+</html>

@@ -15,8 +15,8 @@
     <form method="get" action="/account">
         <input class="personal" type="submit" value="Личный кабинет">
     </form>
-    <label class = "label">ФИО пациента:</label>
-    <input type="text" name="patient" required>
+    <label class="label">ФИО пациента:</label>
+    <input type="text" class="fio" name="patient" required>
     <div id="procedure-container" class="procedure-block">
         <div class="scroll-container">
             <div class="tooth-selection-container">
@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <label class = "label">Направление:</label>
+        <label class="label">Направление:</label>
         <select id="procedure-select" name="type">
             <option value="None" disabled selected hidden>Выбрать направление</option>
             {% for type in job_types %}
@@ -68,8 +68,8 @@
             {% endfor %}
         </select>
         <div class="button-group">
-            <button id="template" type="submit" onclick="addTemplate()" class="button-action">Готовый прайс</button>
-            <button id="manual" type="submit" class="button-action">Собрать вручную</button>
+            <button id="template" type="submit" style="display: none" onclick="addTemplate()" class="button-action">Готовый прайс</button>
+            <button id="manual" type="submit" style="display: none" class="button-action">Собрать вручную</button>
         </div>
         <select id="sub-procedure" name="type" style="display: none">
 
@@ -88,14 +88,16 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <div id="modal-body"></div>
-            <button onclick="addNewField()">Добавить услугу</button>
-            <button id = "saveProcedures">Сохранить</button>
+            <div class="button-group" style="margin-bottom : 0px;margin-top : 20px; ">
+                <button  class="button-action" onclick="addNewField()">Добавить услугу</button>
+                <button  class="button-action" id="saveProcedures">Сохранить</button>
+            </div>
         </div>
     </div>
 
     <div id="add-order" class="add-procedure-button">
         <button onclick="addOrderBlock()">Добавить работу</button>
-      </div>
+    </div>
 
     <input id="submit" type="submit" value="Создать" class="personal">
 </div>

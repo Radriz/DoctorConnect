@@ -158,7 +158,7 @@ def get_template_procedure(type,user_id):
     templates = cursor.execute(
         f"""select template.id,template.name, procedure.id,
         procedure.name,procedure.subtype,procedure.price,user_procedure.id,user_procedure.name,
-        user_procedure.price,template_procedure.amount from template
+        user_procedure.price,template_procedure.amount,template.stick from template
         left join template_procedure on template_procedure.template_id = template.id 
         left join procedure on template_procedure.procedure_id = procedure.id
         left join user_procedure on template_procedure.user_procedure_id = user_procedure.id
@@ -208,5 +208,13 @@ def update_amount_procedure_template(procedure_id,template_id,amount):
                 where user_procedure_id = {procedure_id} and 
                 template_id = {template_id} """)
     connection.commit()
+
+def update_template_name(template_id,template_name,user_id):
+    cursor.execute(
+        f"""update template set name = '{template_name}'
+                    where id = {template_id} and user_id = {user_id}
+                    """)
+    connection.commit()
+
 
 

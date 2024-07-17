@@ -32,12 +32,14 @@ select {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-input[type="text"] {
-    width: calc(100% - 20px);
+input[type="text"], input[type="number"] {
     padding: 10px;
     margin-bottom: 30px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+.fio{
+    width: calc(100% - 20px);
 }
 .button-tooth {
     background-color: transparent;
@@ -115,7 +117,11 @@ input[type="submit"]:hover {
     width: 100%;
     margin-bottom: 10px
 }
-
+.modal-template-name {
+    width: 100%;
+    max-width: 600px;
+    font-size: 20px;
+}
 .button-action {
     background: #28a745;
     color: white;
@@ -126,7 +132,6 @@ input[type="submit"]:hover {
     font-size: 20px;
     font-weight: bold;
     width: 48%;
-    display: none;
     margin-bottom: 10px;
 }
 
@@ -194,7 +199,7 @@ input[type="submit"]:hover {
     padding: 20px;
     border: 1px solid #888;
     border-radius: 20px;
-    width: 40%;
+    width: 620px;
 }
 
 
@@ -279,4 +284,45 @@ input[type="submit"]:hover {
 .column{
     display: flex;
     flex-direction: column;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 80px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+.dropdown-content div {
+    padding: 8px 16px;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown button img {
+    width: 60px;
+    height: auto;
+}
+.dropdown button {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 20px;
+    width: 90%;
+    height: auto;
 }

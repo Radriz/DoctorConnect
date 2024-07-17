@@ -110,6 +110,7 @@ function generateTemplateProcedureHTML(data) {
         const label = document.createElement('label');
         label.htmlFor = `template${key}`;
         label.textContent = template.name;
+        label.style.fontSize = "20px"
         columnDiv.appendChild(label);
 
         const change = document.createElement('a');
@@ -142,11 +143,50 @@ function generateTemplateProcedureHTML(data) {
         incrementButton.onclick = () => increment(key);
         rightDiv.appendChild(incrementButton);
 
+
         procedureBlock.appendChild(leftDiv);
+
+        const stickerDiv = document.createElement('div')
+        stickerDiv.className = "dropdown";
+        const stickerButton = document.createElement('button')
+        stickerDiv.appendChild(stickerButton)
+        const dropDownWindow = generateDropdownContent()
+        stickerDiv.appendChild(dropDownWindow)
+        selectImage(stickerButton, dropDownWindow, template.sticker)
+        procedureBlock.appendChild(stickerDiv)
         procedureBlock.appendChild(rightDiv);
 
+        const price = document.createElement('label');
+        price.htmlFor = `template${key}`;
+        price.textContent = template.price + " руб.";
+        price.style.marginBottom = "0px"
+        price.style.fontSize = "30px"
+        procedureBlock.appendChild(price);
+
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-btn';
+        removeButton.textContent = '×';
+        removeButton.onclick = function() { removeTemplate(`${key}`, procedureBlock);}
+
+        procedureBlock.appendChild(removeButton);
+
         all_templates.appendChild(procedureBlock);
+
+
     });
+    const procedureBlock = document.createElement('div');
+    procedureBlock.className = 'template_procedure_block';
+    procedureBlock.innerHTML = 'Добавить медицинскую услугу'
+    procedureBlock.style.cursor = 'pointer'
+    procedureBlock.style.textAlign = 'center'
+    procedureBlock.style.display = 'flex'
+    procedureBlock.style.justifyContent = 'center'
+    procedureBlock.onclick = function() {
+          open_template_procedure(null, 'new', "");
+        };
+
+    all_templates.appendChild(procedureBlock);
+
 }
 
 function increment(id) {
@@ -181,18 +221,26 @@ function open_template_procedure(data, template_id,template_name) {
     const modalBody = document.getElementById('modal-body');
     document.getElementById('saveProcedures').onclick= function() {saveChanges(template_id);}
     modalBody.innerHTML = '';
+
     
     const label = document.createElement('input');
+    label.placeholder = 'Введите название медицинской услуги'
     label.id = 'template-name'
     label.className = 'modal-template-name'
     label.value=template_name;
     label.type="text";
     label.style.fontSize="25px;"
     modalBody.appendChild(label);
-
-    data.forEach(item => {
+    if (data == null){
+        addField()
+        console.log("Ок")
+    }else{
+     data.forEach(item => {
         addField(item);
     });
+    }
+
+
 
     modal.style.display = "block";
 }
@@ -235,6 +283,7 @@ function addField(item = {}) {
     }
     label.type="text"
     label.placeholder = "Название процедуры"
+    label.style.fontSize = "16px"
     label.value = item.name || '';
     label.style.marginBottom = "0px"
     leftDiv.append(label);
@@ -265,6 +314,10 @@ function addField(item = {}) {
     rightDiv.appendChild(incrementButton);
 
     const priceInput = document.createElement('input');
+    priceInput.style.fontSize = '16px';
+    priceInput.style.marginBottom = "0px";
+    priceInput.style.marginLeft = "20px";
+    priceInput.style.width = "80px";
     priceInput.type = 'number';
     if (item.id) {
         priceInput.id = `price${item.id}`
@@ -273,7 +326,14 @@ function addField(item = {}) {
     }
     priceInput.value = item.price || 0;
     priceInput.placeholder = 'Цена';
+
     rightDiv.appendChild(priceInput);
+    const rub = document.createElement('p');
+    rub.textContent = 'руб.'
+    rub.style.marginLeft = "4px";
+    rightDiv.appendChild(rub);
+
+
 
     procedureBlock.appendChild(leftDiv);
     procedureBlock.appendChild(rightDiv);
@@ -312,10 +372,53 @@ function removeField(id, fieldContainer) {
         fieldContainer.remove();
     }
 }
+function removeTemplate(id, fieldContainer) {
+    console.log(id);
+//    const fieldContainer = document.getElementById(`template-procedure-${id}`);
 
-function saveChanges(template_id) {
+
+    fetch(`/procedure/template/${id}`, { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+            fieldContainer.remove();
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+async function saveChanges(temp_template_id) {
+    var template_id = temp_template_id;
+    const template_name = document.getElementById('template-name').value;
+
+    if (template_id === 'new') {
+        try {
+            const response = await fetch(`/procedure/template/create/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ template_name: template_name })
+            });
+            const data = await response.json();
+            console.log('Success:', data);
+            template_id = data.id;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    } else {
+        try {
+            const response = await fetch(`/procedure/template/${template_id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ template_name: template_name })
+            });
+            const data = await response.json();
+            console.log('Success:', data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    console.log('Updated template_id:', template_id);
+
     const fields = document.querySelectorAll('.procedure_block');
-    console.log(fields)
     fields.forEach(field => {
         const id = field.getAttribute('id').split("-").pop();
         const name = field.querySelector(`#label${id}`).value;
@@ -324,6 +427,7 @@ function saveChanges(template_id) {
         const type = document.getElementById('procedure-select').value;
         console.log(amount);
         if (id.startsWith('new')) {
+            console.log({ name, type, price: parseInt(price), template_id: template_id, amount: parseInt(amount) })
             fetch('/procedure/user/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -351,3 +455,43 @@ function saveChanges(template_id) {
     closeModal();
     addTemplate();
 }
+const imgArray = ["core_tab", "implant", "seal"]; // Array of image names
+const dropdownContent = document.getElementById('dropdownContent');
+
+// Function to generate dropdown content
+function generateDropdownContent(button) {
+    let dropdownContent = document.createElement('div');
+    dropdownContent.id ="dropdownContent"
+    dropdownContent.className="dropdown-content"
+    imgArray.forEach(imgName => {
+        const div = document.createElement('div');
+        const img = document.createElement('img');
+        img.src = `/images/stickers/${imgName}.png`;
+        img.alt = `imgName`;
+        img.onclick = () => selectImage(button, dropdownContent, imgName);
+        div.appendChild(img);
+        dropdownContent.appendChild(div);
+    });
+    return dropdownContent
+}
+
+// Function to handle image selection
+function selectImage(dropdownButton, dropdownContent, src) {
+    dropdownButton.innerHTML = `<img src="/images/stickers/${src}.png" alt="src">`;
+    dropdownContent.classList.remove('show');
+}
+
+//// Toggle dropdown content display on button click
+//const dropdownButton = document.getElementById('dropdownButton');
+//dropdownButton.addEventListener('click', function() {
+//    dropdownContent.classList.toggle('show');
+//});
+//
+//// Close the dropdown if the user clicks outside of it
+//window.onclick = function(event) {
+//    if (!event.target.matches('#dropdownButton') && !event.target.matches('#dropdownButton img')) {
+//        if (dropdownContent.classList.contains('show')) {
+//            dropdownContent.classList.remove('show');
+//        }
+//    }
+//}

@@ -14,7 +14,7 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id, procedure_type, \
     name_procedure, get_subtype_by_type, get_template_procedure, create_template_procedure, \
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
-    update_amount_procedure_template
+    update_amount_procedure_template, update_template_name
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
@@ -48,6 +48,7 @@ class Order(BaseModel):
 
 class TemplateProcedure(BaseModel):
     template_name: str
+
 
 
 class Procedure(BaseModel):
@@ -305,7 +306,7 @@ async def get_subtype(request: Request, type: str):
     # ]  }
     for template in templates:
         if template[0] not in templates_dict:
-            templates_dict[template[0]] = {"name": template[1], "price": 0, "procedure": []}
+            templates_dict[template[0]] = {"name": template[1],"sticker": template[10], "price": 0, "procedure": []}
 
         templates_dict[template[0]]["procedure"].append({
             "id": template[2] if template[2] is not None else template[6],
@@ -314,7 +315,7 @@ async def get_subtype(request: Request, type: str):
             "price": template[5] if template[5] is not None else template[8],
             "amount": template[9]
         })
-        templates_dict[template[0]]["price"] += template[5] if template[5] is not None else template[8]
+        templates_dict[template[0]]["price"] += (template[5] if template[5] is not None else template[8]) * template[9]
     return templates_dict
 
 
@@ -338,6 +339,15 @@ async def procedure(request: Request,id: int, procedure: Procedure):
     update_amount_procedure_template(id, procedure.template_id,procedure.amount)
     return {"result": 'Done'}
 
+
+@app.put("/procedure/template/{id}")
+async def update_template(request: Request,id: int, template: TemplateProcedure):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    update_template_name(id,template.template_name,user_id)
+    return {"result": 'Done'}
+
+
 @app.delete("/procedure/user/{id}")
 async def procedure(request: Request,id: int):
     delete_user_procedure(id)
@@ -349,6 +359,7 @@ async def save_template(request: Request, template_id: int):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie)
     delete_template_procedure_by_id(template_id, user_id)
+    print(template_id, user_id)
     return {"result": 'Done'}
 
 
@@ -380,10 +391,10 @@ async def logout(request: Request):
 
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                port=443,
-                reload=True,
-                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # uvicorn.run("main:app",
+    #             host="0.0.0.0",
+    #             port=443,
+    #             reload=True,
+    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
