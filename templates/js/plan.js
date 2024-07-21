@@ -1,49 +1,63 @@
 
 let counter = 0;
+let initial_procedure_container;
+//document.getElementById('sub-procedure').addEventListener('change', function() {
+//    const subtype = this.value;
+//    proc = document.getElementById('procedure-select');
+//    const url = `/procedure/get/${proc.value}/${subtype}`;
+//
+//    fetch(url)
+//    .then(response => response.json())
+//    .then(data => {
+//        generateProcedureHTML(data);
+//    })
+//    .catch(error => {
+//        console.error('Error fetching procedure data:', error);
+//    });
+//});
+//document.getElementById('manual').addEventListener('click', function() {
+//    subtype_block = document.getElementById('sub-procedure');
+//    subtype_block.style.display = 'block';
+//});
+function updateType(event) {
+    const type = event.target.value;
+    addTemplate(event.target.closest("#procedure-container"));
+//    selected_elements = event.target
+//    for (var i = 1; i < selected_elements.options.length; i++) {
+//        let option = selected_elements.options[i];
+//        if(option.value === type){
+//            option.selected = true;
+//        }else{
+//            option.selected = false;
+//        }
+//    }
+    };
 
-document.getElementById('sub-procedure').addEventListener('change', function() {
-    const subtype = this.value;
-    proc = document.getElementById('procedure-select');
-    const url = `/procedure/get/${proc.value}/${subtype}`;
-
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        generateProcedureHTML(data);
-    })
-    .catch(error => {
-        console.error('Error fetching procedure data:', error);
-    });
-});
-document.getElementById('manual').addEventListener('click', function() {
-    subtype_block = document.getElementById('sub-procedure');
-    subtype_block.style.display = 'block';
-});
-document.getElementById('procedure-select').addEventListener('change', function() {
-    const type = this.value;
-    const url = `/procedure/subtype/${type}`;
-    subtype_block = document.getElementById('sub-procedure');
-    template_block = document.getElementById('template');
-    template_block.style.display = 'block';
-    manual_block = document.getElementById('manual');
-    manual_block.style.display = 'block';
 
 
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        subtype_block.innerHTML = '<option value="None" disabled selected hidden>Выбрать поднаправление</option>';
-        data.forEach((subtype) => {
-              const subtype_option = document.createElement('option');
-              subtype_option.value = subtype;
-              subtype_option.textContent  = subtype;
-              subtype_block.appendChild(subtype_option)
-        })
-    })
-    .catch(error => {
-        console.error('Error fetching procedure data:', error);
-    });
-});
+//    const url = `/procedure/subtype/${type}`;
+//    subtype_block = document.getElementById('sub-procedure');
+//    template_block = document.getElementById('template');
+//    template_block.style.display = 'block';
+//    manual_block = document.getElementById('manual');
+//    manual_block.style.display = 'block';
+//
+//
+//    fetch(url)
+//    .then(response => response.json())
+//    .then(data => {
+//        subtype_block.innerHTML = '<option value="None" disabled selected hidden>Выбрать поднаправление</option>';
+//        data.forEach((subtype) => {
+//              const subtype_option = document.createElement('option');
+//              subtype_option.value = subtype;
+//              subtype_option.textContent  = subtype;
+//              subtype_block.appendChild(subtype_option)
+//        })
+//    })
+//    .catch(error => {
+//        console.error('Error fetching procedure data:', error);
+//    });
+
 
 
 function generateProcedureHTML(data) {
@@ -92,10 +106,9 @@ function generateProcedureHTML(data) {
     });
 }
 
-function generateTemplateProcedureHTML(data) {
-    const all_templates = document.getElementById('all_procedure');
-    all_templates.innerHTML = '';
-
+function generateTemplateProcedureHTML(stage, data) {
+    const all_templates = stage.querySelector('#all_procedure');
+    all_templates.innerHTML = '<label class="label">Список медицинских услуг:</label>';
     Object.keys(data).forEach(key=> {
         const template = data[key];
         const procedureBlock = document.createElement('div');
@@ -114,11 +127,10 @@ function generateTemplateProcedureHTML(data) {
         columnDiv.appendChild(label);
 
         const change = document.createElement('a');
-        change.htmlFor = 'template' + key;
         change.textContent = "Изменить";
         const currentProcedure = template.procedure;
         change.onclick = function() {
-          open_template_procedure(currentProcedure, key, template.name);
+          open_template_procedure(stage, currentProcedure, key, template.name);
         };
         change.style.cursor = 'pointer';
         columnDiv.appendChild(change);
@@ -148,11 +160,17 @@ function generateTemplateProcedureHTML(data) {
 
         const stickerDiv = document.createElement('div')
         stickerDiv.className = "dropdown";
-        const stickerButton = document.createElement('button')
+        const stickerButton = document.createElement('button');
+        const dropdownContent = generateDropdownContent(stickerButton, key)
+        stickerButton.onclick = () =>  dropdownContent.classList.toggle('show');
         stickerDiv.appendChild(stickerButton)
-        const dropDownWindow = generateDropdownContent()
-        stickerDiv.appendChild(dropDownWindow)
-        selectImage(stickerButton, dropDownWindow, template.sticker)
+        stickerDiv.appendChild(dropdownContent)
+        if (template.sticker != null){
+             selectImage(stickerButton, dropdownContent, template.sticker, key)
+        }else{
+            selectImage(stickerButton, dropdownContent, "tooth", key)
+        }
+
         procedureBlock.appendChild(stickerDiv)
         procedureBlock.appendChild(rightDiv);
 
@@ -182,7 +200,7 @@ function generateTemplateProcedureHTML(data) {
     procedureBlock.style.display = 'flex'
     procedureBlock.style.justifyContent = 'center'
     procedureBlock.onclick = function() {
-          open_template_procedure(null, 'new', "");
+          open_template_procedure(stage, null, 'new', "");
         };
 
     all_templates.appendChild(procedureBlock);
@@ -203,23 +221,23 @@ function decrement(id) {
     }
 }
 
-function addTemplate() {
-    const type = document.getElementById('procedure-select').value
+function addTemplate(document) {
+    const type = document.querySelector('#procedure-select').value
     const url = "/procedure/template/get/" + type
     fetch(url)
     .then(response => response.json())
     .then(data => {
-         generateTemplateProcedureHTML(data);
+         generateTemplateProcedureHTML(document, data);
     })
     .catch(error => {
         console.error('Error fetching procedure data:', error);
     });
 }
 
-function open_template_procedure(data, template_id,template_name) {
+function open_template_procedure(stage, data, template_id,template_name) {
     const modal = document.getElementById('modal');
     const modalBody = document.getElementById('modal-body');
-    document.getElementById('saveProcedures').onclick= function() {saveChanges(template_id);}
+    document.getElementById('saveProcedures').onclick= function() {saveChanges(stage, template_id);}
     modalBody.innerHTML = '';
 
     
@@ -301,17 +319,28 @@ function addField(item = {}) {
     }
     numberDiv.textContent = item.amount || 1;
 
-    const decrementButton = document.createElement('button');
+      const decrementButton = document.createElement('button');
     decrementButton.textContent = ' - ';
-    decrementButton.onclick = () => decrementTemplate(numberDiv);
+    decrementButton.setAttribute('data-target', numberDiv.id);
+    decrementButton.onclick = function() {
+        const targetId = this.getAttribute('data-target');
+        const targetElement = document.getElementById(targetId);
+        decrementTemplate(targetElement);
+    };
     rightDiv.appendChild(decrementButton);
 
     rightDiv.appendChild(numberDiv);
 
     const incrementButton = document.createElement('button');
     incrementButton.textContent = ' + ';
-    incrementButton.onclick = () => incrementTemplate(numberDiv);
+    incrementButton.setAttribute('data-target', numberDiv.id);
+    incrementButton.onclick = function() {
+        const targetId = this.getAttribute('data-target');
+        const targetElement = document.getElementById(targetId);
+        incrementTemplate(targetElement);
+    };
     rightDiv.appendChild(incrementButton);
+
 
     const priceInput = document.createElement('input');
     priceInput.style.fontSize = '16px';
@@ -385,7 +414,7 @@ function removeTemplate(id, fieldContainer) {
         .catch(error => console.error('Error:', error));
 }
 
-async function saveChanges(temp_template_id) {
+async function saveChanges(stage, temp_template_id) {
     var template_id = temp_template_id;
     const template_name = document.getElementById('template-name').value;
 
@@ -453,13 +482,13 @@ async function saveChanges(temp_template_id) {
     });
 
     closeModal();
-    addTemplate();
+    addTemplate(stage);
 }
 const imgArray = ["core_tab", "implant", "seal"]; // Array of image names
 const dropdownContent = document.getElementById('dropdownContent');
 
 // Function to generate dropdown content
-function generateDropdownContent(button) {
+function generateDropdownContent(button, template_id) {
     let dropdownContent = document.createElement('div');
     dropdownContent.id ="dropdownContent"
     dropdownContent.className="dropdown-content"
@@ -468,7 +497,7 @@ function generateDropdownContent(button) {
         const img = document.createElement('img');
         img.src = `/images/stickers/${imgName}.png`;
         img.alt = `imgName`;
-        img.onclick = () => selectImage(button, dropdownContent, imgName);
+        img.onclick = () => selectImage(button, dropdownContent, imgName, template_id);
         div.appendChild(img);
         dropdownContent.appendChild(div);
     });
@@ -476,22 +505,87 @@ function generateDropdownContent(button) {
 }
 
 // Function to handle image selection
-function selectImage(dropdownButton, dropdownContent, src) {
+async function selectImage(dropdownButton, dropdownContent, src, template_id) {
     dropdownButton.innerHTML = `<img src="/images/stickers/${src}.png" alt="src">`;
     dropdownContent.classList.remove('show');
+    try {
+            const response = await fetch(`/procedure/sticker/template`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ template_id: Number(template_id), sticker: src})
+            });
+            const data = await response.json();
+            console.log('Success:', data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
 }
 
-//// Toggle dropdown content display on button click
-//const dropdownButton = document.getElementById('dropdownButton');
-//dropdownButton.addEventListener('click', function() {
-//    dropdownContent.classList.toggle('show');
-//});
-//
-//// Close the dropdown if the user clicks outside of it
-//window.onclick = function(event) {
-//    if (!event.target.matches('#dropdownButton') && !event.target.matches('#dropdownButton img')) {
-//        if (dropdownContent.classList.contains('show')) {
-//            dropdownContent.classList.remove('show');
-//        }
-//    }
-//}
+document.addEventListener("DOMContentLoaded", async function () {
+    initial_procedure_container = document.getElementById('procedure-container').innerHTML;
+    var buttonTooth=document.querySelectorAll('.button-tooth')
+    function setTooth(buttonTooth){
+        buttonTooth.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                if(this.style.backgroundColor == "rgb(126, 247, 139)"){
+                    this.style.backgroundColor = "transparent";;
+                } else{
+                    this.style.backgroundColor = "#7ef78b";
+                }
+                event.preventDefault();
+           });
+        });
+    }
+
+    setTooth(buttonTooth)
+});
+
+function addOrderBlock(){
+    // Получаем все текущие элементы с выбранными значениями
+    var all_procedures_selected = document.querySelectorAll('#procedure-select');
+    var procedures_selected = [];
+
+    all_procedures_selected.forEach((ps) => {
+        procedures_selected.push(ps.value);
+    });
+
+    // Добавляем новый блок этапа
+    var stages = document.getElementById('stage');
+    stages.innerHTML += '<div id="procedure-container" class="procedure-block">' + initial_procedure_container + '</div>';
+
+    // После обновления innerHTML повторно получаем элементы
+    all_procedures_selected = document.querySelectorAll('#procedure-select');
+
+    // Восстанавливаем выбранные значения
+    for(var i = 0; i < procedures_selected.length; i++){
+        all_procedures_selected[i].value = procedures_selected[i];
+    }
+
+    // Проверяем восстановленные значения в консоли
+    for(var i = 0; i < procedures_selected.length; i++){
+       console.log(all_procedures_selected[i].value);
+    }
+    var buttonTooth=document.querySelectorAll('.button-tooth')
+    function setTooth(buttonTooth){
+        buttonTooth.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                if(this.style.backgroundColor == "rgb(126, 247, 139)"){
+                    this.style.backgroundColor = "transparent";;
+                } else{
+                    this.style.backgroundColor = "#7ef78b";
+                }
+                event.preventDefault();
+           });
+        });
+    }
+
+    setTooth(buttonTooth)
+}
+
+function deleteOrderBlock(button) {
+    var orderBlock = button.closest('.procedure-block');
+    orderBlock.parentNode.removeChild(orderBlock);
+}
+
+
+

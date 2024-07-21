@@ -14,7 +14,7 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id, procedure_type, \
     name_procedure, get_subtype_by_type, get_template_procedure, create_template_procedure, \
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
-    update_amount_procedure_template, update_template_name
+    update_amount_procedure_template, update_template_name, update_sticker_name
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
@@ -49,6 +49,9 @@ class Order(BaseModel):
 class TemplateProcedure(BaseModel):
     template_name: str
 
+class TemplateSticker(BaseModel):
+    template_id: int
+    sticker: str
 
 
 class Procedure(BaseModel):
@@ -57,6 +60,7 @@ class Procedure(BaseModel):
     price: int
     template_id: int
     amount: int
+
 
 
 def create_session(user_id):
@@ -346,7 +350,12 @@ async def update_template(request: Request,id: int, template: TemplateProcedure)
     user_id = read_session(session_cookie)
     update_template_name(id,template.template_name,user_id)
     return {"result": 'Done'}
-
+@app.put("/procedure/sticker/template")
+async def update_stickers(request: Request, template: TemplateSticker):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    update_sticker_name(template.template_id,template.sticker,user_id)
+    return {"result": 'Done'}
 
 @app.delete("/procedure/user/{id}")
 async def procedure(request: Request,id: int):

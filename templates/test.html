@@ -13,8 +13,11 @@
         .dropdown-content {
             display: none;
             position: absolute;
+            left: 100%;
             background-color: #f9f9f9;
-            min-width: 80px;
+            width: 300px;
+            max-height: 400px; /* Add max-height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
         }
@@ -39,10 +42,12 @@
             width: 50px;
             height: auto;
         }
+
         .dropdown button {
             background-color: white;
             border: 1px solid black;
             border-radius: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -61,6 +66,7 @@
             <div>
                 <img src="images/stickers/seal.png" alt="Фото 3" onclick="selectImage(event.target.src)">
             </div>
+            <!-- Add more images if needed -->
         </div>
     </div>
 
@@ -85,7 +91,9 @@
                 }
             }
         }
-        selectImage('images/stickers/core_tab.png')
+
+        // Initially select the first image
+        selectImage('images/stickers/core_tab.png');
     </script>
 </body>
 </html>

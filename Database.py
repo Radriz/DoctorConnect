@@ -197,6 +197,12 @@ def edit_user_procedure(id,name,type,price):
             where id = {id}""")
     connection.commit()
 
+def update_sticker_name(template_id,sticker,user_id):
+    cursor.execute(
+        f"""update template set stick = '{sticker}'
+                where id = {template_id} and user_id = {user_id}""")
+    connection.commit()
+
 def delete_user_procedure(id):
     cursor.execute(
         f"""delete from user_procedure where id = {id}""")
