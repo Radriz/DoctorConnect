@@ -1,5 +1,6 @@
-
+let clients = {};
 let counter = 0;
+let stageNumber = 1;
 let initial_procedure_container;
 //document.getElementById('sub-procedure').addEventListener('change', function() {
 //    const subtype = this.value;
@@ -21,7 +22,7 @@ let initial_procedure_container;
 //});
 function updateType(event) {
     const type = event.target.value;
-    addTemplate(event.target.closest("#procedure-container"));
+    addTemplate(event.target.closest(".procedure-block"));
 //    selected_elements = event.target
 //    for (var i = 1; i < selected_elements.options.length; i++) {
 //        let option = selected_elements.options[i];
@@ -58,6 +59,104 @@ function updateType(event) {
 //        console.error('Error fetching procedure data:', error);
 //    });
 
+document.getElementById('combobox').addEventListener('input',() => {
+    const fio = document.querySelector('.fio').value;
+    console.log('Имя и фамилия:', fio,fio in clients);
+    if (fio in clients) {
+        const birthday = clients[fio];
+        document.getElementById('calendar').value = birthday;
+        console.log('Дата рождения:', birthday);
+        }});
+
+
+document.getElementById('submit').addEventListener('click', async (event) => {
+    event.preventDefault();
+    const fio = document.querySelector('.fio').value;
+    const birthday = document.getElementById('calendar').value;
+    const stages = document.getElementById('stage');
+    const procedureBlocks = stages.querySelectorAll('.procedure-block');
+    let planId = null;
+
+    try {
+        // Create the plan
+        const planResponse = await fetch('/plan/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'fio':fio , 'birthday': birthday }),
+        });
+
+        if (!planResponse.ok) {
+            throw new Error('Ошибка при создании плана');
+        }
+
+        const planData = await planResponse.json();
+        planId = planData.plan_id;
+
+        // Create services for each procedure block
+        for (let procedureBlock_i of procedureBlocks) {
+            const stageName = procedureBlock_i.querySelector('#stage-name').value;
+            let currentTooth = [];
+            const buttons = procedureBlock_i.querySelectorAll('.tooth-selection button');
+            buttons.forEach(button => {
+                if(button.style.backgroundColor == "rgb(126, 247, 139)"){
+                    currentTooth.push(button.innerText.trim())
+                }
+            });
+
+            const templateProcedureBlocks = procedureBlock_i.querySelectorAll('.template_procedure_block');
+            for (let tpb of templateProcedureBlocks) {
+                const tpbId = tpb.id.split('_').at(-1);
+                if (tpb.querySelector('#number' + tpbId) === null) {
+                    continue;
+                }
+                const amount = tpb.querySelector('#number' + tpbId).textContent.trim();
+
+                if (amount !== "0") {
+                console.log({
+                            stage: stageName,
+                            template_id: parseInt(tpbId),
+                            tooths: currentTooth.join(','),
+                            plan_id: planId,
+                            amount: parseInt(amount)
+                        })
+                    // Create service
+                    const serviceResponse = await fetch('/plan/service/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            stage: stageName,
+                            template_id: parseInt(tpbId),
+                            tooths: currentTooth.join(','),
+                            plan_id: planId,
+                            amount: parseInt(amount)
+                        })
+                    });
+
+                    if (!serviceResponse.ok) {
+                        throw new Error('Ошибка при создании услуги');
+                    }
+                }
+            }
+            await fetch(`/plan/document/${planId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        }
+
+
+
+        alert('План и услуги успешно созданы');
+    } catch (error) {
+        console.error(error);
+        alert('Произошла ошибка при создании плана или услуг');
+    }
+});
 
 
 function generateProcedureHTML(data) {
@@ -108,12 +207,13 @@ function generateProcedureHTML(data) {
 
 function generateTemplateProcedureHTML(stage, data) {
     const all_templates = stage.querySelector('#all_procedure');
+    var stageCurrentNumber = stage.id.split("-").at(-1);
     all_templates.innerHTML = '<label class="label">Список медицинских услуг:</label>';
     Object.keys(data).forEach(key=> {
         const template = data[key];
         const procedureBlock = document.createElement('div');
         procedureBlock.className = 'template_procedure_block';
-        procedureBlock
+        procedureBlock.id = 'template_procedure_block_' + key;
 
         const leftDiv = document.createElement('div');
         leftDiv.className = 'left';
@@ -140,19 +240,21 @@ function generateTemplateProcedureHTML(stage, data) {
         const rightDiv = document.createElement('div');
         rightDiv.className = 'right';
 
-        const decrementButton = document.createElement('button');
-        decrementButton.textContent = ' - ';
-        decrementButton.onclick = () => decrement(key);
-        rightDiv.appendChild(decrementButton);
 
         const numberDiv = document.createElement('div');
         numberDiv.id = `number${key}`;
         numberDiv.textContent = '0';
+
+        const decrementButton = document.createElement('button');
+        decrementButton.textContent = ' - ';
+        decrementButton.onclick = () => decrement(numberDiv);
+        rightDiv.appendChild(decrementButton);
+
         rightDiv.appendChild(numberDiv);
 
         const incrementButton = document.createElement('button');
         incrementButton.textContent = ' + ';
-        incrementButton.onclick = () => increment(key);
+        incrementButton.onclick = () => increment(numberDiv);
         rightDiv.appendChild(incrementButton);
 
 
@@ -207,14 +309,12 @@ function generateTemplateProcedureHTML(stage, data) {
 
 }
 
-function increment(id) {
-    const numberElement = document.getElementById("number" + id);
+function increment(numberElement) {
     let currentNumber = parseInt(numberElement.innerText);
     numberElement.innerText = currentNumber + 1;
 }
 
-function decrement(id) {
-    const numberElement = document.getElementById("number" + id);
+function decrement(numberElement) {
     let currentNumber = parseInt(numberElement.innerText);
     if (currentNumber > 0) {
         numberElement.innerText = currentNumber - 1;
@@ -222,6 +322,8 @@ function decrement(id) {
 }
 
 function addTemplate(document) {
+    var stageCurrentNumber = document.id.split("-").at(-1);
+    console.log(document)
     const type = document.querySelector('#procedure-select').value
     const url = "/procedure/template/get/" + type
     fetch(url)
@@ -319,26 +421,16 @@ function addField(item = {}) {
     }
     numberDiv.textContent = item.amount || 1;
 
-      const decrementButton = document.createElement('button');
+    const decrementButton = document.createElement('button');
     decrementButton.textContent = ' - ';
-    decrementButton.setAttribute('data-target', numberDiv.id);
-    decrementButton.onclick = function() {
-        const targetId = this.getAttribute('data-target');
-        const targetElement = document.getElementById(targetId);
-        decrementTemplate(targetElement);
-    };
+    decrementButton.onclick = () => decrementTemplate(numberDiv);
     rightDiv.appendChild(decrementButton);
 
     rightDiv.appendChild(numberDiv);
 
     const incrementButton = document.createElement('button');
     incrementButton.textContent = ' + ';
-    incrementButton.setAttribute('data-target', numberDiv.id);
-    incrementButton.onclick = function() {
-        const targetId = this.getAttribute('data-target');
-        const targetElement = document.getElementById(targetId);
-        incrementTemplate(targetElement);
-    };
+    incrementButton.onclick = () => incrementTemplate(numberDiv);
     rightDiv.appendChild(incrementButton);
 
 
@@ -403,13 +495,15 @@ function removeField(id, fieldContainer) {
 }
 function removeTemplate(id, fieldContainer) {
     console.log(id);
-//    const fieldContainer = document.getElementById(`template-procedure-${id}`);
+    const fieldContainers = document.querySelectorAll(`#template_procedure_block_${id}`);
 
 
     fetch(`/procedure/template/${id}`, { method: 'DELETE' })
         .then(response => response.json())
         .then(data => {
-            fieldContainer.remove();
+            fieldContainers.forEach(fieldContainer => {
+                fieldContainer.remove();
+            })
         })
         .catch(error => console.error('Error:', error));
 }
@@ -483,7 +577,24 @@ async function saveChanges(stage, temp_template_id) {
 
     closeModal();
     addTemplate(stage);
+
+    const stageProcedureSelectValue = stage.querySelector(`#procedure-select`).value;
+
+    // Получаем div с id 'stage'
+    const stageElement = document.getElementById('stage');
+
+    // Пробегаемся по каждому div внутри stage с классом 'procedure_block'
+    const procedureBlocks = stageElement.querySelectorAll('.procedure-block');
+    procedureBlocks.forEach(procedureBlock => {
+        const procedureSelect = procedureBlock.querySelector(`#procedure-select`);
+        console.log(`Stages: ${procedureSelect.value} ${stageProcedureSelectValue}`)
+        if (procedureSelect && procedureSelect.value === stageProcedureSelectValue) {
+            // Вызываем addTemplate для этого блока
+            addTemplate(procedureBlock);
+        }
+    });
 }
+
 const imgArray = ["core_tab", "implant", "seal"]; // Array of image names
 const dropdownContent = document.getElementById('dropdownContent');
 
@@ -522,8 +633,22 @@ async function selectImage(dropdownButton, dropdownContent, src, template_id) {
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
-    initial_procedure_container = document.getElementById('procedure-container').innerHTML;
+    initial_procedure_container = document.getElementById('procedure-container-1').innerHTML;
     var buttonTooth=document.querySelectorAll('.button-tooth')
+    try {
+            const response = await fetch(`/clients`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const data = await response.json();
+            console.log('Success:', data);
+            template_id = data.id;
+            data["clients"].forEach((client) => {
+            clients[client.fio] = client.birthday;
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
     function setTooth(buttonTooth){
         buttonTooth.forEach(function(button) {
             button.addEventListener('click', function(event) {
@@ -549,11 +674,20 @@ function addOrderBlock(){
         procedures_selected.push(ps.value);
     });
 
-    // Добавляем новый блок этапа
-    var stages = document.getElementById('stage');
-    stages.innerHTML += '<div id="procedure-container" class="procedure-block">' + initial_procedure_container + '</div>';
+    stageNumber += 1;
+    console.log(stageNumber);
 
-    // После обновления innerHTML повторно получаем элементы
+    // Создаем новый блок этапа
+    var newProcedureBlock = document.createElement('div');
+    newProcedureBlock.id = 'procedure-container-' + stageNumber;
+    newProcedureBlock.className = 'procedure-block';
+    newProcedureBlock.innerHTML = initial_procedure_container;
+
+    // Добавляем новый блок в контейнер stages
+    var stages = document.getElementById('stage');
+    stages.appendChild(newProcedureBlock);
+
+    // Повторно получаем элементы после добавления нового блока
     all_procedures_selected = document.querySelectorAll('#procedure-select');
 
     // Восстанавливаем выбранные значения
@@ -565,26 +699,29 @@ function addOrderBlock(){
     for(var i = 0; i < procedures_selected.length; i++){
        console.log(all_procedures_selected[i].value);
     }
-    var buttonTooth=document.querySelectorAll('.button-tooth')
-    function setTooth(buttonTooth){
-        buttonTooth.forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                if(this.style.backgroundColor == "rgb(126, 247, 139)"){
-                    this.style.backgroundColor = "transparent";;
-                } else{
-                    this.style.backgroundColor = "#7ef78b";
-                }
-                event.preventDefault();
-           });
-        });
-    }
 
-    setTooth(buttonTooth)
+    // Привязываем обработчики событий только к новым кнопкам
+    var newButtons = newProcedureBlock.querySelectorAll('.button-tooth');
+    setTooth(newButtons);
+}
+
+function setTooth(buttonTooth){
+    buttonTooth.forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            if (this.style.backgroundColor == "rgb(126, 247, 139)"){
+                this.style.backgroundColor = "transparent";
+            } else {
+                this.style.backgroundColor = "#7ef78b";
+            }
+            event.preventDefault();
+       });
+    });
 }
 
 function deleteOrderBlock(button) {
     var orderBlock = button.closest('.procedure-block');
     orderBlock.parentNode.removeChild(orderBlock);
+
 }
 
 

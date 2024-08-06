@@ -33,7 +33,7 @@ select {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-input[type="text"], input[type="number"] {
+input[type="text"], input[type="number"],input[type="date"] {
     padding: 10px;
     margin-bottom: 30px;
     border: 1px solid #ccc;
@@ -41,6 +41,10 @@ input[type="text"], input[type="number"] {
 }
 .fio{
     width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 .button-tooth {
     background-color: transparent;
@@ -329,3 +333,4 @@ input[type="submit"]:hover {
     width: 90%;
     height: auto;
 }
+

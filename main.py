@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 from fastapi import FastAPI, Form, Depends, HTTPException, Request
@@ -14,7 +15,9 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_orders_technik, get_order_by_id, update_order_done, delete_order_by_id, update_order_by_id, procedure_type, \
     name_procedure, get_subtype_by_type, get_template_procedure, create_template_procedure, \
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
-    update_amount_procedure_template, update_template_name, update_sticker_name
+    update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
+    get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id
+from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
@@ -187,13 +190,19 @@ async def create_order_form(request: Request):
 @app.get("/order/plan", response_class=HTMLResponse)
 async def plan(request: Request):
     types = procedure_type()
+    patients = get_all_patient()
     return templates.TemplateResponse("plan.html", {
         "request": request,
         "first_row": first_row,
         "second_row": second_row,
-        "job_types": types
+        "job_types": types,
+        "patients": patients
     })
 
+@app.get("/clients")
+async def plan(request: Request):
+    patients = get_all_patient()
+    return {"clients": [{"id" : client[0],"fio" :client[1],"birthday": client[2]} for client in patients]}
 
 @app.get("/procedure/get/{type}/{subtype}")
 async def get_name_procedure_by_type(request: Request, type: str, subtype: str):
@@ -397,7 +406,74 @@ async def logout(request: Request):
     response = RedirectResponse(url="/authorization")
     response.delete_cookie("session")
     return response
+class PlanModel(BaseModel):
+    fio: str
+    birthday: str
+@app.post("/plan/create")
+async def create_plan(request: Request, plan: PlanModel):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    plan_id = create_plan_db(plan.fio.title().strip(), datetime.datetime.now(), user_id, plan.birthday)
+    return {"plan_id":plan_id}
 
+class ServiceModel(BaseModel):
+    stage : str
+    template_id: int
+    tooths : str
+    plan_id: int
+    amount: int
+
+@app.post("/plan/service/create")
+async def create_service(request: Request, service: ServiceModel):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    service_id = create_service_db(service.stage, service.template_id, service.tooths, service.plan_id, service.amount)
+    return {"service_id": service_id}
+
+@app.get("/plan/document/{plan_id}")
+async def get_document(request: Request, plan_id: int):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    data = get_patient_data_plan_by_id(plan_id,user_id)
+    data = {
+        "fio": data[0],
+        "birthday": data[1],
+        "data_day": datetime.datetime.now().strftime("%d.%m.%Y")
+    }
+    get_stages = get_stages_plan_id(plan_id)
+
+    stages = []
+    done_stages = []
+    for stage in get_stages:
+
+        if stage in done_stages:
+            stage_i = done_stages.index(stages)
+            stages[stage_i]["items"].append({
+                "no": len(stages[stage_i]["items"]) + 1,
+                "service": stage[3],
+                "price_per_unit":"1000",
+                "quantity": stage[1],
+                "total": f"{stage[1] * 1000}",
+            })
+        else:
+            stages.append({
+                "number": len(done_stages) + 1,
+                "stage": stage[0],
+                "items": [
+                    {"no": 1, "service": stage[3], "price_per_unit": "1000", "quantity": stage[1], "total": f"{stage[1] * 1000}"}
+                ]
+            })
+            done_stages.append(stage[0])
+
+
+    generate_plan(stages, data)
+    return {"document": "Done"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -1,5 +1,6 @@
 import sqlite3
 import hashlib
+
 connection = sqlite3.connect("Database.db")
 cursor = connection.cursor()
 
@@ -8,7 +9,6 @@ def hash_password(password):
     h = hashlib.md5(password.encode())
     p = h.hexdigest()
     return p
-
 
 
 def registration(fio, email, password, speciality, repeat_password):
@@ -53,7 +53,7 @@ def find_techniks():
     return technik_objects
 
 
-def create_order(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter,color_number):
+def create_order(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter, color_number):
     cursor.execute(
         f"""insert into "order"(patient, formula, type, comment, fitting, deadline, to_user, from_user,color_letter,color_number) 
         Values('{patient}','{formula}','{type}','{comment}','{fitting}','{deadline}',{technik},{doctor},'{color_letter}','{color_number}')""")
@@ -106,7 +106,8 @@ def get_order_doctor_done(id, is_done, fitting_done):
             f"""select * from "order" where from_user = {id} and is_done = {is_done}""").fetchall()
     return order
 
-def update_order_done(order_id, is_done= None, fitting_done = None):
+
+def update_order_done(order_id, is_done=None, fitting_done=None):
     if fitting_done is not None:
         cursor.execute(
             f"""update "order" set fitting_done = {fitting_done} where id = {order_id}""")
@@ -115,12 +116,15 @@ def update_order_done(order_id, is_done= None, fitting_done = None):
             f"""update "order" set is_done = {is_done} where id = {order_id}""")
     connection.commit()
 
+
 def delete_order_by_id(id):
     cursor.execute(
         f"""delete from "order" where id = {id}""")
     connection.commit()
 
-def update_order_by_id(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter,color_number,order_id):
+
+def update_order_by_id(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter, color_number,
+                       order_id):
     cursor.execute(
         f"""update "order" set patient = '{patient}',
         formula = '{formula}',
@@ -135,26 +139,30 @@ def update_order_by_id(patient, formula, type, comment, fitting, deadline, techn
         where id = {order_id}""")
     connection.commit()
 
+
 def procedure_type():
     type = cursor.execute(
-        f"select type from procedure").fetchall() # [("",), ("",), ]
+        f"select type from procedure").fetchall()  # [("",), ("",), ]
     type = list(set(type))
     updt_types = [t[0] for t in type]
     return updt_types
 
-def name_procedure(type,subtype):
-    x =  f"""select * from procedure where type = '{type}' and subtype= '{subtype}'"""
+
+def name_procedure(type, subtype):
+    x = f"""select * from procedure where type = '{type}' and subtype= '{subtype}'"""
     name = cursor.execute(x).fetchall()
     return name
+
 
 def get_subtype_by_type(type):
     subtype = cursor.execute(
         f"""select subtype from procedure where type = '{type}'"""
     ).fetchall()
-    subtype_list = list(set([sub[0] for sub in subtype ]))
+    subtype_list = list(set([sub[0] for sub in subtype]))
     return subtype_list
 
-def get_template_procedure(type,user_id):
+
+def get_template_procedure(type, user_id):
     templates = cursor.execute(
         f"""select template.id,template.name, procedure.id,
         procedure.name,procedure.subtype,procedure.price,user_procedure.id,user_procedure.name,
@@ -167,18 +175,22 @@ def get_template_procedure(type,user_id):
     ).fetchall()
     return templates
 
-def create_template_procedure(template_name,user_id):
+
+def create_template_procedure(template_name, user_id):
     id = cursor.execute(
         f"""insert into template(name,user_id) 
             Values('{template_name}',{user_id}) returning id""").fetchone()
     connection.commit()
     return id[0]
 
-def delete_template_procedure_by_id(id,user_id):
+
+def delete_template_procedure_by_id(id, user_id):
     cursor.execute(
         f"""delete from template where id = {id} and user_id={user_id}""")
     connection.commit()
-def add_procedure_to_template(name,type,price,template_id,amount):
+
+
+def add_procedure_to_template(name, type, price, template_id, amount):
     user_procedure_id = cursor.execute(
         f"""insert into user_procedure(name,type,price) 
               Values('{name}','{type}',{price}) returning id""").fetchone()
@@ -189,7 +201,8 @@ def add_procedure_to_template(name,type,price,template_id,amount):
                   Values({template_id},{user_procedure_id[0]},{amount})""")
     connection.commit()
 
-def edit_user_procedure(id,name,type,price):
+
+def edit_user_procedure(id, name, type, price):
     cursor.execute(
         f"""update user_procedure set name = '{name}',
             type = '{type}',
@@ -197,25 +210,29 @@ def edit_user_procedure(id,name,type,price):
             where id = {id}""")
     connection.commit()
 
-def update_sticker_name(template_id,sticker,user_id):
+
+def update_sticker_name(template_id, sticker, user_id):
     cursor.execute(
         f"""update template set stick = '{sticker}'
                 where id = {template_id} and user_id = {user_id}""")
     connection.commit()
+
 
 def delete_user_procedure(id):
     cursor.execute(
         f"""delete from user_procedure where id = {id}""")
     connection.commit()
 
-def update_amount_procedure_template(procedure_id,template_id,amount):
+
+def update_amount_procedure_template(procedure_id, template_id, amount):
     cursor.execute(
         f"""update template_procedure set amount = {amount}
                 where user_procedure_id = {procedure_id} and 
                 template_id = {template_id} """)
     connection.commit()
 
-def update_template_name(template_id,template_name,user_id):
+
+def update_template_name(template_id, template_name, user_id):
     cursor.execute(
         f"""update template set name = '{template_name}'
                     where id = {template_id} and user_id = {user_id}
@@ -223,4 +240,56 @@ def update_template_name(template_id,template_name,user_id):
     connection.commit()
 
 
+def create_client(fio, birthday):
+    cursor.execute(
+        f"""insert into client(fio, birth_day) 
+            Values('{fio}', '{birthday}') returning id""").fetchone()
+    connection.commit()
+    return cursor.lastrowid
 
+
+def get_client_by_fio(fio,birthday):
+    client = cursor.execute(
+        f"""select id from client where fio = '{fio}' and birth_day = '{birthday}'""").fetchone()
+    return client
+
+
+def create_plan_db(fio, date_time, user_id,birthday):
+    client = get_client_by_fio(fio,birthday)
+    if not client:
+        client_id = create_client(fio, birthday)
+    else:
+        client_id=client[0]
+    cursor.execute(
+        f"""insert into treatment_plan(client_id, date_time, user_id) 
+            Values({client_id}, '{date_time.strftime('%d.%m.%Y %H:%M:%S')}',{user_id}) returning id""").fetchone()
+    connection.commit()
+    return cursor.lastrowid
+
+
+def create_service_db(stage, template_id, tooth, plan_id, amount):
+    cursor.execute(
+        f"""insert into plan_template(stage, plan_id, tooth, template_id, quantity) 
+            Values('{stage}',{plan_id}, '{tooth}', {template_id}, {amount}) returning id""").fetchone()
+    connection.commit()
+    return cursor.lastrowid
+
+def get_all_patient():
+    patient = cursor.execute(
+        f"""SELECT * FROM client""").fetchall()
+    return patient
+
+def get_patient_data_plan_by_id(id,user_id):
+    patient = cursor.execute(
+        f"""SELECT client.fio , client.birth_day from client
+        join treatment_plan on client.id = treatment_plan.client_id
+        where treatment_plan.id = {id} and user_id={user_id}""").fetchone()
+    return patient
+
+def get_stages_plan_id(id):
+    stages = cursor.execute(
+        f"""SELECT stage, quantity, tooth, template.name FROM plan_template
+        join treatment_plan on plan_template.plan_id = treatment_plan.id
+        join template on plan_template.template_id = template.id
+        where treatment_plan.id = {id}""").fetchall()
+    return stages

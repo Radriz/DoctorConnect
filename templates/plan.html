@@ -16,7 +16,18 @@
         <input class="personal" type="submit" value="Личный кабинет">
     </form>
     <label class="label">ФИО пациента:</label>
-    <input type="text" class="fio" name="patient" required>
+    <input list="options" id="combobox" class="fio" name="patient" required>
+    <datalist id="options">
+        <option value=""></option>
+        {% for patient in patients %}
+        <option value="{{patient[1]}}">{{patient[1]}}</option>
+        {% endfor %}
+    </datalist>
+    <label for="calendar">Выберите дату рождения:</label>
+        <input type="date" id="calendar" name="calendar">
+
+
+
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -28,9 +39,9 @@
         </div>
     </div>
     <div id="stage">
-        <div id="procedure-container" class="procedure-block">
+        <div id="procedure-container-1" class="procedure-block">
         <label class="label">Название этапа:</label>
-        <input type="text" name="stage" required>
+        <input type="text" id="stage-name" name="stage" required>
         <div class="scroll-container">
             <div class="tooth-selection-container">
                 <div class="tooth-selection">
