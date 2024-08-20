@@ -24,8 +24,7 @@
         {% endfor %}
     </datalist>
     <label for="calendar">Выберите дату рождения:</label>
-        <input type="date" id="calendar" name="calendar">
-
+    <input type="date" id="calendar" name="calendar">
 
 
     <div id="modal" class="modal">
@@ -33,83 +32,82 @@
             <span class="close" onclick="closeModal()">&times;</span>
             <div id="modal-body"></div>
             <div class="button-group" style="margin-bottom : 0px;margin-top : 20px; ">
-                <button  class="button-action" onclick="addNewField()">Добавить услугу</button>
-                <button  class="button-action" id="saveProcedures">Сохранить</button>
+                <button class="button-action" onclick="addNewField()">Добавить услугу</button>
+                <button class="button-action" id="saveProcedures">Сохранить</button>
             </div>
         </div>
     </div>
     <div id="stage">
         <div id="procedure-container-1" class="procedure-block">
-        <label class="label">Название этапа:</label>
-        <input type="text" id="stage-name" name="stage" required>
-        <div class="scroll-container">
-            <div class="tooth-selection-container">
-                <div class="tooth-selection">
-                    {% for tooth in first_row %}
-                    {% if tooth == 21 %}
-                    <div class="separator"></div>
-                    {% endif %}
-                    {% if tooth in selected_tooth %}
-                    <button style="background-color:#7ef78b" class="button-tooth">
-                        <img src="/images/tooth.png" alt="Tooth"><br>
-                        {{tooth}}
-                    </button>
-                    {% else %}
-                    <button class="button-tooth">
-                        <img src="/images/tooth.png" alt="Tooth"><br>
-                        {{tooth}}
-                    </button>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                <hr>
-                <div class="tooth-selection">
-                    {% for tooth in second_row %}
-                    {% if tooth == 31 %}
-                    <div class="separator"></div>
-                    {% endif %}
-                    {% if tooth in selected_tooth %}
-                    <button style="background-color:#7ef78b" class="button-tooth">
-                        <img src="/images/tooth.png" alt="Tooth"><br>
-                        {{tooth}}
-                    </button>
-                    {% else %}
-                    <button class="button-tooth">
-                        <img src="/images/tooth.png" alt="Tooth"><br>
-                        {{tooth}}
-                    </button>
-                    {% endif %}
-                    {% endfor %}
+            <label class="label">Название этапа:</label>
+            <input type="text" id="stage-name" name="stage" required>
+            <div class="scroll-container">
+                <div class="tooth-selection-container">
+                    <div class="tooth-selection">
+                        {% for tooth in first_row %}
+                        {% if tooth == 21 %}
+                        <div class="separator"></div>
+                        {% endif %}
+                        {% if tooth in selected_tooth %}
+                        <button style="background-color:#7ef78b" class="button-tooth">
+                            <img src="/images/tooth.png" alt="Tooth"><br>
+                            {{tooth}}
+                        </button>
+                        {% else %}
+                        <button class="button-tooth">
+                            <img src="/images/tooth.png" alt="Tooth"><br>
+                            {{tooth}}
+                        </button>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <div class="tooth-selection">
+                        {% for tooth in second_row %}
+                        {% if tooth == 31 %}
+                        <div class="separator"></div>
+                        {% endif %}
+                        {% if tooth in selected_tooth %}
+                        <button style="background-color:#7ef78b" class="button-tooth">
+                            <img src="/images/tooth.png" alt="Tooth"><br>
+                            {{tooth}}
+                        </button>
+                        {% else %}
+                        <button class="button-tooth">
+                            <img src="/images/tooth.png" alt="Tooth"><br>
+                            {{tooth}}
+                        </button>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <label class="label">Направление:</label>
-        <select id="procedure-select" name="type" onchange="updateType(event)">
-            <option value="None" disabled selected hidden >Выбрать направление</option>
-            {% for type in job_types %}
-            <option value="{{type}}">{{type}}</option>
-            {% endfor %}
-        </select>
-<!--        <div class="button-group">-->
-<!--            <button id="template" type="submit" style="display: none" onclick="addTemplate()" class="button-action">Готовый прайс</button>-->
-<!--            <button id="manual" type="submit" style="display: none" class="button-action">Собрать вручную</button>-->
-<!--        </div>-->
-        <select id="sub-procedure" name="type" style="display: none">
+            <label class="label">Направление:</label>
+            <select id="procedure-select" name="type" onchange="updateType(event)">
+                <option value="None" disabled selected hidden>Выбрать направление</option>
+                {% for type in job_types %}
+                <option value="{{type}}">{{type}}</option>
+                {% endfor %}
+            </select>
+            <!--        <div class="button-group">-->
+            <!--            <button id="template" type="submit" style="display: none" onclick="addTemplate()" class="button-action">Готовый прайс</button>-->
+            <!--            <button id="manual" type="submit" style="display: none" class="button-action">Собрать вручную</button>-->
+            <!--        </div>-->
+            <select id="sub-procedure" name="type" style="display: none">
 
-            <option value="None" disabled selected hidden>Выбрать поднаправление</option>
+                <option value="None" disabled selected hidden>Выбрать поднаправление</option>
 
-        </select>
+            </select>
 
-        <div id="all_procedure">
+            <div id="all_procedure">
 
-        </div>
-        <div class="delete-button">
-            <button class="delete-btn" onclick="deleteOrderBlock(this)">×</button>
+            </div>
+            <div class="delete-button">
+                <button class="delete-btn" onclick="deleteOrderBlock(this)">×</button>
+            </div>
         </div>
     </div>
-    </div>
-
 
 
     <div id="add-order" class="add-procedure-button">

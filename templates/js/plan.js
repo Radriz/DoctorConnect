@@ -2,6 +2,11 @@ let clients = {};
 let counter = 0;
 let stageNumber = 1;
 let initial_procedure_container;
+let selected_template = {'procedure-container-1' :[]};
+console.log(selected_template)
+
+
+
 //document.getElementById('sub-procedure').addEventListener('change', function() {
 //    const subtype = this.value;
 //    proc = document.getElementById('procedure-select');
@@ -108,18 +113,16 @@ document.getElementById('submit').addEventListener('click', async (event) => {
             const templateProcedureBlocks = procedureBlock_i.querySelectorAll('.template_procedure_block');
             for (let tpb of templateProcedureBlocks) {
                 const tpbId = tpb.id.split('_').at(-1);
-                if (tpb.querySelector('#number' + tpbId) === null) {
+                if (tpb.querySelector('#checkbox' + tpbId) === null) {
                     continue;
                 }
-                const amount = tpb.querySelector('#number' + tpbId).textContent.trim();
 
-                if (amount !== "0") {
+                if (tpb.querySelector('#checkbox' + tpbId).checked) {
                 console.log({
                             stage: stageName,
                             template_id: parseInt(tpbId),
                             tooths: currentTooth.join(','),
-                            plan_id: planId,
-                            amount: parseInt(amount)
+                            plan_id: planId
                         })
                     // Create service
                     const serviceResponse = await fetch('/plan/service/create', {
@@ -131,8 +134,7 @@ document.getElementById('submit').addEventListener('click', async (event) => {
                             stage: stageName,
                             template_id: parseInt(tpbId),
                             tooths: currentTooth.join(','),
-                            plan_id: planId,
-                            amount: parseInt(amount)
+                            plan_id: planId
                         })
                     });
 
@@ -216,13 +218,35 @@ function generateTemplateProcedureHTML(stage, data) {
         procedureBlock.id = 'template_procedure_block_' + key;
 
         const leftDiv = document.createElement('div');
+        leftDiv.style.width = '200px';
         leftDiv.className = 'left';
+        const checkbox = document.createElement('input');
+        checkbox.id = `checkbox${key}`;
+        checkbox.style.marginRight = '30px'
+        checkbox.style.marginLeft = '20px'
+        checkbox.style.transform = 'scale(2)';
+        checkbox.type = 'checkbox';
+        if (selected_template[stage.id].includes(key)) {
+            checkbox.checked = true;
+            }
+        checkbox.onclick = function() {
+               console.log(stage.id + " " + selected_template[stage.id])
+            if (selected_template[stage.id].includes(key)) {
+            selected_template[stage.id].splice(selected_template[stage.id].indexOf(key), 1);
+            } else {
+            selected_template[stage.id].push(key);
+            }
+        }
+        leftDiv.appendChild(checkbox);
         const columnDiv = document.createElement('div');
         columnDiv.className = 'column'
 
         const label = document.createElement('label');
         label.htmlFor = `template${key}`;
         label.textContent = template.name;
+        if (template.tooth_depend) {
+            label.textContent += ` ×🦷`;
+        }
         label.style.fontSize = "20px"
         columnDiv.appendChild(label);
 
@@ -230,35 +254,17 @@ function generateTemplateProcedureHTML(stage, data) {
         change.textContent = "Изменить";
         const currentProcedure = template.procedure;
         change.onclick = function() {
-          open_template_procedure(stage, currentProcedure, key, template.name);
+          open_template_procedure(stage, currentProcedure, key, template.name,template.tooth_depend);
         };
         change.style.cursor = 'pointer';
         columnDiv.appendChild(change);
 
         leftDiv.append(columnDiv)
-
+        procedureBlock.appendChild(leftDiv);
         const rightDiv = document.createElement('div');
         rightDiv.className = 'right';
 
 
-        const numberDiv = document.createElement('div');
-        numberDiv.id = `number${key}`;
-        numberDiv.textContent = '0';
-
-        const decrementButton = document.createElement('button');
-        decrementButton.textContent = ' - ';
-        decrementButton.onclick = () => decrement(numberDiv);
-        rightDiv.appendChild(decrementButton);
-
-        rightDiv.appendChild(numberDiv);
-
-        const incrementButton = document.createElement('button');
-        incrementButton.textContent = ' + ';
-        incrementButton.onclick = () => increment(numberDiv);
-        rightDiv.appendChild(incrementButton);
-
-
-        procedureBlock.appendChild(leftDiv);
 
         const stickerDiv = document.createElement('div')
         stickerDiv.className = "dropdown";
@@ -302,7 +308,7 @@ function generateTemplateProcedureHTML(stage, data) {
     procedureBlock.style.display = 'flex'
     procedureBlock.style.justifyContent = 'center'
     procedureBlock.onclick = function() {
-          open_template_procedure(stage, null, 'new', "");
+          open_template_procedure(stage, null, 'new', "",false);
         };
 
     all_templates.appendChild(procedureBlock);
@@ -336,7 +342,7 @@ function addTemplate(document) {
     });
 }
 
-function open_template_procedure(stage, data, template_id,template_name) {
+function open_template_procedure(stage, data, template_id,template_name, tooth_depend) {
     const modal = document.getElementById('modal');
     const modalBody = document.getElementById('modal-body');
     document.getElementById('saveProcedures').onclick= function() {saveChanges(stage, template_id);}
@@ -350,7 +356,27 @@ function open_template_procedure(stage, data, template_id,template_name) {
     label.value=template_name;
     label.type="text";
     label.style.fontSize="25px;"
+    label.style.marginBottom = '15px'
     modalBody.appendChild(label);
+    const label_block = document.createElement("label");
+    label_block.style.fontWeight = 'normal';
+    const checkbox = document.createElement("input");
+    const labelText = document.createTextNode('Стоимость услуги будет умножена на количество выбранных зубов');
+    checkbox.id = 'checkbox-tooth-dependency';
+    checkbox.style.marginRight = '15px'
+    checkbox.style.marginLeft = '15px'
+    checkbox.style.marginBottom = '20px'
+    checkbox.style.transform = 'scale(1.6)';
+    checkbox.type = 'checkbox';
+
+    if (tooth_depend){
+        checkbox.checked = true;
+    }
+
+    label_block.appendChild(checkbox);
+    label_block.appendChild(labelText);
+
+    modalBody.appendChild(label_block);
     if (data == null){
         addField()
         console.log("Ок")
@@ -394,6 +420,21 @@ function addField(item = {}) {
 
     const leftDiv = document.createElement('div');
     leftDiv.className = 'left';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    if (item.id) {
+        checkbox.id = `checkbox${item.id}`;
+        checkbox.checked = item.is_active;
+    } else{
+        checkbox.id = `checkboxnew${counter}`;
+        checkbox.checked = true;
+    }
+    checkbox.style.marginRight = '30px'
+    checkbox.style.marginLeft = '20px'
+    checkbox.style.transform = 'scale(1.8)';
+
+    leftDiv.appendChild(checkbox);
 
     const label = document.createElement('input');
     if (item.id) {
@@ -511,13 +552,15 @@ function removeTemplate(id, fieldContainer) {
 async function saveChanges(stage, temp_template_id) {
     var template_id = temp_template_id;
     const template_name = document.getElementById('template-name').value;
+    const tooth_depend = document.getElementById('checkbox-tooth-dependency').checked;
+    const stageProcedureSelectValue = stage.querySelector(`#procedure-select`).value;
 
     if (template_id === 'new') {
         try {
             const response = await fetch(`/procedure/template/create/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ template_name: template_name })
+                body: JSON.stringify({ template_name: template_name, tooth_depend: tooth_depend })
             });
             const data = await response.json();
             console.log('Success:', data);
@@ -530,7 +573,7 @@ async function saveChanges(stage, temp_template_id) {
             const response = await fetch(`/procedure/template/${template_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ template_name: template_name })
+                body: JSON.stringify({ template_name: template_name, tooth_depend: tooth_depend })
             });
             const data = await response.json();
             console.log('Success:', data);
@@ -547,14 +590,15 @@ async function saveChanges(stage, temp_template_id) {
         const name = field.querySelector(`#label${id}`).value;
         const price = field.querySelector(`#price${id}`).value;
         const amount = field.querySelector(`#amount${id}`).innerText;
-        const type = document.getElementById('procedure-select').value;
+        const type = stageProcedureSelectValue;
+        const is_active = field.querySelector(`#checkbox${id}`).checked;
         console.log(amount);
         if (id.startsWith('new')) {
             console.log({ name, type, price: parseInt(price), template_id: template_id, amount: parseInt(amount) })
             fetch('/procedure/user/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, type, price: parseInt(price), template_id: template_id, amount: parseInt(amount) })
+                body: JSON.stringify({ name, type, price: parseInt(price), template_id: template_id, amount: parseInt(amount), is_active: is_active })
             })
                 .then(response => response.json())
                 .then(data => {
@@ -565,7 +609,7 @@ async function saveChanges(stage, temp_template_id) {
             fetch(`/procedure/user/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, type, price: parseInt(price), template_id: template_id, amount: parseInt(amount) })
+                body: JSON.stringify({ name, type, price: parseInt(price), template_id: template_id, amount: parseInt(amount), is_active: is_active })
             })
                 .then(response => response.json())
                 .then(data => {
@@ -577,8 +621,6 @@ async function saveChanges(stage, temp_template_id) {
 
     closeModal();
     addTemplate(stage);
-
-    const stageProcedureSelectValue = stage.querySelector(`#procedure-select`).value;
 
     // Получаем div с id 'stage'
     const stageElement = document.getElementById('stage');
@@ -682,6 +724,7 @@ function addOrderBlock(){
     newProcedureBlock.id = 'procedure-container-' + stageNumber;
     newProcedureBlock.className = 'procedure-block';
     newProcedureBlock.innerHTML = initial_procedure_container;
+    selected_template[newProcedureBlock.id] = []
 
     // Добавляем новый блок в контейнер stages
     var stages = document.getElementById('stage');

@@ -1,5 +1,7 @@
 import datetime
+import os
 from typing import Optional
+from docx2pdf import convert
 
 from fastapi import FastAPI, Form, Depends, HTTPException, Request
 from fastapi.openapi.models import Response
@@ -51,6 +53,7 @@ class Order(BaseModel):
 
 class TemplateProcedure(BaseModel):
     template_name: str
+    tooth_depend: bool
 
 class TemplateSticker(BaseModel):
     template_id: int
@@ -63,6 +66,7 @@ class Procedure(BaseModel):
     price: int
     template_id: int
     amount: int
+    is_active: bool
 
 
 
@@ -319,14 +323,15 @@ async def get_subtype(request: Request, type: str):
     # ]  }
     for template in templates:
         if template[0] not in templates_dict:
-            templates_dict[template[0]] = {"name": template[1],"sticker": template[10], "price": 0, "procedure": []}
+            templates_dict[template[0]] = {"name": template[1],"sticker": template[10], "price": 0,"tooth_depend": template[12] == 1, "procedure": []}
 
         templates_dict[template[0]]["procedure"].append({
             "id": template[2] if template[2] is not None else template[6],
             "type": "template" if template[2] is not None else 'user',
             "name": template[3] if template[3] is not None else template[7],
             "price": template[5] if template[5] is not None else template[8],
-            "amount": template[9]
+            "amount": template[9],
+            "is_active": template[11] == 1
         })
         templates_dict[template[0]]["price"] += (template[5] if template[5] is not None else template[8]) * template[9]
     return templates_dict
@@ -336,20 +341,20 @@ async def get_subtype(request: Request, type: str):
 async def save_template(request: Request, templateProcedure: TemplateProcedure):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie)
-    new_template = create_template_procedure(templateProcedure.template_name, user_id)
+    new_template = create_template_procedure(templateProcedure.template_name, templateProcedure.tooth_depend, user_id)
     return {'id': new_template}
 
 
 @app.post("/procedure/user/")
 async def procedure(request: Request, procedure: Procedure):
-    add_procedure_to_template(procedure.name, procedure.type, procedure.price, procedure.template_id, procedure.amount)
+    add_procedure_to_template(procedure.name, procedure.type, procedure.price, procedure.template_id, procedure.amount,procedure.is_active)
     return {"result": 'Done'}
 
 @app.put("/procedure/user/{id}")
 async def procedure(request: Request,id: int, procedure: Procedure):
     edit_user_procedure(id, procedure.name, procedure.type, procedure.price)
     print(id, procedure.template_id,procedure.amount)
-    update_amount_procedure_template(id, procedure.template_id,procedure.amount)
+    update_amount_procedure_template(id, procedure.template_id,procedure.amount,procedure.is_active)
     return {"result": 'Done'}
 
 
@@ -357,7 +362,7 @@ async def procedure(request: Request,id: int, procedure: Procedure):
 async def update_template(request: Request,id: int, template: TemplateProcedure):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie)
-    update_template_name(id,template.template_name,user_id)
+    update_template_name(id,template.template_name,user_id,template.tooth_depend)
     return {"result": 'Done'}
 @app.put("/procedure/sticker/template")
 async def update_stickers(request: Request, template: TemplateSticker):
@@ -423,7 +428,7 @@ class ServiceModel(BaseModel):
     template_id: int
     tooths : str
     plan_id: int
-    amount: int
+
 
 @app.post("/plan/service/create")
 async def create_service(request: Request, service: ServiceModel):
@@ -431,7 +436,7 @@ async def create_service(request: Request, service: ServiceModel):
     user_id = read_session(session_cookie)
     if user_id is None:
         return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
-    service_id = create_service_db(service.stage, service.template_id, service.tooths, service.plan_id, service.amount)
+    service_id = create_service_db(service.stage, service.template_id, service.tooths, service.plan_id)
     return {"service_id": service_id}
 
 @app.get("/plan/document/{plan_id}")
@@ -447,33 +452,51 @@ async def get_document(request: Request, plan_id: int):
         "data_day": datetime.datetime.now().strftime("%d.%m.%Y")
     }
     get_stages = get_stages_plan_id(plan_id)
+    total_price = 0
 
     stages = []
     done_stages = []
     for stage in get_stages:
-
-        if stage in done_stages:
-            stage_i = done_stages.index(stages)
-            stages[stage_i]["items"].append({
-                "no": len(stages[stage_i]["items"]) + 1,
-                "service": stage[3],
-                "price_per_unit":"1000",
-                "quantity": stage[1],
-                "total": f"{stage[1] * 1000}",
+        if stage[0] in done_stages:
+            stage_i = done_stages.index(stage[0])
+            if stage[2] not in stages[stage_i]['templates']:
+                stages[stage_i]['templates'][stage[2]] = {'name' : stage[3], 'items' : []}
+            stages[stage_i]['templates'][stage[2]]["items"].append({
+                "no": len(stages[stage_i]['templates'][stage[2]]["items"]) + 1,
+                "service": stage[5],
+                "price_per_unit": stage[6],
+                "quantity":  stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(",")),
+                "total":  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
             })
+            stages[stage_i]['total_price'] +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
+
         else:
             stages.append({
                 "number": len(done_stages) + 1,
                 "stage": stage[0],
-                "items": [
-                    {"no": 1, "service": stage[3], "price_per_unit": "1000", "quantity": stage[1], "total": f"{stage[1] * 1000}"}
-                ]
+                'total_price' : (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
+                'tooth' : stage[1],
+                "templates": {
+                    stage[2]: {'name' : stage[3], 'items' : [
+                        {
+                            "no": 1,
+                            "service": stage[5],
+                            "price_per_unit": stage[6],
+                            "quantity":  stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(",")),
+                            "total": (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
+                        }
+                    ]}
+                }
             })
             done_stages.append(stage[0])
+        total_price +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
+    print(stages)
+    output_path =  os.getcwd() +f'/treatment_plans/{data["fio"].replace(" ", "_")}_{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
+    generate_plan(stages, data,total_price,
+                  output_path=output_path + ".docx")
+    convert(output_path + ".docx", output_path + ".pdf")
 
-
-    generate_plan(stages, data)
-    return {"document": "Done"}
+    return {"document":output_path + ".pdf"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -12,6 +12,7 @@ from docx.oxml.ns import qn
 def generate_plan(
         stages,
         data,
+        total_price,
         output_path = os.getcwd() + "/templates/file/output.docx",
         template_path = os.getcwd() + "/templates/file/plan_word.docx",
         add_template_path = os.getcwd()  + "/templates/file/add_plan_word.docx",
@@ -58,18 +59,18 @@ def generate_plan(
             run.font.size = Pt(14)  # Размер шрифта 15 пунктов
 
             # Добавляем границы
-            set_cell_border(cell, top={"sz": 12, "val": "single", "color": "000000"},
-                            bottom={"sz": 12, "val": "single", "color": "000000"},
-                            start={"sz": 12, "val": "single", "color": "000000"},
-                            end={"sz": 12, "val": "single", "color": "000000"})
+            set_cell_border(cell, top={"sz": 10, "val": "single", "color": "000000"},
+                            bottom={"sz": 10, "val": "single", "color": "000000"},
+                            start={"sz": 10, "val": "single", "color": "000000"},
+                            end={"sz": 10, "val": "single", "color": "000000"})
 
         for item in items:
             row_cells = table.add_row().cells
             row_cells[0].text = str(item['no'])
-            row_cells[1].text = item['service']
-            row_cells[2].text = item['price_per_unit']
+            row_cells[1].text = item['service'] + "  "
+            row_cells[2].text = f"{item['price_per_unit']} руб."
             row_cells[3].text = str(item['quantity'])
-            row_cells[4].text = item['total']
+            row_cells[4].text = f"{item['total']} руб."
             for cell in row_cells:
                 # Установка размера шрифта для текста в ячейке
                 for paragraph in cell.paragraphs:
@@ -77,10 +78,10 @@ def generate_plan(
                         run.font.size = Pt(14)  # Размер шрифта 15 пунктов
 
                 # Добавляем границы
-                set_cell_border(cell, top={"sz": 12, "val": "single", "color": "000000"},
-                                bottom={"sz": 12, "val": "single", "color": "000000"},
-                                start={"sz": 12, "val": "single", "color": "000000"},
-                                end={"sz": 12, "val": "single", "color": "000000"})
+                set_cell_border(cell, top={"sz": 10, "val": "single", "color": "000000"},
+                                bottom={"sz": 10, "val": "single", "color": "000000"},
+                                start={"sz": 10, "val": "single", "color": "000000"},
+                                end={"sz": 10, "val": "single", "color": "000000"})
 
     doc = DocxTemplate(template_path)
     doc.render(data)
@@ -89,10 +90,28 @@ def generate_plan(
 
     for stage in stages:
         title = document.add_paragraph()
+        ts = title.add_run(f"-" * 132)
         ts = title.add_run(f"Этап №{stage['number']} – {stage['stage']}")
         ts.font.size = Pt(14)
-        create_table(document, stage['items'])
-        document.add_paragraph()  # Добавляем пустую строку между этапами
+        title=document.add_paragraph()
+        for stage_template in stage['templates'].values():
+            ts = title.add_run(f"{stage_template['name']} — {stage['tooth']}" + " " + ("зуб" if ',' not in stage['tooth'] else "зубы"))
+            ts.font.size = Pt(14)
+            create_table(document, stage_template['items'])
+            title=document.add_paragraph()
+            title.paragraph_format.space_before = Pt(13)
+        ts = title.add_run(f"Общая стоимость за этап {stage['stage'].lower()}: {stage['total_price']} руб.")
+        ts.font.size = Pt(14)  # Добавляем пустую строку между этапами
+    title = document.add_paragraph()
+    ts = title.add_run(f"-" * 132)
+    title = document.add_paragraph()
+    title.paragraph_format.space_after = Pt(20)
+    ts = title.add_run("ОБЩАЯ СТОИМОСТЬ ЗА ПЛАН ЛЕЧЕНИЯ: ")
+    ts.bold = True
+    ts.font.size = Pt(14)
+    ts = title.add_run(f"{total_price} руб.")
+    ts.bold = True
+    ts.font.size = Pt(18)
     doc_end = Document(add_template_path)
 
     # Сохраняем результирующий документ
@@ -112,30 +131,3 @@ def generate_plan(
     # Сохраняем результирующий документ
     new_doc_from_buffer.save(output_path)
 
-stages = [
-    {
-        "number": 1,
-        "stage": "Подготовка",
-        "items": [
-            {"no": 1, "service": "Услуга 1", "price_per_unit": "100", "quantity": 2, "total": "200"},
-            {"no": 2, "service": "Услуга 2", "price_per_unit": "150", "quantity": 1, "total": "150"},
-        ]
-    },
-    {
-        "number": 2,
-        "stage": "Реализация",
-        "items": [
-            {"no": 1, "service": "Услуга 3", "price_per_unit": "200", "quantity": 3, "total": "600"},
-            {"no": 2, "service": "Услуга 4", "price_per_unit": "250", "quantity": 2, "total": "500"},
-        ]
-    }
-]
-
-# Открываем шаблон
-data = {
-        "fio": 1,
-        "birthday": "Подготовка",
-        "data_day": datetime.datetime.now().strftime("%d.%m.%Y")
-    }
-
-generate_plan(stages,data)

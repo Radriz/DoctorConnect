@@ -166,7 +166,7 @@ def get_template_procedure(type, user_id):
     templates = cursor.execute(
         f"""select template.id,template.name, procedure.id,
         procedure.name,procedure.subtype,procedure.price,user_procedure.id,user_procedure.name,
-        user_procedure.price,template_procedure.amount,template.stick from template
+        user_procedure.price,template_procedure.amount,template.stick,template_procedure.is_active,template.tooth_depend from template
         left join template_procedure on template_procedure.template_id = template.id 
         left join procedure on template_procedure.procedure_id = procedure.id
         left join user_procedure on template_procedure.user_procedure_id = user_procedure.id
@@ -176,10 +176,10 @@ def get_template_procedure(type, user_id):
     return templates
 
 
-def create_template_procedure(template_name, user_id):
+def create_template_procedure(template_name,tooth_depend,user_id):
     id = cursor.execute(
-        f"""insert into template(name,user_id) 
-            Values('{template_name}',{user_id}) returning id""").fetchone()
+        f"""insert into template(name,user_id,tooth_depend) 
+            Values('{template_name}',{user_id},{1 if tooth_depend else 0}) returning id""").fetchone()
     connection.commit()
     return id[0]
 
@@ -190,15 +190,15 @@ def delete_template_procedure_by_id(id, user_id):
     connection.commit()
 
 
-def add_procedure_to_template(name, type, price, template_id, amount):
+def add_procedure_to_template(name, type, price, template_id, amount,is_active):
     user_procedure_id = cursor.execute(
         f"""insert into user_procedure(name,type,price) 
               Values('{name}','{type}',{price}) returning id""").fetchone()
     connection.commit()
     print(template_id, user_procedure_id, amount)
     cursor.execute(
-        f"""insert into template_procedure(template_id, user_procedure_id, amount) 
-                  Values({template_id},{user_procedure_id[0]},{amount})""")
+        f"""insert into template_procedure(template_id, user_procedure_id, amount,is_active) 
+                  Values({template_id},{user_procedure_id[0]},{amount},{1 if is_active else 0} )""")
     connection.commit()
 
 
@@ -224,17 +224,17 @@ def delete_user_procedure(id):
     connection.commit()
 
 
-def update_amount_procedure_template(procedure_id, template_id, amount):
+def update_amount_procedure_template(procedure_id, template_id, amount,is_active):
     cursor.execute(
-        f"""update template_procedure set amount = {amount}
+        f"""update template_procedure set amount = {amount}, is_active = {1 if is_active else 0}
                 where user_procedure_id = {procedure_id} and 
                 template_id = {template_id} """)
     connection.commit()
 
 
-def update_template_name(template_id, template_name, user_id):
+def update_template_name(template_id, template_name, user_id, tooth_depend):
     cursor.execute(
-        f"""update template set name = '{template_name}'
+        f"""update template set name = '{template_name}', tooth_depend = {1 if tooth_depend else 0}
                     where id = {template_id} and user_id = {user_id}
                     """)
     connection.commit()
@@ -267,10 +267,10 @@ def create_plan_db(fio, date_time, user_id,birthday):
     return cursor.lastrowid
 
 
-def create_service_db(stage, template_id, tooth, plan_id, amount):
+def create_service_db(stage, template_id, tooth, plan_id):
     cursor.execute(
-        f"""insert into plan_template(stage, plan_id, tooth, template_id, quantity) 
-            Values('{stage}',{plan_id}, '{tooth}', {template_id}, {amount}) returning id""").fetchone()
+        f"""insert into plan_template(stage, plan_id, tooth, template_id) 
+            Values('{stage}',{plan_id}, '{tooth}', {template_id}) returning id""").fetchone()
     connection.commit()
     return cursor.lastrowid
 
@@ -288,8 +288,12 @@ def get_patient_data_plan_by_id(id,user_id):
 
 def get_stages_plan_id(id):
     stages = cursor.execute(
-        f"""SELECT stage, quantity, tooth, template.name FROM plan_template
+        f"""SELECT stage, tooth, template.id, template.name, template.stick, 
+        user_procedure.name, user_procedure.price, template_procedure.amount,template.tooth_depend
+        FROM plan_template
         join treatment_plan on plan_template.plan_id = treatment_plan.id
         join template on plan_template.template_id = template.id
-        where treatment_plan.id = {id}""").fetchall()
+        join template_procedure on template.id = template_procedure.template_id
+        join user_procedure on template_procedure.user_procedure_id = user_procedure.id
+        where treatment_plan.id = {id} order by plan_template.id""").fetchall()
     return stages
