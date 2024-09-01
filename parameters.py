@@ -12,5 +12,31 @@ types = [
     "Бюгельный протез на аттачменах",
     "Другое"
 ]
-color_letter = ["A","B","C","D"]
-color_number = ["1","2","3","3.5","4"]
+color_letter = ["A", "B", "C", "D"]
+color_number = ["1", "2", "3", "3.5", "4"]
+
+tooth_data = {
+    36: {"x":459,"type":"lower_molar"},
+    37:  {"x":505,"type":"lower_molar"},
+    38:  {"x":555,"type":"lower_molar"},
+    46:  {"x":120,"type":"lower_molar"},
+    47:  {"x":75,"type":"lower_molar"},
+    48:  {"x":24,"type":"lower_molar"},
+
+}
+image_data = {
+    "crown":
+        {
+            "delta": -10,
+            "y": 307,
+            "width":41,
+            "height":33
+        },
+    "remove":
+        {
+            "delta": -5,
+            "y": 320,
+            "width": 31,
+            "height": 49
+        }
+}

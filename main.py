@@ -1,6 +1,8 @@
 import datetime
 import os
 from typing import Optional
+
+import fitz
 from docx2pdf import convert
 
 from fastapi import FastAPI, Form, Depends, HTTPException, Request
@@ -19,6 +21,7 @@ from Database import autorization, registration, find_techniks, get_user, create
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
     update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
     get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id
+from add_image import image_to_pdf
 from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
 
@@ -26,7 +29,7 @@ app = FastAPI()
 app.mount("/css", StaticFiles(directory="templates/css"), name="css")
 app.mount("/js", StaticFiles(directory="templates/js"), name="js")
 app.mount("/images", StaticFiles(directory="templates/images"), name="images")
-
+app.mount("/plans", StaticFiles(directory="treatment_plans"), name="treatment_plan")
 templates = Jinja2Templates(directory="templates")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account")
 
@@ -447,9 +450,9 @@ async def get_document(request: Request, plan_id: int):
         return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
     data = get_patient_data_plan_by_id(plan_id,user_id)
     data = {
-        "fio": data[0],
-        "birthday": data[1],
-        "data_day": datetime.datetime.now().strftime("%d.%m.%Y")
+        "fio": str(data[0]),
+        "birthday": str(data[1]),
+        "data_day": str(datetime.datetime.now().strftime("%d.%m.%Y"))
     }
     get_stages = get_stages_plan_id(plan_id)
     total_price = 0
@@ -476,6 +479,7 @@ async def get_document(request: Request, plan_id: int):
                 "stage": stage[0],
                 'total_price' : (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
                 'tooth' : stage[1],
+                'sticker' : stage[4],
                 "templates": {
                     stage[2]: {'name' : stage[3], 'items' : [
                         {
@@ -491,12 +495,25 @@ async def get_document(request: Request, plan_id: int):
             done_stages.append(stage[0])
         total_price +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
     print(stages)
-    output_path =  os.getcwd() +f'/treatment_plans/{data["fio"].replace(" ", "_")}_{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
+    file_name = f'{data["fio"].replace(" ", "_")}_{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
+    output_path =  os.getcwd() +f'/treatment_plans/{file_name}'
     generate_plan(stages, data,total_price,
                   output_path=output_path + ".docx")
-    convert(output_path + ".docx", output_path + ".pdf")
+    convert(output_path + ".docx", output_path + "no_icons.pdf")
 
-    return {"document":output_path + ".pdf"}
+    file_handle = fitz.open(output_path + "no_icons.pdf")
+    page = file_handle[0]
+    for stage in stages:
+        image = stage["sticker"]
+        tooths = stage["tooth"].split(",")
+        for tooth in tooths:
+
+            image_to_pdf(image,int(tooth),page)
+    file_handle.save(output_path + ".pdf")
+    file_handle.close()
+    os.remove(output_path + "no_icons.pdf")
+
+    return {"document_word":file_name + ".docx","document_pdf":file_name + ".pdf"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

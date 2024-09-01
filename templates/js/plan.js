@@ -143,17 +143,22 @@ document.getElementById('submit').addEventListener('click', async (event) => {
                     }
                 }
             }
-            await fetch(`/plan/document/${planId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
+            fetch(`/plan/document/${planId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при создании документа');
+                }
+                    return response.json()
+                }).then(data => {
+                    downloadFile('/plans/' + data.document_word, data.document_word);
+                    downloadFile('/plans/' + data.document_pdf, data.document_pdf);
+                })
         }
 
-
-
-        alert('План и услуги успешно созданы');
     } catch (error) {
         console.error(error);
         alert('Произошла ошибка при создании плана или услуг');
@@ -637,7 +642,7 @@ async function saveChanges(stage, temp_template_id) {
     });
 }
 
-const imgArray = ["core_tab", "implant", "seal"]; // Array of image names
+const imgArray = ["core_tab", "implant", "seal","crown","periodont","tooth"]; // Array of image names
 const dropdownContent = document.getElementById('dropdownContent');
 
 // Function to generate dropdown content
@@ -765,6 +770,14 @@ function deleteOrderBlock(button) {
     var orderBlock = button.closest('.procedure-block');
     orderBlock.parentNode.removeChild(orderBlock);
 
+}
+function downloadFile(url, filename) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 

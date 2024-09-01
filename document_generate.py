@@ -1,5 +1,3 @@
-import copy
-import datetime
 import os
 from io import BytesIO
 
@@ -17,18 +15,14 @@ def generate_plan(
         template_path = os.getcwd() + "/templates/file/plan_word.docx",
         add_template_path = os.getcwd()  + "/templates/file/add_plan_word.docx",
 ):
+    def fill_docx_template(doc, replacements):
+        for para in doc.paragraphs:
+            for run in para.runs:
+                for key, value in replacements.items():
+                    if key in run.text:
+                        run.text = run.text.replace(key, value)
+        return doc
     def set_cell_border(cell, **kwargs):
-        """
-        Set cell`s border
-        Usage:
-            set_cell_border(
-                cell,
-                top={"sz": 12, "color": "#FF0000", "val": "single"},
-                bottom={"sz": 12, "color": "#00FF00", "val": "single"},
-                start={"sz": 24, "color": "#0000FF", "val": "dashed"},
-                end={"sz": 24, "color": "#FF00FF", "val": "dashed"},
-            )
-        """
         tc = cell._element
         tcPr = tc.get_or_add_tcPr()
 
@@ -45,20 +39,17 @@ def generate_plan(
                     if key in edge_data:
                         element.set(qn(f'w:{key}'), str(edge_data[key]))
 
-    # Функция для создания таблицы
     def create_table(doc, items):
         table = doc.add_table(rows=1, cols=5)
         hdr_cells = table.rows[0].cells
         headers = ['№', 'Услуга', 'Цена за ед.', 'Кол-во', 'Всего']
 
-        # Устанавливаем стили для заголовков таблицы
         for i, header in enumerate(headers):
             cell = hdr_cells[i]
             run = cell.paragraphs[0].add_run(header)
             run.bold = True
-            run.font.size = Pt(14)  # Размер шрифта 15 пунктов
+            run.font.size = Pt(14)
 
-            # Добавляем границы
             set_cell_border(cell, top={"sz": 10, "val": "single", "color": "000000"},
                             bottom={"sz": 10, "val": "single", "color": "000000"},
                             start={"sz": 10, "val": "single", "color": "000000"},
@@ -72,36 +63,40 @@ def generate_plan(
             row_cells[3].text = str(item['quantity'])
             row_cells[4].text = f"{item['total']} руб."
             for cell in row_cells:
-                # Установка размера шрифта для текста в ячейке
                 for paragraph in cell.paragraphs:
                     for run in paragraph.runs:
-                        run.font.size = Pt(14)  # Размер шрифта 15 пунктов
+                        run.font.size = Pt(14)
 
-                # Добавляем границы
                 set_cell_border(cell, top={"sz": 10, "val": "single", "color": "000000"},
                                 bottom={"sz": 10, "val": "single", "color": "000000"},
                                 start={"sz": 10, "val": "single", "color": "000000"},
                                 end={"sz": 10, "val": "single", "color": "000000"})
 
-    doc = DocxTemplate(template_path)
-    doc.render(data)
-    doc.save(output_path)
-    document = Document(output_path)
+    # Генерация основного документа
+    doc = Document(template_path)
+    doc = fill_docx_template(doc, data)
+
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+
+    document = Document(buffer)
 
     for stage in stages:
         title = document.add_paragraph()
         ts = title.add_run(f"-" * 132)
         ts = title.add_run(f"Этап №{stage['number']} – {stage['stage']}")
         ts.font.size = Pt(14)
-        title=document.add_paragraph()
+        title = document.add_paragraph()
         for stage_template in stage['templates'].values():
             ts = title.add_run(f"{stage_template['name']} — {stage['tooth']}" + " " + ("зуб" if ',' not in stage['tooth'] else "зубы"))
             ts.font.size = Pt(14)
             create_table(document, stage_template['items'])
-            title=document.add_paragraph()
+            title = document.add_paragraph()
             title.paragraph_format.space_before = Pt(13)
         ts = title.add_run(f"Общая стоимость за этап {stage['stage'].lower()}: {stage['total_price']} руб.")
-        ts.font.size = Pt(14)  # Добавляем пустую строку между этапами
+        ts.font.size = Pt(14)
+
     title = document.add_paragraph()
     ts = title.add_run(f"-" * 132)
     title = document.add_paragraph()
@@ -112,22 +107,13 @@ def generate_plan(
     ts = title.add_run(f"{total_price} руб.")
     ts.bold = True
     ts.font.size = Pt(18)
+
+    # Загружаем дополнительный шаблон и добавляем его к основному документу
     doc_end = Document(add_template_path)
+
+    for element in doc_end.element.body:
+        document.element.body.append(element)
 
     # Сохраняем результирующий документ
     document.save(output_path)
-    # Создаем буфер для записи нового документа
-    buffer = BytesIO()
-    document.save(buffer)
-    buffer.seek(0)
-
-    # Считываем новый документ и заполненный шаблон
-    new_doc_from_buffer = Document(buffer)
-
-    # Переносим содержимое заполненного шаблона в новый документ с сохранением стилей
-    for element in doc_end.element.body:
-        new_doc_from_buffer.element.body.append(element)
-
-    # Сохраняем результирующий документ
-    new_doc_from_buffer.save(output_path)
 
