@@ -642,7 +642,7 @@ async function saveChanges(stage, temp_template_id) {
     });
 }
 
-const imgArray = ["core_tab", "implant", "seal","crown","periodont","tooth"]; // Array of image names
+const imgArray = ["core_tab", "implant", "seal","crown","gutta","periodont","tooth"]; // Array of image names
 const dropdownContent = document.getElementById('dropdownContent');
 
 // Function to generate dropdown content
@@ -769,7 +769,40 @@ function setTooth(buttonTooth){
 function deleteOrderBlock(button) {
     var orderBlock = button.closest('.procedure-block');
     orderBlock.parentNode.removeChild(orderBlock);
-
+}
+function selectBottomRow(button) {
+     var orderBlock = button.closest('.procedure-block');
+     const allBottomTooth = orderBlock.querySelector('#bottom-tooth').querySelectorAll('button');
+     let allSelected = true;
+     allBottomTooth.forEach((bt) => {
+          if (bt.style.backgroundColor != "rgb(126, 247, 139)"){
+              allSelected = false;
+          }
+     });
+     allBottomTooth.forEach((bt) => {
+          if (allSelected){
+              bt.style.backgroundColor = "transparent";
+          } else {
+              bt.style.backgroundColor = "#7ef78b";
+          }
+     });
+}
+function selectTopRow(button) {
+     var orderBlock = button.closest('.procedure-block');
+     const allTopTooth = orderBlock.querySelector('#top-tooth').querySelectorAll('button');
+     let allSelected = true;
+     allTopTooth.forEach((bt) => {
+          if (bt.style.backgroundColor != "rgb(126, 247, 139)"){
+              allSelected = false;
+          }
+     });
+     allTopTooth.forEach((bt) => {
+          if (allSelected){
+              bt.style.backgroundColor = "transparent";
+          } else {
+              bt.style.backgroundColor = "#7ef78b";
+          }
+     });
 }
 function downloadFile(url, filename) {
     const a = document.createElement('a');

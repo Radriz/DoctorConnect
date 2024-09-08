@@ -40,10 +40,11 @@
     <div id="stage">
         <div id="procedure-container-1" class="procedure-block">
             <label class="label">Название этапа:</label>
-            <input type="text" id="stage-name" name="stage" required>
+            <input type="text" id="stage-name" style="margin-bottom: 20px" name="stage" required>
+            <br><button class="button-select" onclick="selectTopRow(this)">Выбрать верхний ряд</button>
             <div class="scroll-container">
                 <div class="tooth-selection-container">
-                    <div class="tooth-selection">
+                    <div class="tooth-selection" id="top-tooth">
                         {% for tooth in first_row %}
                         {% if tooth == 21 %}
                         <div class="separator"></div>
@@ -62,7 +63,7 @@
                         {% endfor %}
                     </div>
                     <hr>
-                    <div class="tooth-selection">
+                    <div class="tooth-selection" id="bottom-tooth">
                         {% for tooth in second_row %}
                         {% if tooth == 31 %}
                         <div class="separator"></div>
@@ -82,7 +83,7 @@
                     </div>
                 </div>
             </div>
-
+            <button class="button-select" style="margin-bottom: 20px" onclick="selectBottomRow(this)">Выбрать нижний ряд</button>
             <label class="label">Направление:</label>
             <select id="procedure-select" name="type" onchange="updateType(event)">
                 <option value="None" disabled selected hidden>Выбрать направление</option>
