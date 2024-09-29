@@ -9,6 +9,7 @@ body {
 }
 h1 {
     color: #333;
+    margin: 30px;
 }
 
 .plan {
@@ -18,7 +19,6 @@ h1 {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     width: 90%;
     max-width: 1700px;
-    margin-top: 20px;
 }
 label {
     font-weight: bold;
@@ -69,7 +69,7 @@ input[type="text"], input[type="number"],input[type="date"] {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
+    width: 96%;
     max-width: 600px;
     border: 1px solid #ccc;
     padding: 10px;
@@ -81,6 +81,7 @@ input[type="text"], input[type="number"],input[type="date"] {
 .procedure_block .left, .template_procedure_block .left {
     display: flex;
     align-items: center;
+
 }
 .procedure_block .right, .template_procedure_block .right {
     display: flex;
@@ -152,9 +153,7 @@ input[type="submit"]:hover {
     position: relative;
 }
 .add-procedure-button {
-    text-align: center;
     margin-top: 30px;
-
 }
 
 .add-procedure-button button {
@@ -167,6 +166,7 @@ input[type="submit"]:hover {
     cursor: pointer;
     font-size: 25px;
     font-weight: bold;
+    width: 100%;
 }
 
 .add-procedure-button button:hover {
@@ -255,12 +255,34 @@ input[type="submit"]:hover {
         flex-direction: column;
         align-items: flex-start;
     }
-    .procedure_block .left, .template_procedure_block .left, .procedure_block .right, .template_procedure_block .right,{
-        justify-content: space-between;
-        width: 100%;
+    .procedure_block .left,
+    .template_procedure_block .left,
+    .procedure_block .right,
+    .template_procedure_block .right {
         margin-bottom: 10px;
     }
+    .personal {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .add-procedure-button {
+        width: 100%;
+        margin-top: 30px;
+    }
 }
+@media screen and (min-width: 600px) {
+.personal {
+        width: 350px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .add-procedure-button {
+        width: 350px;
+        margin-top: 30px;
+    }
+}
+
 .success {
     background-color: #4CAF50;
     color: white;
@@ -277,7 +299,6 @@ input[type="submit"]:hover {
     padding: 10px;
     border-radius: 5px;
     cursor: pointer;
-    width: 20%;
     font-size: 25px;
     font-weight: bold;
     margin-bottom: 20px;
@@ -341,4 +362,147 @@ input[type="submit"]:hover {
     border-color:  #45a049;
     padding: 10px;
     cursor: pointer;
+}
+.stage-name{
+    margin-bottom: 20px;
+    width: 96%;
+    max-width: 620px;
+}
+
+.price{
+    margin-bottom: 0px;
+    font-size: 30px;
+
+}
+
+@media screen and (min-width: 600px) {
+
+    .template_procedure_block input[type="checkbox"] {
+        width: 25px;
+        height:25px;
+    }
+    .column{
+        width: 220px;
+    }
+    .template_procedure_block .left {
+        width: 222px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .template_procedure_block {
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+    }
+    .column{
+        width: 150px;
+    }
+    .template_procedure_block .left {
+        display: flex;
+        align-items: center;
+        width: 200px;
+        margin-bottom: 10px;
+    }
+
+    .template_procedure_block .right {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 10px;
+        align-items: center; /* Для центрирования элементов по вертикали */
+    }
+
+    .template_procedure_block label {
+        font-size: 18px;
+        margin-bottom: 0;
+        width: 190px;
+    }
+
+    .template_procedure_block .remove-btn {
+        position: absolute;
+        right: 5px;
+        font-size: 24px;
+    }
+
+    .template_procedure_block input[type="checkbox"] {
+        width: 20px;
+        height:20px;
+    }
+
+    .template_procedure_block .dropdown {
+        display: inline-block; /* Размещаем на одной строке с ценой */
+        margin-left: auto; /* Отодвигаем dropdown вправо от цены */
+    }
+
+    .template_procedure_block .right label {
+        font-size: 24px;
+    }
+
+    .template_procedure_block .column a {
+        font-size: 16px;
+    }
+
+    .template_procedure_block .dropdown-content {
+        max-width: 100px;
+    }
+
+    .template_procedure_block .price {
+        display: inline-block;
+        margin-left: 10px;
+        font-size: 26px;
+        position: absolute;
+        left: 10px;
+        bottom: 5px;
+        margin-bottom: 10px;
+
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .modal-content {
+        width: 90%; /* Make the modal content take up more width */
+        margin: 10% auto; /* Adjust the top margin */
+        padding: 15px; /* Reduce padding */
+        border-radius: 10px; /* Optional: reduce border radius */
+    }
+
+    .modal-template-name {
+        font-size: 18px; /* Adjust font size for smaller screens */
+    }
+
+    .button-action {
+        font-size: 16px; /* Reduce font size of action buttons */
+        padding: 8px; /* Adjust padding */
+        width: 100%; /* Ensure buttons take full width */
+    }
+
+    .close {
+        font-size: 24px; /* Adjust close button size */
+    }
+
+    .button-group {
+        flex-direction: column; /* Stack buttons vertically */
+        width: 100%;
+    }
+
+    .procedure_block, .template_procedure_block {
+        max-width: 94%; /* Allow blocks to take full width */
+    }
+
+    .procedure_block .left, .template_procedure_block .left,
+    .procedure_block .right, .template_procedure_block .right {
+        margin-bottom: 10px;
+    }
+
+    .procedure_block .remove-btn {
+        position: absolute;
+        right: 5%;
+        font-size: 24px;
+    }
+
+    /* Adjust input sizes */
+    input[type="text"], input[type="number"], .modal-template-name {
+        width: 94%; /* Full width inputs */
+    }
 }

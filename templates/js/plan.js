@@ -77,7 +77,15 @@ document.getElementById('combobox').addEventListener('input',() => {
 document.getElementById('submit').addEventListener('click', async (event) => {
     event.preventDefault();
     const fio = document.querySelector('.fio').value;
+    if (fio == "") {
+        alert('Введите имя и фамилию пациента');
+        return;
+    }
     const birthday = document.getElementById('calendar').value;
+    if (birthday == "") {
+        alert('Введите дату рождения пациента');
+        return;
+    }
     const stages = document.getElementById('stage');
     const procedureBlocks = stages.querySelectorAll('.procedure-block');
     let planId = null;
@@ -98,10 +106,16 @@ document.getElementById('submit').addEventListener('click', async (event) => {
 
         const planData = await planResponse.json();
         planId = planData.plan_id;
+        data_procedure_block = [];
 
         // Create services for each procedure block
         for (let procedureBlock_i of procedureBlocks) {
             const stageName = procedureBlock_i.querySelector('#stage-name').value;
+            const stageI = procedureBlock_i.id.split('-').at(-1);
+            if (stageName == "") {
+            alert('Отсутствует название этапа №' + stageI);
+            return;
+            }
             let currentTooth = [];
             const buttons = procedureBlock_i.querySelectorAll('.tooth-selection button');
             buttons.forEach(button => {
@@ -109,8 +123,28 @@ document.getElementById('submit').addEventListener('click', async (event) => {
                     currentTooth.push(button.innerText.trim())
                 }
             });
+            console.log(currentTooth)
+            if (currentTooth.length == 0) {
+                alert(`Не выбран ни один зуб на этапе \"${stageName}\"` );
+                return;
+            }
 
             const templateProcedureBlocks = procedureBlock_i.querySelectorAll('.template_procedure_block');
+            selectedProcedure = false;
+            for (let tpb of templateProcedureBlocks) {
+                const tpbId = tpb.id.split('_').at(-1);
+                if (tpb.querySelector('#checkbox' + tpbId) === null) {
+                    continue;
+                }
+
+                if (tpb.querySelector('#checkbox' + tpbId).checked) {
+                selectedProcedure = true;
+                }
+            }
+            if (selectedProcedure == false){
+                alert(`Не выбрана ни одна медицинская услуга на этапе \"${stageName}\"`);
+                return;
+            }
             for (let tpb of templateProcedureBlocks) {
                 const tpbId = tpb.id.split('_').at(-1);
                 if (tpb.querySelector('#checkbox' + tpbId) === null) {
@@ -143,21 +177,22 @@ document.getElementById('submit').addEventListener('click', async (event) => {
                     }
                 }
             }
-            fetch(`/plan/document/${planId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка при создании документа');
-                }
-                    return response.json()
-                }).then(data => {
-                    downloadFile('/plans/' + data.document_word, data.document_word);
-                    downloadFile('/plans/' + data.document_pdf, data.document_pdf);
-                })
         }
+        fetch(`/plan/document/${planId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при создании документа');
+            }
+                return response.json()
+            }).then(data => {
+                downloadFile('/plans/' + data.document_word, data.document_word);
+                downloadFile('/plans/' + data.document_pdf, data.document_pdf);
+            })
+
 
     } catch (error) {
         console.error(error);
@@ -223,59 +258,57 @@ function generateTemplateProcedureHTML(stage, data) {
         procedureBlock.id = 'template_procedure_block_' + key;
 
         const leftDiv = document.createElement('div');
-        leftDiv.style.width = '200px';
         leftDiv.className = 'left';
+
         const checkbox = document.createElement('input');
         checkbox.id = `checkbox${key}`;
-        checkbox.style.marginRight = '30px'
-        checkbox.style.marginLeft = '20px'
-        checkbox.style.transform = 'scale(2)';
         checkbox.type = 'checkbox';
         if (selected_template[stage.id].includes(key)) {
             checkbox.checked = true;
-            }
-        checkbox.onclick = function() {
-               console.log(stage.id + " " + selected_template[stage.id])
-            if (selected_template[stage.id].includes(key)) {
-            selected_template[stage.id].splice(selected_template[stage.id].indexOf(key), 1);
-            } else {
-            selected_template[stage.id].push(key);
-            }
         }
+        checkbox.onclick = function() {
+            if (selected_template[stage.id].includes(key)) {
+                selected_template[stage.id].splice(selected_template[stage.id].indexOf(key), 1);
+            } else {
+                selected_template[stage.id].push(key);
+            }
+        };
         leftDiv.appendChild(checkbox);
+
         const columnDiv = document.createElement('div');
-        columnDiv.className = 'column'
+        columnDiv.className = 'column';
 
         const label = document.createElement('label');
-        label.htmlFor = `template${key}`;
+        label.htmlFor = `checkbox${key}`;
         label.textContent = template.name;
         if (template.tooth_depend) {
-            label.textContent += ` ×🦷`;
+            label.textContent += ' ×🦷';
         }
-        label.style.fontSize = "20px"
+        label.style.fontSize = '18px';
+        label.style.marginLeft = '10px';
+        label.style.marginBottom = '5px';
         columnDiv.appendChild(label);
 
         const change = document.createElement('a');
-        change.textContent = "Изменить";
-        const currentProcedure = template.procedure;
+        change.textContent = 'Изменить';
         change.onclick = function() {
-          open_template_procedure(stage, currentProcedure, key, template.name,template.tooth_depend);
+            open_template_procedure(stage, template.procedure, key, template.name, template.tooth_depend);
         };
         change.style.cursor = 'pointer';
+        change.style.marginLeft = '10px';
         columnDiv.appendChild(change);
 
-        leftDiv.append(columnDiv)
+        leftDiv.appendChild(columnDiv);
         procedureBlock.appendChild(leftDiv);
-        const rightDiv = document.createElement('div');
-        rightDiv.className = 'right';
-
 
 
         const stickerDiv = document.createElement('div')
         stickerDiv.className = "dropdown";
         const stickerButton = document.createElement('button');
         const dropdownContent = generateDropdownContent(stickerButton, key)
-        stickerButton.onclick = () =>  dropdownContent.classList.toggle('show');
+        stickerButton.onclick = () =>  {
+            handle_dropdown(dropdownContent)
+        }
         stickerDiv.appendChild(stickerButton)
         stickerDiv.appendChild(dropdownContent)
         if (template.sticker != null){
@@ -285,13 +318,11 @@ function generateTemplateProcedureHTML(stage, data) {
         }
 
         procedureBlock.appendChild(stickerDiv)
-        procedureBlock.appendChild(rightDiv);
 
         const price = document.createElement('label');
         price.htmlFor = `template${key}`;
         price.textContent = template.price + " руб.";
-        price.style.marginBottom = "0px"
-        price.style.fontSize = "30px"
+        price.className="price"
         procedureBlock.appendChild(price);
 
         const removeButton = document.createElement('button');
@@ -346,14 +377,43 @@ function addTemplate(document) {
         console.error('Error fetching procedure data:', error);
     });
 }
+function handleClick(event) {
+        if (event.target.getAttribute("name") != "img-dropdown") {
+            high_all_dropdown_content()
+
+        }
+        console.log(event.target)
+
+}
+document.addEventListener('click', handleClick);
+
+
+function high_all_dropdown_content() {
+    const dropdowns = document.getElementsByClassName("dropdown-content");
+    for (let i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].classList.remove("show");
+    }
+}
+
+function handle_dropdown(element) {
+    console.log(element.classList.contains("show"))
+    if (element.classList.contains("show")) {
+        element.classList.remove("show");
+    } else {
+        high_all_dropdown_content()
+        element.classList.toggle("show");
+    }
+}
+
 
 function open_template_procedure(stage, data, template_id,template_name, tooth_depend) {
     const modal = document.getElementById('modal');
     const modalBody = document.getElementById('modal-body');
     document.getElementById('saveProcedures').onclick= function() {saveChanges(stage, template_id);}
     modalBody.innerHTML = '';
+    high_all_dropdown_content()
 
-    
+
     const label = document.createElement('input');
     label.placeholder = 'Введите название медицинской услуги'
     label.id = 'template-name'
@@ -369,8 +429,7 @@ function open_template_procedure(stage, data, template_id,template_name, tooth_d
     const labelText = document.createTextNode('Стоимость услуги будет умножена на количество выбранных зубов');
     checkbox.id = 'checkbox-tooth-dependency';
     checkbox.style.marginRight = '15px'
-    checkbox.style.marginLeft = '15px'
-    checkbox.style.marginBottom = '20px'
+    label_block.style.marginBottom = '20px'
     checkbox.style.transform = 'scale(1.6)';
     checkbox.type = 'checkbox';
 
@@ -384,7 +443,6 @@ function open_template_procedure(stage, data, template_id,template_name, tooth_d
     modalBody.appendChild(label_block);
     if (data == null){
         addField()
-        console.log("Ок")
     }else{
      data.forEach(item => {
         addField(item);
@@ -425,6 +483,7 @@ function addField(item = {}) {
 
     const leftDiv = document.createElement('div');
     leftDiv.className = 'left';
+    leftDiv.style.width = '270px'
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -451,6 +510,7 @@ function addField(item = {}) {
     label.placeholder = "Название процедуры"
     label.style.fontSize = "16px"
     label.value = item.name || '';
+    label.style.width = '180px'
     label.style.marginBottom = "0px"
     leftDiv.append(label);
 
@@ -483,7 +543,6 @@ function addField(item = {}) {
     const priceInput = document.createElement('input');
     priceInput.style.fontSize = '16px';
     priceInput.style.marginBottom = "0px";
-    priceInput.style.marginLeft = "20px";
     priceInput.style.width = "80px";
     priceInput.type = 'number';
     if (item.id) {
@@ -642,17 +701,18 @@ async function saveChanges(stage, temp_template_id) {
     });
 }
 
-const imgArray = ["core_tab", "implant", "seal","crown","gutta","periodont","tooth"]; // Array of image names
+const imgArray = ["tooth","tab", "implant", "seal","crown","gutta","periodont","bracket","remove"]; // Array of image names
 const dropdownContent = document.getElementById('dropdownContent');
 
 // Function to generate dropdown content
 function generateDropdownContent(button, template_id) {
     let dropdownContent = document.createElement('div');
-    dropdownContent.id ="dropdownContent"
+    dropdownContent.id = "dropdownContent"
     dropdownContent.className="dropdown-content"
     imgArray.forEach(imgName => {
         const div = document.createElement('div');
         const img = document.createElement('img');
+        img.className = "img-dropdown";
         img.src = `/images/stickers/${imgName}.png`;
         img.alt = `imgName`;
         img.onclick = () => selectImage(button, dropdownContent, imgName, template_id);
@@ -664,7 +724,7 @@ function generateDropdownContent(button, template_id) {
 
 // Function to handle image selection
 async function selectImage(dropdownButton, dropdownContent, src, template_id) {
-    dropdownButton.innerHTML = `<img src="/images/stickers/${src}.png" alt="src">`;
+    dropdownButton.innerHTML = `<img src="/images/stickers/${src}.png" name = "img-dropdown" alt="src">`;
     dropdownContent.classList.remove('show');
     try {
             const response = await fetch(`/procedure/sticker/template`, {

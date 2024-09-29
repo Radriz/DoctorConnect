@@ -1,17 +1,20 @@
 import datetime
 import os
+import subprocess
+import time
 from typing import Optional
 
 import fitz
 from docx2pdf import convert
-
+import pypandoc
 from fastapi import FastAPI, Form, Depends, HTTPException, Request
 from fastapi.openapi.models import Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from starlette.templating import Jinja2Templates
-from starlette.staticfiles import StaticFiles
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 from itsdangerous import URLSafeSerializer, BadSignature
 
@@ -26,6 +29,8 @@ from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
+app.add_middleware(HTTPSRedirectMiddleware)
+
 app.mount("/css", StaticFiles(directory="templates/css"), name="css")
 app.mount("/js", StaticFiles(directory="templates/js"), name="js")
 app.mount("/images", StaticFiles(directory="templates/images"), name="images")
@@ -180,6 +185,10 @@ async def regist(request: Request, fio: str = Form(...),
 
 @app.get("/order/create", response_class=HTMLResponse)
 async def create_order_form(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
     techniks = find_techniks()
     selected_tooth = []
     return templates.TemplateResponse("create_order.html", {
@@ -196,6 +205,10 @@ async def create_order_form(request: Request):
 
 @app.get("/order/plan", response_class=HTMLResponse)
 async def plan(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
     types = procedure_type()
     patients = get_all_patient()
     return templates.TemplateResponse("plan.html", {
@@ -251,7 +264,9 @@ async def update_order(request: Request, order_id: int, patient: str = Form(...)
                        deadline: str = Form(...), technik: str = Form(...), color_letter: str = Form(...),
                        color_number: str = Form(...)):
     session_cookie = request.cookies.get("session")
-    user_id = read_session(session_cookie)
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
     doctor = get_user(user_id)
     techniks = find_techniks()
 
@@ -279,7 +294,9 @@ async def get_order(request: Request, order_id: int):
     selected_tooth = list(map(int, order[2].split(", ")))
 
     session_cookie = request.cookies.get("session")
-    user_id = read_session(session_cookie)
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
     user = get_user(user_id)
 
     if user[5] == "doctor":
@@ -336,7 +353,8 @@ async def get_subtype(request: Request, type: str):
             "amount": template[9],
             "is_active": template[11] == 1
         })
-        templates_dict[template[0]]["price"] += (template[5] if template[5] is not None else template[8]) * template[9]
+        if template[11] == 1:
+            templates_dict[template[0]]["price"] += (template[5] if template[5] is not None else template[8]) * template[9]
     return templates_dict
 
 
@@ -499,13 +517,20 @@ async def get_document(request: Request, plan_id: int):
     output_path =  os.getcwd() +f'/treatment_plans/{file_name}'
     generate_plan(stages, data,total_price,
                   output_path=output_path + ".docx")
-    convert(output_path + ".docx", output_path + "no_icons.pdf")
-
+    # convert(output_path + ".docx", output_path + "no_icons.pdf")
+    original_directory = os.getcwd()
+    os.chdir('treatment_plans')
+    subprocess.run(['libreoffice', '--headless', '--convert-to', 'pdf', output_path + ".docx"], check=True)
+    os.chdir(original_directory)
+    default_pdf_name = os.path.splitext(output_path + ".docx")[0] + ".pdf"
+    os.rename(default_pdf_name, output_path + "no_icons.pdf")
     file_handle = fitz.open(output_path + "no_icons.pdf")
     page = file_handle[0]
     for stage in stages:
         image = stage["sticker"]
         tooths = stage["tooth"].split(",")
+        if image == "tooth":
+            continue
         for tooth in tooths:
 
             image_to_pdf(image,int(tooth),page)
@@ -516,10 +541,10 @@ async def get_document(request: Request, plan_id: int):
     return {"document_word":file_name + ".docx","document_pdf":file_name + ".pdf"}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    # uvicorn.run("main:app",
-    #             host="0.0.0.0",
-    #             port=443,
-    #             reload=True,
-    #             ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-    #             ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app",
+                host="0.0.0.0",
+                port=443,
+                reload=True,
+                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")

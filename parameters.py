@@ -14,10 +14,11 @@ types = [
 ]
 color_letter = ["A", "B", "C", "D"]
 color_number = ["1", "2", "3", "3.5", "4"]
+tooth_priority = ["gutta", "tab", "implant", "seal", "crown", "periodont", "bracket", "tooth"]
 
 tooth_data = {
     36: {"x": 459, "name": "molar", "type": "left_lower"},
-    37: {"x": 504, "name": "molar", "type": "left_lower"},
+    37: {"x": 505, "name": "molar", "type": "left_lower"},
     38: {"x": 555, "name": "molar", "type": "left_lower"},
     46: {"x": 120, "name": "molar", "type": "right_lower"},
     47: {"x": 75, "name": "molar", "type": "right_lower"},
@@ -54,6 +55,7 @@ tooth_data = {
     11: {"x": 269, "name": "incisor", "type": "upper_center"},
 
 }
+
 image_data = {
     "crown": {
         "right_lower":
@@ -107,6 +109,261 @@ image_data = {
             "height": 35
         },
     },
+    "bracket": {
+        "right_lower":
+            {
+                "delta": -5,
+                "y": 318,
+                "width": 33,
+                "height": 15
+            },
+        "left_lower": {
+            "delta": -6,
+            "y": 318,
+            "width": 33,
+            "height": 15
+        },
+        "lower": {
+            "delta": -1,
+            "y": 317,
+            "width": 26,
+            "height": 13
+        },
+        "lower_center": {
+            "delta": 5,
+            "y": 317,
+            "width": 16,
+            "height": 11
+        },
+        "right_upper":
+            {
+                "delta": -5,
+                "y": 273,
+                "width": 33,
+                "height": 15
+            },
+        "left_upper": {
+            "delta": -5,
+            "y": 273,
+            "width": 33,
+            "height": 15
+        },
+        "upper": {
+            "delta": -1,
+            "y": 274,
+            "width": 26,
+            "height": 16
+        },
+        "upper_center": {
+            "delta": -1,
+            "y": 274,
+            "width": 26,
+            "height": 16
+        },
+    },
+    "remove": {
+        "right_lower": {
+            "delta": -2,
+            "y": 320,
+            "width": 28,
+            "height": 45
+        },
+        "left_lower": {
+            "delta": -3,
+            "y": 320,
+            "width": 28,
+            "height": 45
+        },
+        "lower": {
+            "delta": 0,
+            "y": 320,
+            "width": 28,
+            "height": 45
+        },
+        "lower_center": {
+            "delta": 3,
+            "y": 320,
+            "width": 20,
+            "height": 45
+        },
+        "right_upper": {
+            "delta": -2,
+            "y": 240,
+            "width": 28,
+            "height": 45
+        },
+        "left_upper": {
+            "delta": -3,
+            "y": 240,
+            "width": 28,
+            "height": 45
+        },
+        "upper": {
+            "delta": -1,
+            "y": 240,
+            "width": 28,
+            "height": 45
+        },
+        "upper_center": {
+            "delta": 2,
+            "y": 240,
+            "width": 22,
+            "height": 45
+        },
+    },
+    "caries": {
+        "right_lower": {
+            "delta": 5,
+            "y": 317,
+            "width": 18,
+            "height": 18
+        },
+        "left_lower": {
+            "delta": 4,
+            "y": 317,
+            "width": 18,
+            "height": 18
+        },
+        "lower": {
+            "delta": 5,
+            "y": 313,
+            "width": 18,
+            "height": 18
+        },
+        "lower_center": {
+            "delta": 7,
+            "y": 310,
+            "width": 13,
+            "height": 18
+        },
+        "right_upper": {
+            "delta": 5,
+            "y": 271,
+            "width": 18,
+            "height": 18
+        },
+        "left_upper": {
+            "delta": 4,
+            "y": 271,
+            "width": 18,
+            "height": 18
+        },
+        "upper": {
+            "delta": 5,
+            "y": 268,
+            "width": 18,
+            "height": 18
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 272,
+            "width": 18,
+            "height": 18
+        },
+    },
+    "periodont": {
+        "right_lower": {
+            "delta": 5,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "left_lower": {
+            "delta": 4,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "lower": {
+            "delta": 5,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "lower_center": {
+            "delta": 7,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "right_upper": {
+            "delta": 5,
+            "y": 216,
+            "width": 14,
+            "height": 13
+        },
+        "left_upper": {
+            "delta": 4,
+            "y": 216,
+            "width": 14,
+            "height": 13
+        },
+        "upper": {
+            "delta": 5,
+            "y": 213,
+            "width": 14,
+            "height": 13
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 213,
+            "width": 14,
+            "height": 13
+        },
+    },
+    "tab": {
+        "right_lower":
+            {
+                "delta": -1,
+                "y": 316,
+                "width": 28,
+                "height": 37
+            },
+        "left_lower": {
+            "delta": -4,
+            "y": 316,
+            "width": 28,
+            "height": 37
+        },
+        "lower": {
+            "delta": 5,
+            "y": 319,
+            "width": 18,
+            "height": 41
+        },
+        "lower_center": {
+            "delta": 7,
+            "y": 319,
+            "width": 12,
+            "height": 41
+        },
+        "right_upper":
+            {
+                "delta": -2,
+                "y": 248,
+                "width": 28,
+                "height": 37
+            },
+        "left_upper": {
+            "delta": -2,
+            "y": 248,
+            "width": 28,
+            "height": 37
+        },
+        "upper": {
+            "delta": 4,
+            "y": 237,
+            "width": 18,
+            "height": 41
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 237,
+            "width": 18,
+            "height": 41
+        },
+    },
+
     "implant": {
         "right_lower":
             {
@@ -216,11 +473,4 @@ image_data = {
         },
     }
 
-    # "remove":
-    #     {
-    #         "delta": -5,
-    #         "y": 320,
-    #         "width": 31,
-    #         "height": 49
-    #     }
 }

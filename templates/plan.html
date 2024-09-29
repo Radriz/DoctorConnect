@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/plan.css">
     <link rel="stylesheet" href="/css/tooth.css">
+    <link rel="icon" href="/images/tooth.png" type="image/png">
 </head>
 
 <body>
 
-<h1>Создание заказа</h1>
+<h1>Создание плана лечения</h1>
 <div class="plan" id="procedure_form">
     <form method="get" action="/account">
         <input class="personal" type="submit" value="Личный кабинет">
@@ -40,7 +41,7 @@
     <div id="stage">
         <div id="procedure-container-1" class="procedure-block">
             <label class="label">Название этапа:</label>
-            <input type="text" id="stage-name" style="margin-bottom: 20px" name="stage" required>
+            <input type="text" id="stage-name" class="stage-name" name="stage" required>
             <br><button class="button-select" onclick="selectTopRow(this)">Выбрать верхний ряд</button>
             <div class="scroll-container">
                 <div class="tooth-selection-container">
@@ -51,12 +52,20 @@
                         {% endif %}
                         {% if tooth in selected_tooth %}
                         <button style="background-color:#7ef78b" class="button-tooth">
+                            {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                            <img src="/images/incisor.png" alt="Tooth"><br>
+                            {% else %}
                             <img src="/images/tooth.png" alt="Tooth"><br>
+                            {% endif %}
                             {{tooth}}
                         </button>
                         {% else %}
                         <button class="button-tooth">
+                            {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                            <img src="/images/incisor.png" alt="Tooth"><br>
+                            {% else %}
                             <img src="/images/tooth.png" alt="Tooth"><br>
+                            {% endif %}
                             {{tooth}}
                         </button>
                         {% endif %}
@@ -70,12 +79,20 @@
                         {% endif %}
                         {% if tooth in selected_tooth %}
                         <button style="background-color:#7ef78b" class="button-tooth">
+                            {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                            <img src="/images/incisor.png" alt="Tooth"><br>
+                            {% else %}
                             <img src="/images/tooth.png" alt="Tooth"><br>
+                            {% endif %}
                             {{tooth}}
                         </button>
                         {% else %}
                         <button class="button-tooth">
+                            {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                            <img src="/images/incisor.png" alt="Tooth"><br>
+                            {% else %}
                             <img src="/images/tooth.png" alt="Tooth"><br>
+                            {% endif %}
                             {{tooth}}
                         </button>
                         {% endif %}
