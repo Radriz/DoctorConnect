@@ -38,6 +38,7 @@ input[type="text"], input[type="number"],input[type="date"] {
     margin-bottom: 30px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 18px;
 }
 .fio{
     width: calc(100% - 20px);
@@ -45,25 +46,9 @@ input[type="text"], input[type="number"],input[type="date"] {
     margin-bottom: 30px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 18px;
 }
-.button-tooth {
-    background-color: transparent;
-    border: 2px solid #d8d7db;
-    border-radius: 10px;
-    width: 100px;
-    font-size: 100%;
-    display: inline-block;
-    margin: 5px;
-    padding: 10px;
-    vertical-align: top;
-}
-.button-tooth img {
-    max-width: 100px;
-    width: 100%;
-}
-.button-tooth:hover {
-    background-color: #f2f3f7;
-}
+
 
 .procedure_block, .template_procedure_block {
     display: flex;
@@ -228,6 +213,11 @@ input[type="submit"]:hover {
     margin-bottom: 20px;
 }
 
+.button-tooth {
+    margin: 3.7px;
+}
+
+
 .field-container .remove-btn {
     position: absolute;
     top: 5px;
@@ -355,14 +345,7 @@ input[type="submit"]:hover {
     height: auto;
 }
 
-.button-select {
-    background-color: transparent;
-    border: 2px solid;
-    border-radius: 5px;
-    border-color:  #45a049;
-    padding: 10px;
-    cursor: pointer;
-}
+
 .stage-name{
     margin-bottom: 20px;
     width: 96%;

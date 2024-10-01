@@ -176,9 +176,9 @@ async def check_login_password(request: Request, form_data: OAuth2PasswordReques
 async def regist(request: Request, fio: str = Form(...),
                  email: str = Form(...), password: str = Form(...), speciality: str = Form(...),
                  repeat_password: str = Form(...)):
-    res = registration(fio, email, password, speciality, repeat_password)
+    res, comment = registration(fio, email, password, speciality, repeat_password)
     if not res:
-        return templates.TemplateResponse("registration.html", {"request": request})
+        return templates.TemplateResponse("registration.html", {"request": request,"comment": comment})
     else:
         return templates.TemplateResponse("authorization.html", {"request": request})
 
@@ -190,6 +190,7 @@ async def create_order_form(request: Request):
     if user_id is None:
         return RedirectResponse(url="/authorization")
     techniks = find_techniks()
+    patients = get_all_patient()
     selected_tooth = []
     return templates.TemplateResponse("create_order.html", {
         "request": request,
@@ -199,7 +200,8 @@ async def create_order_form(request: Request):
         "selected_tooth": selected_tooth,
         "job_types": types,
         "color_letter": color_letter,
-        "color_number": color_number
+        "color_number": color_number,
+        "patients" : patients
     })
 
 
@@ -237,7 +239,7 @@ async def get_name_procedure_by_type(request: Request, type: str, subtype: str):
     return procedures
 
 
-@app.post("/order/create", response_class=HTMLResponse)
+@app.post("/order/create")
 async def add_order(request: Request, order: Order):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie)
@@ -255,7 +257,7 @@ async def add_order(request: Request, order: Order):
         order.color_letter,
         order.color_number
     )
-    return Response(content="Успешно!", status_code=200, type="application/text")
+    return {"result" : "Успешно!"}
 
 
 @app.post("/order/update/{order_id}", response_class=HTMLResponse)
@@ -517,7 +519,7 @@ async def get_document(request: Request, plan_id: int):
     output_path =  os.getcwd() +f'/treatment_plans/{file_name}'
     generate_plan(stages, data,total_price,
                   output_path=output_path + ".docx")
-    # convert(output_path + ".docx", output_path + "no_icons.pdf")
+    convert(output_path + ".docx", output_path + "no_icons.pdf")
     original_directory = os.getcwd()
     os.chdir('treatment_plans')
     subprocess.run(['libreoffice', '--headless', '--convert-to', 'pdf', output_path + ".docx"], check=True)

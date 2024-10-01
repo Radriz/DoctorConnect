@@ -14,14 +14,15 @@ def hash_password(password):
 def registration(fio, email, password, speciality, repeat_password):
     if password.lower() == repeat_password.lower():
         password = hash_password(password)
-        cursor.execute(
-            f"insert into User(fio,email, password,speciality) Values('{fio}','{email}','{password}','{speciality}')")
-        connection.commit()
-        print('Пользователь зарегистрирован!')
-        return True
+        try:
+            cursor.execute(
+                f"insert into User(fio,email, password,speciality) Values('{fio}','{email}','{password}','{speciality}')")
+            connection.commit()
+        except:
+            return False, 'Пользователь с таким e-mail существует'
+        return True, 'Пользователь зарегистрирован!'
     elif password.lower() != repeat_password.lower():
-        print('Повторить пароль')
-        return False
+        return False, 'Пароли не совпадают попробуйте еще раз'
 
 
 def autorization(email, password):

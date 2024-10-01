@@ -43,6 +43,8 @@ async function submit() {
 
             const result = await response.json();
             console.log("Success:", result);
+            alert("Заказ отправлен успешно")
+            window.location.href = "/account"
         } catch (error) {
             console.error("Error:", error);
         }
@@ -73,14 +75,47 @@ function setTooth(buttonTooth){
 
 setTooth(buttonTooth)
 
-
+function selectBottomRow(button) {
+     var orderBlock = button.closest('.order-block');
+     const allBottomTooth = orderBlock.querySelector('#bottom-tooth').querySelectorAll('button');
+     let allSelected = true;
+     allBottomTooth.forEach((bt) => {
+          if (bt.style.backgroundColor != "rgb(126, 247, 139)"){
+              allSelected = false;
+          }
+     });
+     allBottomTooth.forEach((bt) => {
+          if (allSelected){
+              bt.style.backgroundColor = "transparent";
+          } else {
+              bt.style.backgroundColor = "#7ef78b";
+          }
+     });
+}
+function selectTopRow(button) {
+     var orderBlock = button.closest('.order-block');
+     const allTopTooth = orderBlock.querySelector('#top-tooth').querySelectorAll('button');
+     let allSelected = true;
+     allTopTooth.forEach((bt) => {
+          if (bt.style.backgroundColor != "rgb(126, 247, 139)"){
+              allSelected = false;
+          }
+     });
+     allTopTooth.forEach((bt) => {
+          if (allSelected){
+              bt.style.backgroundColor = "transparent";
+          } else {
+              bt.style.backgroundColor = "#7ef78b";
+          }
+     });
+}
 function deleteOrderBlock(button) {
     var orderBlock = button.closest('.order-block');
     orderBlock.parentNode.removeChild(orderBlock);
 }
 
 function addOrderBlock() {
-    var container = document.querySelector('.container');
+    var container = document.querySelector('.plan');
     var newOrderBlock = document.createElement('div');
     newOrderBlock.classList.add('order-block');
     newOrderBlock.innerHTML = orderContainerInnerHtml;

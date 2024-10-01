@@ -4,23 +4,500 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1 {
+    color: #333;
+    margin: 30px;
+}
+
+.plan {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 1700px;
+}
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+select {
+    width: calc(100%);
+    max-width:620px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.fio{
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 18px;
+}
+
+.procedure_block, .template_procedure_block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 96%;
+    max-width: 600px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.procedure_block .left, .template_procedure_block .left {
+    display: flex;
+    align-items: center;
+
+}
+.procedure_block .right, .template_procedure_block .right {
+    display: flex;
+    align-items: center;
+}
+.button-tooth {
+    margin: 3.2px;
+}
+
+.procedure_block button, .template_procedure_block button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.procedure_block button:hover {
+    background-color: #e0e0e0;
+}
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+.modal-template-name {
+    width: 100%;
+    max-width: 600px;
+    font-size: 20px;
+}
+.button-action {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    width: 98%;
+    margin-bottom: 10px;
+}
+
+.button-action:hover {
+    background: #004494;
+}
+.procedure-block {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+}
+.add-procedure-button {
+    margin-top: 30px;
+}
+
+.add-procedure-button button {
+    margin-bottom: 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 25px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.add-procedure-button button:hover {
+    background: #0056b3;
+}
+.delete-button {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 40px;
+    cursor: pointer;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 20px;
+    width: 620px;
+}
+
+
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.field-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.field-container .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+
+    .button-action {
+        font-size: 15px;
+    }
+    .procedure_block {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .template_procedure_block {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .procedure_block .left,
+    .template_procedure_block .left,
+    .procedure_block .right,
+    .template_procedure_block .right {
+        margin-bottom: 10px;
+    }
+    .personal {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .add-procedure-button {
+        width: 100%;
+        margin-top: 30px;
+    }
+}
+@media screen and (min-width: 600px) {
+.personal {
+        width: 350px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .add-procedure-button {
+        width: 350px;
+        margin-top: 30px;
+    }
+}
+
+.success {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    width: 50%;
+    margin-bottom: 20px;
+}
+
+.personal {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+input[type="submit"]:hover {
+    background: #218838;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    width: 100px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+.dropdown-content div {
+    padding: 8px 16px;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown button img {
+    width: 60px;
+    height: auto;
+}
+.dropdown button {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 20px;
+    width: 90%;
+    height: auto;
+}
+
+
+.stage-name{
+    margin-bottom: 20px;
+    width: 96%;
+    max-width: 620px;
+}
+
+.price{
+    margin-bottom: 0px;
+    font-size: 30px;
+
+}
+
+@media screen and (min-width: 600px) {
+
+    .template_procedure_block input[type="checkbox"] {
+        width: 25px;
+        height:25px;
+    }
+    .column{
+        width: 220px;
+    }
+    .template_procedure_block .left {
+        width: 222px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .template_procedure_block {
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+    }
+    .column{
+        width: 150px;
+    }
+    .template_procedure_block .left {
+        display: flex;
+        align-items: center;
+        width: 200px;
+        margin-bottom: 10px;
+    }
+
+    .template_procedure_block .right {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 10px;
+        align-items: center; /* Для центрирования элементов по вертикали */
+    }
+
+    .template_procedure_block label {
+        font-size: 18px;
+        margin-bottom: 0;
+        width: 190px;
+    }
+
+    .template_procedure_block .remove-btn {
+        position: absolute;
+        right: 5px;
+        font-size: 24px;
+    }
+
+    .template_procedure_block input[type="checkbox"] {
+        width: 20px;
+        height:20px;
+    }
+
+    .template_procedure_block .dropdown {
+        display: inline-block; /* Размещаем на одной строке с ценой */
+        margin-left: auto; /* Отодвигаем dropdown вправо от цены */
+    }
+
+    .template_procedure_block .right label {
+        font-size: 24px;
+    }
+
+    .template_procedure_block .column a {
+        font-size: 16px;
+    }
+
+    .template_procedure_block .dropdown-content {
+        max-width: 100px;
+    }
+
+    .template_procedure_block .price {
+        display: inline-block;
+        margin-left: 10px;
+        font-size: 26px;
+        position: absolute;
+        left: 10px;
+        bottom: 5px;
+        margin-bottom: 10px;
+
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .modal-content {
+        width: 90%; /* Make the modal content take up more width */
+        margin: 10% auto; /* Adjust the top margin */
+        padding: 15px; /* Reduce padding */
+        border-radius: 10px; /* Optional: reduce border radius */
+    }
+
+    .modal-template-name {
+        font-size: 18px; /* Adjust font size for smaller screens */
+    }
+
+    .button-action {
+        font-size: 16px; /* Reduce font size of action buttons */
+        padding: 8px; /* Adjust padding */
+        width: 100%; /* Ensure buttons take full width */
+    }
+
+    .close {
+        font-size: 24px; /* Adjust close button size */
+    }
+
+    .button-group {
+        flex-direction: column; /* Stack buttons vertically */
+        width: 100%;
+    }
+
+    .procedure_block, .template_procedure_block {
+        max-width: 94%; /* Allow blocks to take full width */
+    }
+
+    .procedure_block .left, .template_procedure_block .left,
+    .procedure_block .right, .template_procedure_block .right {
+        margin-bottom: 10px;
+    }
+
+    .procedure_block .remove-btn {
+        position: absolute;
+        right: 5%;
+        font-size: 24px;
+    }
+
+    /* Adjust input sizes */
+    input[type="text"], input[type="number"], .modal-template-name {
+        width: 94%; /* Full width inputs */
+    }
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     font-size: 20px;
 }
-
-hr {
+hr{
+    width: 100%;
     border: 1px solid black;
-}
 
+
+}
 .container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
     padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
     width: 90%;
-    margin: 20px;
+    max-width: 1700px;
 }
 
 header {
@@ -33,16 +510,12 @@ header form input:hover {
 }
 
 .success {
-    color: #228B22;
-    text-align: left;
-    font-size: 20px;
-    font-style: italic;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 5px;
 }
-
-.form-group {
-    margin-bottom: 20px;
-}
-
 .form-group label {
     display: block;
     margin-bottom: 5px;
@@ -78,84 +551,28 @@ input[type="text"], input[type="date"], select {
     background: #28a745;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    font-size: 25px;
-    font-weight: bold;
-}
-
-.personal {
-    background: #28a745;
-    color: white;
-    border: none;
     padding: 10px;
     border-radius: 5px;
     cursor: pointer;
-    width: 20%;
     font-size: 25px;
     font-weight: bold;
     margin-bottom: 20px;
 }
 
+
+
 input[type="submit"]:hover {
     background: #218838;
 }
 
-.tooth-selection-container {
-    overflow-x: auto;
-    white-space: nowrap;
+@media screen and (max-width: 900px) {
+    .container {
+        padding: 10px;
+    }
 }
 
 
-.separator {
-    width: 2px;
-    background-color: #000;
-    height: calc(100% + 40px); /* Adjust the height to ensure the separator spans both rows */
-    position: absolute;
-    left: 50%;
-    top: -20px; /* Adjust the top position to ensure the separator spans both rows */
-    z-index: 0;
-}
-
-
-.button-tooth img {
-    max-width: 100px;
-    width: 100%;
-}
-
-.button-tooth:hover {
-    background-color: #f2f3f7;
-}
-
-.button-tooth.selected {
-    background-color: #7ef78b;
-    border-color: #4CAF50;
-}
-
-.button-group {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.button-action {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 30px;
-    font-weight: bold;
-    width: 48%; /* Adjusted width to fit two buttons side by side */
-    margin: 5px;
-}
-
-.button-action:hover {
-    background: #004494;
-}
+/* Стили для order-block */
 .order-block {
     background: #f9f9f9;
     border: 1px solid #ccc;
@@ -163,63 +580,6 @@ input[type="submit"]:hover {
     border-radius: 8px;
     margin-bottom: 20px;
     position: relative;
-}
-
-/* Стили для кнопки удаления */
-.delete-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-}
-
-.delete-btn {
-    background: none;
-    border: none;
-    color: red;
-    font-size: 40px;
-    cursor: pointer;
-}
-
-/* Стили для кнопки добавления */
-.add-order-button {
-    text-align: center;
-    margin-top: 30px;
-
-}
-
-.add-order-button button {
-    margin-bottom: 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 25px;
-    font-weight: bold;
-}
-
-.add-order-button button:hover {
-    background: #0056b3;
-}
-
-
-@media screen and (max-width: 600px) {
-
-
-    .container {
-        padding: 10px;
-    }
-    .button-action {
-        font-size: 20px;
-    }
-    .personal {
-        width: 100%;
-        font-size: 20px;
-    }
-    .success {
-        font-size: 16px;
-    }
 }
 
 

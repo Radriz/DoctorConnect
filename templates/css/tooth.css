@@ -17,7 +17,14 @@ hr {
     position: sticky;
 }
 
-
+.button-select {
+    background-color: transparent;
+    border: 2px solid;
+    border-radius: 5px;
+    border-color:  #45a049;
+    padding: 10px;
+    cursor: pointer;
+}
 
 
 .separator {
@@ -36,7 +43,6 @@ hr {
     border-radius: 10px;
     width: 92px;
     font-size: 100%;
-    margin: 5px;
     padding: 10px;
     display: inline-block;
     vertical-align: top;
