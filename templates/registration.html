@@ -9,7 +9,6 @@
 </head>
 <body>
 <div class="container-fluid">
-
     <div class="background" style="{% if comment %}height:130vh{% endif %}">
         <div class="register-container" style="{% if comment %}margin-top:100px{% endif %}">
             <img src="/images/logo.png" alt="Logo">
@@ -32,6 +31,10 @@
                     <option value="doctor">Врач</option>
                     <option value="technik">Зубной техник</option>
                 </select>
+                <div id="clinic_div">
+                    <label for="clinic">Название клиники</label>
+                    <input type="text" id="clinic" name="clinic" required>
+                </div>
                 {% if comment %}
                 <label class="comment">{{comment}}</label><br>
                 {% endif %}
@@ -48,6 +51,6 @@
 
     </div>
 </div>
-
+<script src="/js/registration.js"></script>
 </body>
 </html>

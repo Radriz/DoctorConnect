@@ -2,8 +2,13 @@ var buttonTooth=document.querySelectorAll('.button-tooth')
 var submitButton=document.getElementById('submit')
 async function submit() {
     var orderBlocks = document.querySelectorAll('.order-block')
+    fio = document.getElementById('fio');
+    if (fio.value == "") {
+        alert('Введите имя и фамилию пациента');
+        return;
+    }
     orderBlocks.forEach( async function(orderBlock){
-    console.log(orderBlock)
+        console.log(orderBlock)
         var toothNumbers = []
         buttonTooth = orderBlock.querySelectorAll('.button-tooth')
         buttonTooth.forEach(function(button){
@@ -12,7 +17,6 @@ async function submit() {
             }
         });
         tooths = toothNumbers.join(", ");
-        fio = document.getElementById('fio');
         tech = document.getElementById('technik');
         type = orderBlock.querySelector('#type');
         color_letter = orderBlock.querySelector('#color_letter');
@@ -128,4 +132,8 @@ function addOrderBlock() {
     container.insertBefore(newOrderBlock, document.getElementById('add-order'));
 }
 
+const today = new Date();
+const formattedDate = today.toISOString().split('T')[0];
+document.getElementById('date_fitting').setAttribute('min', formattedDate);
+document.getElementById('date_deadline').setAttribute('min', formattedDate);
 

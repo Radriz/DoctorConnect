@@ -17,7 +17,7 @@
         <input class="personal" type="submit" value="Личный кабинет">
     </form>
     <label class="label">ФИО пациента:</label>
-    <input value="{{order[1]}}" id="fio" class="fio" name="patient" required><br>
+    <input value="{{order[1]}}" id="fio" class="fio" name="patient" required readonly><br>
     <div id="order-container" class="order-block">
         <div class="scroll-container">
             <div class="tooth-selection-container">
@@ -78,32 +78,33 @@
         </div>
         <div class="form-group">
             <label>Вид работы:</label>
-            <input type="text" name="type" value="{{order[3]}}"><br><br>
+            <input type="text" name="type" value="{{order[3]}}" readonly><br><br>
         </div>
 
         <div class="form-group">
             <label>Цвет конструкции:</label>
-            <input type="text" name="color" value="{{order[11]}}{{order[13]}}"><br><br>
+            <input type="text" name="color" value="{{order[11]}}{{order[13]}}" readonly><br><br>
         </div>
 
         <div class="form-group">
             <label>Комментарии:</label>
-            <input type="text" name="comment" value="{{order[8]}}"><br><br>
+            <input type="text" name="comment" value="{{order[8]}}" readonly><br><br>
         </div>
 
         <div class="form-group">
             <label>Дата примерка:</label>
-            <input type="date" name="fitting" value="{{order[4]}}"><br><br>
+            <input type="date" name="fitting" value="{{order[4]}}" readonly><br><br>
         </div>
 
         <div class="form-group">
             <label>Дата сдачи работы:</label>
-            <input type="date" name="deadline" value="{{order[5]}}"><br><br>
+            <input type="date" name="deadline" value="{{order[5]}}" readonly><br><br>
         </div>
 
         <div class="form-group">
             <label for="doctor">Доктор:</label>
-            <input id="doctor" type="text" name="doctor" value="{{doctor[1]}}"><br><br>
+            <input id="doctor" type="text" name="doctor" value="{{ doctor[1] }}{% if doctor[6] %} ({{ doctor[6] }}){% endif %}" readonly><br><br>
+
         </div>
 
     </div>

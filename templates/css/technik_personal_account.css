@@ -1,10 +1,10 @@
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    font-family: Georgia, serif;
 }
 header {
     background-color: white;
@@ -14,12 +14,16 @@ header {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #ddd;
+    font-family: Georgia, serif;
 }
 header h1 {
     margin-left: 10%;
     display: flex;
     align-items: center;
-    font-size: 2.3vh;
+    font-size: 2.5vh;
+}
+header img {
+    margin-right: 20px;
 }
 header form {
     margin-right: 10%;
@@ -33,6 +37,7 @@ header form input[type="submit"] {
     border-radius: 5px;
     font-size: 2vh;
 }
+
 .container {
     width: 80%;
     margin: 20px auto;
@@ -48,6 +53,11 @@ h2 {
     justify-content: space-between;
     margin-bottom: 20px;
 }
+
+.actions form {
+    width: 48%;
+}
+
 .actions input[type="submit"] {
     background-color: rgb(3,182,236);
     color: white;
@@ -57,19 +67,23 @@ h2 {
     border-radius: 5px;
     font-size: 3vh;
     width: 100%;
+    white-space: normal;
     text-align: center;
     height: 20vh;
     font-weight: bold;
 }
+
 @media (min-width: 768px) {
     .actions input[type="submit"] {
         font-size: 4vh;
     }
 }
+
 .table-container {
     overflow-x: auto;
     margin-bottom: 20px;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -103,4 +117,13 @@ a {
 }
 a:hover {
     text-decoration: underline;
+}
+
+select {
+    width: calc(100%);
+    max-width:400px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

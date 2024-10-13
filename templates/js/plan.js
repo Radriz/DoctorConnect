@@ -701,7 +701,7 @@ async function saveChanges(stage, temp_template_id) {
     });
 }
 
-const imgArray = ["tooth","tab", "implant", "seal","crown","gutta","periodont","bracket","remove"]; // Array of image names
+const imgArray = ["tooth","tab", "implant", "seal","crown","gutta","periodont","bracket","remove","fiberglass"]; // Array of image names
 const dropdownContent = document.getElementById('dropdownContent');
 
 // Function to generate dropdown content

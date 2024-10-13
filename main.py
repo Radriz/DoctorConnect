@@ -29,7 +29,7 @@ from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
 
 app = FastAPI()
-app.add_middleware(HTTPSRedirectMiddleware)
+
 
 app.mount("/css", StaticFiles(directory="templates/css"), name="css")
 app.mount("/js", StaticFiles(directory="templates/js"), name="js")
@@ -115,22 +115,27 @@ async def account(request: Request):
             orders = get_orders_doctor(user[0])
             for i in range(len(orders)):
                 orders[i] = list(orders[i])
-                data = orders[i][5].split("-")
-                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
+                if orders[i][5]:
+                    data = orders[i][5].split("-")
+                    orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
                 technik = get_user(orders[i][7])
                 orders[i][7] = technik[1]
 
         else:
+            selected_doctors = []
             orders = get_orders_technik(user[0])
             for i in range(len(orders)):
                 orders[i] = list(orders[i])
-                data = orders[i][5].split("-")
-                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
+                if orders[i][5]:
+                    data = orders[i][5].split("-")
+                    orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
                 doctor = get_user(orders[i][6])
+                selected_doctors.append({"id" : doctor[0], "name" : ""})
                 if doctor[6] is not None:
-                    orders[i][6] = f"{doctor[1]} ({doctor[6]})"
+                    selected_doctors[-1]["name"] = f"{doctor[1]} ({doctor[6]})"
                 else:
-                    orders[i][6] = f"{doctor[1]}"
+                    selected_doctors[-1]["name"] = f"{doctor[1]}"
+                orders[i][6] =  selected_doctors[-1]
 
         done = [order for order in orders if order[9] == 1]
         fitting_done = [order for order in orders if order[9] == 0 and order[12] == 1]
@@ -146,6 +151,7 @@ async def account(request: Request):
                                                   "not_done": not_done
                                               })
         else:
+
             return templates.TemplateResponse(
                 "technik_personal_account.html",
                 {
@@ -153,7 +159,8 @@ async def account(request: Request):
                     'fio': user[1],
                     "done": done,
                     "fitting_done": fitting_done,
-                    "not_done": not_done
+                    "not_done": not_done,
+                    "doctors": selected_doctors,
                 })
 
     return RedirectResponse(url="/authorization")
@@ -175,8 +182,8 @@ async def check_login_password(request: Request, form_data: OAuth2PasswordReques
 @app.post("/registration", response_class=HTMLResponse)
 async def regist(request: Request, fio: str = Form(...),
                  email: str = Form(...), password: str = Form(...), speciality: str = Form(...),
-                 repeat_password: str = Form(...)):
-    res, comment = registration(fio, email, password, speciality, repeat_password)
+                 repeat_password: str = Form(...), clinic: str = Form(...),):
+    res, comment = registration(fio, email, password, speciality, repeat_password,clinic)
     if not res:
         return templates.TemplateResponse("registration.html", {"request": request,"comment": comment})
     else:
@@ -519,10 +526,10 @@ async def get_document(request: Request, plan_id: int):
     output_path =  os.getcwd() +f'/treatment_plans/{file_name}'
     generate_plan(stages, data,total_price,
                   output_path=output_path + ".docx")
-    convert(output_path + ".docx", output_path + "no_icons.pdf")
+    # convert(output_path + ".docx", output_path + "no_icons.pdf")
     original_directory = os.getcwd()
     os.chdir('treatment_plans')
-    subprocess.run(['libreoffice', '--headless', '--convert-to', 'pdf', output_path + ".docx"], check=True)
+    subprocess.run(['libreoffice', '--headless', '--convert-to', 'pdf:writer_pdf_Export', output_path + ".docx"], check=True)
     os.chdir(original_directory)
     default_pdf_name = os.path.splitext(output_path + ".docx")[0] + ".pdf"
     os.rename(default_pdf_name, output_path + "no_icons.pdf")
@@ -543,10 +550,13 @@ async def get_document(request: Request, plan_id: int):
     return {"document_word":file_name + ".docx","document_pdf":file_name + ".pdf"}
 
 if __name__ == "__main__":
-    # uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                port=443,
-                reload=True,
-                ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
-                ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    if os.path.exists("/etc/letsencrypt/live/drlink.ru/privkey.pem"):
+        app.add_middleware(HTTPSRedirectMiddleware)
+        uvicorn.run("main:app",
+                    host="0.0.0.0",
+                    port=443,
+                    reload=True,
+                    ssl_keyfile="/etc/letsencrypt/live/drlink.ru/privkey.pem",
+                    ssl_certfile="/etc/letsencrypt/live/drlink.ru/fullchain.pem")
+    else:
+        uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -7,3 +7,4 @@ document.getElementById('fitting_done_form').submit();
 doneCheckBox.addEventListener('change', function() {
 document.getElementById('done_form').submit();
 });
+

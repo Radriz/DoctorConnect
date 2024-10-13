@@ -11,12 +11,14 @@ def hash_password(password):
     return p
 
 
-def registration(fio, email, password, speciality, repeat_password):
+def registration(fio, email, password, speciality, repeat_password, clinic):
+    if not clinic:
+        clinic = None
     if password.lower() == repeat_password.lower():
         password = hash_password(password)
         try:
             cursor.execute(
-                f"insert into User(fio,email, password,speciality) Values('{fio}','{email}','{password}','{speciality}')")
+                f"insert into User(fio,email, password,speciality,clinic) Values('{fio}','{email}','{password}','{speciality}','{clinic}')")
             connection.commit()
         except:
             return False, 'Пользователь с таким e-mail существует'
@@ -28,7 +30,7 @@ def registration(fio, email, password, speciality, repeat_password):
 def autorization(email, password):
     h2 = hashlib.md5(password.encode())
     checks = cursor.execute(
-        f"select * from user where email='{email}'").fetchall()  # [(id, fio...),]
+        f"select * from user where LOWER(email)='{email.lower()}'").fetchall()  # [(id, fio...),]
     for check in checks:
         if check[4] == h2.hexdigest():
             print("Успешно авторизирован")
@@ -296,5 +298,5 @@ def get_stages_plan_id(id):
         join template on plan_template.template_id = template.id
         join template_procedure on template.id = template_procedure.template_id
         join user_procedure on template_procedure.user_procedure_id = user_procedure.id
-        where treatment_plan.id = {id} order by plan_template.id""").fetchall()
+        where treatment_plan.id = {id} and template_procedure.is_active = 1 order by plan_template.id""").fetchall()
     return stages

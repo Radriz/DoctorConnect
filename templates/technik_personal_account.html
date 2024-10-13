@@ -2,22 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
     <link rel="stylesheet" href="/css/technik_personal_account.css">
     <link rel="icon" href="/images/tooth.png" type="image/png">
 </head>
 <body>
 <header>
-    <h1>Личный кабинет</h1>
+    <h1>
+        <img src="/images/logo.png" alt="Логотип" width="100" height="65">
+        Личный кабинет
+    </h1>
     <form method="get" action="/logout">
         <input type="submit" value="Выход">
     </form>
 </header>
 <div class="container">
     <h2>Добро пожаловать, {{fio}}!</h2>
+    <label for="doctor">Выберите врача:</label>
+    <select id="doctor" name="doctor">
+        <option value="None" selected>Все врачи</option>
+        {% for doctor in doctors %}
+        <option value="{{doctor.id}}">{{doctor.name}}</option>
+        {% endfor %}
+    </select><br><br>
     <div class="table-container">
-        <h2>Невыполненные заказы</h2>
-        <table>
+        <h2>Отправлены на примерку</h2>
+        <table id="fitting-done-orders">
             <tr>
                 <th>Врач</th>
                 <th>ФИО пациента</th>
@@ -26,9 +37,9 @@
                 <th>Дата сдачи работы</th>
                 <th>Подробнее</th>
             </tr>
-            {% for order in not_done %}
-            <tr>
-                <td>{{order[6]}}</td>
+            {% for order in fitting_done %}
+            <tr class="yellow" data-doctor-id="{{order[6].id}}">
+                <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
                 <td>{{order[2]}}</td>
                 <td>{{order[3]}}</td>
@@ -39,8 +50,8 @@
         </table>
     </div>
     <div class="table-container">
-        <h2>Отправлены на примерку</h2>
-        <table>
+        <h2>Невыполненные заказы</h2>
+        <table id="not-done-orders">
             <tr>
                 <th>Врач</th>
                 <th>ФИО пациента</th>
@@ -49,9 +60,10 @@
                 <th>Дата сдачи работы</th>
                 <th>Подробнее</th>
             </tr>
-            {% for order in fitting_done %}
-            <tr class="yellow">
-                <td>{{order[6]}}</td>
+            {% for order in not_done %}
+            <tr data-doctor-id="{{order[6].id}}">
+
+                <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
                 <td>{{order[2]}}</td>
                 <td>{{order[3]}}</td>
@@ -63,7 +75,7 @@
     </div>
     <div class="table-container">
         <h2>Выполненные заказы</h2>
-        <table>
+        <table id="done-orders">
             <tr>
                 <th>Врач</th>
                 <th>ФИО пациента</th>
@@ -73,8 +85,8 @@
                 <th>Подробнее</th>
             </tr>
             {% for order in done %}
-            <tr class="green">
-                <td>{{order[6]}}</td>
+            <tr class="green" data-doctor-id="{{order[6].id}}">
+                <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
                 <td>{{order[2]}}</td>
                 <td>{{order[3]}}</td>
@@ -85,5 +97,6 @@
         </table>
     </div>
 </div>
+<script src="/js/technik_personal_account.js"></script>
 </body>
 </html>

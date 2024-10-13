@@ -35,3 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+const today = new Date();
+const formattedDate = today.toISOString().split('T')[0];
+document.getElementById('date_fitting').setAttribute('min', formattedDate);
+document.getElementById('date_deadline').setAttribute('min', formattedDate);
