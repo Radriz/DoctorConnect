@@ -33,13 +33,15 @@
                 </select>
                 <div id="clinic_div">
                     <label for="clinic">Название клиники</label>
-                    <input type="text" id="clinic" name="clinic" required>
+                    <input type="text" id="clinic" name="clinic">
                 </div>
                 {% if comment %}
                 <label class="comment">{{comment}}</label><br>
                 {% endif %}
-                <a href="/authorization">Уже есть аккаунт</a>
+
                 <input type="submit" value="Зарегистрировать">
+                <a style="text-align:center; margin-top: 10px; text-decoration:underline" href="/authorization">Войти в
+                    существующий аккаунт</a>
             </form>
         </div>
         <div class="cube"></div>

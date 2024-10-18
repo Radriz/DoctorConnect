@@ -2,12 +2,13 @@ import datetime
 import os
 import subprocess
 import time
-from typing import Optional
+import uuid
+from typing import Optional, List
 
 import fitz
 from docx2pdf import convert
 import pypandoc
-from fastapi import FastAPI, Form, Depends, HTTPException, Request
+from fastapi import FastAPI, Form, Depends, HTTPException, Request, UploadFile, File
 from fastapi.openapi.models import Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -23,7 +24,7 @@ from Database import autorization, registration, find_techniks, get_user, create
     name_procedure, get_subtype_by_type, get_template_procedure, create_template_procedure, \
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
     update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
-    get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id
+    get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
@@ -182,7 +183,7 @@ async def check_login_password(request: Request, form_data: OAuth2PasswordReques
 @app.post("/registration", response_class=HTMLResponse)
 async def regist(request: Request, fio: str = Form(...),
                  email: str = Form(...), password: str = Form(...), speciality: str = Form(...),
-                 repeat_password: str = Form(...), clinic: str = Form(...),):
+                 repeat_password: str = Form(...), clinic: Optional[str] = Form(None),):
     res, comment = registration(fio, email, password, speciality, repeat_password,clinic)
     if not res:
         return templates.TemplateResponse("registration.html", {"request": request,"comment": comment})
@@ -252,7 +253,7 @@ async def add_order(request: Request, order: Order):
     user_id = read_session(session_cookie)
     doctor = get_user(user_id)
 
-    create_order(
+    id = create_order(
         order.patient,
         order.formula,
         order.type,
@@ -264,9 +265,23 @@ async def add_order(request: Request, order: Order):
         order.color_letter,
         order.color_number
     )
-    return {"result" : "Успешно!"}
+    return {"order_id" : id}
 
+@app.post("/order/photo/upload/{order_id}")
+async def upload_photos(request: Request, order_id: int, photos: List[UploadFile] = File(...)):
+    uploaded_files = []
 
+    for photo in photos:
+        extension = os.path.splitext(photo.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{extension}"
+        file_path = os.path.join("orders_photo", unique_filename)
+        with open(file_path, "wb") as file:
+            content = await photo.read()
+            file.write(content)
+        uploaded_files.append(photo.filename)
+        add_photo_to_order(order_id,unique_filename)
+
+    return {"uploaded_files": uploaded_files}
 @app.post("/order/update/{order_id}", response_class=HTMLResponse)
 async def update_order(request: Request, order_id: int, patient: str = Form(...), formula: str = Form(...),
                        type: str = Form(...), comment: str = Form(""), fitting: str = Form(...),
@@ -487,10 +502,11 @@ async def get_document(request: Request, plan_id: int):
     stages = []
     done_stages = []
     for stage in get_stages:
-        if stage[0] in done_stages:
-            stage_i = done_stages.index(stage[0])
+        if (stage[0], stage[1]) in done_stages:
+            stage_i = done_stages.index((stage[0],stage[1]))
             if stage[2] not in stages[stage_i]['templates']:
                 stages[stage_i]['templates'][stage[2]] = {'name' : stage[3], 'items' : []}
+                stages[stage_i]['sticker'].append(stage[4])
             stages[stage_i]['templates'][stage[2]]["items"].append({
                 "no": len(stages[stage_i]['templates'][stage[2]]["items"]) + 1,
                 "service": stage[5],
@@ -506,7 +522,7 @@ async def get_document(request: Request, plan_id: int):
                 "stage": stage[0],
                 'total_price' : (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
                 'tooth' : stage[1],
-                'sticker' : stage[4],
+                'sticker' : [stage[4]],
                 "templates": {
                     stage[2]: {'name' : stage[3], 'items' : [
                         {
@@ -519,7 +535,7 @@ async def get_document(request: Request, plan_id: int):
                     ]}
                 }
             })
-            done_stages.append(stage[0])
+            done_stages.append((stage[0],stage[1]))
         total_price +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
     print(stages)
     file_name = f'{data["fio"].replace(" ", "_")}_{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
@@ -536,13 +552,13 @@ async def get_document(request: Request, plan_id: int):
     file_handle = fitz.open(output_path + "no_icons.pdf")
     page = file_handle[0]
     for stage in stages:
-        image = stage["sticker"]
+        images = stage["sticker"]
         tooths = stage["tooth"].split(",")
-        if image == "tooth":
-            continue
-        for tooth in tooths:
-
-            image_to_pdf(image,int(tooth),page)
+        for image in images:
+            if image == "tooth":
+                continue
+            for tooth in tooths:
+                image_to_pdf(image, int(tooth), page)
     file_handle.save(output_path + ".pdf")
     file_handle.close()
     os.remove(output_path + "no_icons.pdf")

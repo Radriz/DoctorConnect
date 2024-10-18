@@ -57,365 +57,365 @@ tooth_data = {
 }
 
 image_data = {
-    # "crown": {
-    #     "right_lower":
-    #         {
-    #             "delta": -10,
-    #             "y": 307,
-    #             "width": 41,
-    #             "height": 33
-    #         },
-    #     "left_lower": {
-    #         "delta": -10,
-    #         "y": 307,
-    #         "width": 41,
-    #         "height": 33
-    #     },
-    #     "lower": {
-    #         "delta": 0,
-    #         "y": 306,
-    #         "width": 26,
-    #         "height": 30
-    #     },
-    #     "lower_center": {
-    #         "delta": 3,
-    #         "y": 305,
-    #         "width": 19,
-    #         "height": 31
-    #     },
-    #     "right_upper":
-    #         {
-    #             "delta": -10,
-    #             "y": 263,
-    #             "width": 41,
-    #             "height": 33
-    #         },
-    #     "left_upper": {
-    #         "delta": -10,
-    #         "y": 263,
-    #         "width": 41,
-    #         "height": 33
-    #     },
-    #     "upper": {
-    #         "delta": -1,
-    #         "y": 261,
-    #         "width": 28,
-    #         "height": 36
-    #     },
-    #     "upper_center": {
-    #         "delta": -1,
-    #         "y": 266,
-    #         "width": 27,
-    #         "height": 35
-    #     },
-    # },
-    # "bracket": {
-    #     "right_lower":
-    #         {
-    #             "delta": -5,
-    #             "y": 318,
-    #             "width": 33,
-    #             "height": 15
-    #         },
-    #     "left_lower": {
-    #         "delta": -6,
-    #         "y": 318,
-    #         "width": 33,
-    #         "height": 15
-    #     },
-    #     "lower": {
-    #         "delta": -1,
-    #         "y": 317,
-    #         "width": 26,
-    #         "height": 13
-    #     },
-    #     "lower_center": {
-    #         "delta": 5,
-    #         "y": 317,
-    #         "width": 16,
-    #         "height": 11
-    #     },
-    #     "right_upper":
-    #         {
-    #             "delta": -5,
-    #             "y": 273,
-    #             "width": 33,
-    #             "height": 15
-    #         },
-    #     "left_upper": {
-    #         "delta": -5,
-    #         "y": 273,
-    #         "width": 33,
-    #         "height": 15
-    #     },
-    #     "upper": {
-    #         "delta": -1,
-    #         "y": 274,
-    #         "width": 26,
-    #         "height": 16
-    #     },
-    #     "upper_center": {
-    #         "delta": -1,
-    #         "y": 274,
-    #         "width": 26,
-    #         "height": 16
-    #     },
-    # },
-    # "remove": {
-    #     "right_lower": {
-    #         "delta": -2,
-    #         "y": 320,
-    #         "width": 28,
-    #         "height": 45
-    #     },
-    #     "left_lower": {
-    #         "delta": -3,
-    #         "y": 320,
-    #         "width": 28,
-    #         "height": 45
-    #     },
-    #     "lower": {
-    #         "delta": 0,
-    #         "y": 320,
-    #         "width": 28,
-    #         "height": 45
-    #     },
-    #     "lower_center": {
-    #         "delta": 3,
-    #         "y": 320,
-    #         "width": 20,
-    #         "height": 45
-    #     },
-    #     "right_upper": {
-    #         "delta": -2,
-    #         "y": 240,
-    #         "width": 28,
-    #         "height": 45
-    #     },
-    #     "left_upper": {
-    #         "delta": -3,
-    #         "y": 240,
-    #         "width": 28,
-    #         "height": 45
-    #     },
-    #     "upper": {
-    #         "delta": -1,
-    #         "y": 240,
-    #         "width": 28,
-    #         "height": 45
-    #     },
-    #     "upper_center": {
-    #         "delta": 2,
-    #         "y": 240,
-    #         "width": 22,
-    #         "height": 45
-    #     },
-    # },
-    # "caries": {
-    #     "right_lower": {
-    #         "delta": 5,
-    #         "y": 317,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    #     "left_lower": {
-    #         "delta": 4,
-    #         "y": 317,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    #     "lower": {
-    #         "delta": 5,
-    #         "y": 313,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    #     "lower_center": {
-    #         "delta": 7,
-    #         "y": 310,
-    #         "width": 13,
-    #         "height": 18
-    #     },
-    #     "right_upper": {
-    #         "delta": 5,
-    #         "y": 271,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    #     "left_upper": {
-    #         "delta": 4,
-    #         "y": 271,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    #     "upper": {
-    #         "delta": 5,
-    #         "y": 268,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    #     "upper_center": {
-    #         "delta": 4,
-    #         "y": 272,
-    #         "width": 18,
-    #         "height": 18
-    #     },
-    # },
-    # "periodont": {
-    #     "right_lower": {
-    #         "delta": 5,
-    #         "y": 374,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "left_lower": {
-    #         "delta": 4,
-    #         "y": 374,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "lower": {
-    #         "delta": 5,
-    #         "y": 374,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "lower_center": {
-    #         "delta": 7,
-    #         "y": 374,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "right_upper": {
-    #         "delta": 5,
-    #         "y": 216,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "left_upper": {
-    #         "delta": 4,
-    #         "y": 216,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "upper": {
-    #         "delta": 5,
-    #         "y": 213,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    #     "upper_center": {
-    #         "delta": 4,
-    #         "y": 213,
-    #         "width": 14,
-    #         "height": 13
-    #     },
-    # },
-    # "tab": {
-    #     "right_lower":
-    #         {
-    #             "delta": -1,
-    #             "y": 316,
-    #             "width": 28,
-    #             "height": 37
-    #         },
-    #     "left_lower": {
-    #         "delta": -4,
-    #         "y": 316,
-    #         "width": 28,
-    #         "height": 37
-    #     },
-    #     "lower": {
-    #         "delta": 5,
-    #         "y": 319,
-    #         "width": 18,
-    #         "height": 41
-    #     },
-    #     "lower_center": {
-    #         "delta": 7,
-    #         "y": 319,
-    #         "width": 12,
-    #         "height": 41
-    #     },
-    #     "right_upper":
-    #         {
-    #             "delta": -2,
-    #             "y": 248,
-    #             "width": 28,
-    #             "height": 37
-    #         },
-    #     "left_upper": {
-    #         "delta": -2,
-    #         "y": 248,
-    #         "width": 28,
-    #         "height": 37
-    #     },
-    #     "upper": {
-    #         "delta": 4,
-    #         "y": 237,
-    #         "width": 18,
-    #         "height": 41
-    #     },
-    #     "upper_center": {
-    #         "delta": 4,
-    #         "y": 237,
-    #         "width": 18,
-    #         "height": 41
-    #     },
-    # },
-    #
-    # "implant": {
-    #     "right_lower":
-    #         {
-    #             "delta": -3,
-    #             "y": 336,
-    #             "width": 32,
-    #             "height": 48
-    #         },
-    #     "left_lower": {
-    #         "delta": -3,
-    #         "y": 336,
-    #         "width": 32,
-    #         "height": 48
-    #     },
-    #     "lower": {
-    #         "delta": 4,
-    #         "y": 335,
-    #         "width": 20,
-    #         "height": 44
-    #     },
-    #     "lower_center": {
-    #         "delta": 5,
-    #         "y": 335,
-    #         "width": 17,
-    #         "height": 46
-    #     },
-    #     "right_upper":
-    #         {
-    #             "delta": -5,
-    #             "y": 216,
-    #             "width": 32,
-    #             "height": 53
-    #         },
-    #     "left_upper": {
-    #         "delta": -5,
-    #         "y": 216,
-    #         "width": 32,
-    #         "height": 53
-    #     },
-    #     "upper": {
-    #         "delta": 4,
-    #         "y": 220,
-    #         "width": 20,
-    #         "height": 44
-    #     },
-    #     "upper_center": {
-    #         "delta": 4,
-    #         "y": 220,
-    #         "width": 20,
-    #         "height": 44
-    #     },
-    # },
+    "crown": {
+        "right_lower":
+            {
+                "delta": -10,
+                "y": 307,
+                "width": 41,
+                "height": 33
+            },
+        "left_lower": {
+            "delta": -10,
+            "y": 307,
+            "width": 41,
+            "height": 33
+        },
+        "lower": {
+            "delta": 0,
+            "y": 306,
+            "width": 26,
+            "height": 30
+        },
+        "lower_center": {
+            "delta": 3,
+            "y": 305,
+            "width": 19,
+            "height": 31
+        },
+        "right_upper":
+            {
+                "delta": -10,
+                "y": 263,
+                "width": 41,
+                "height": 33
+            },
+        "left_upper": {
+            "delta": -10,
+            "y": 263,
+            "width": 41,
+            "height": 33
+        },
+        "upper": {
+            "delta": -1,
+            "y": 261,
+            "width": 28,
+            "height": 36
+        },
+        "upper_center": {
+            "delta": -1,
+            "y": 266,
+            "width": 27,
+            "height": 35
+        },
+    },
+    "bracket": {
+        "right_lower":
+            {
+                "delta": -5,
+                "y": 318,
+                "width": 33,
+                "height": 15
+            },
+        "left_lower": {
+            "delta": -6,
+            "y": 318,
+            "width": 33,
+            "height": 15
+        },
+        "lower": {
+            "delta": -1,
+            "y": 317,
+            "width": 26,
+            "height": 13
+        },
+        "lower_center": {
+            "delta": 5,
+            "y": 317,
+            "width": 16,
+            "height": 11
+        },
+        "right_upper":
+            {
+                "delta": -5,
+                "y": 273,
+                "width": 33,
+                "height": 15
+            },
+        "left_upper": {
+            "delta": -5,
+            "y": 273,
+            "width": 33,
+            "height": 15
+        },
+        "upper": {
+            "delta": -1,
+            "y": 274,
+            "width": 26,
+            "height": 16
+        },
+        "upper_center": {
+            "delta": -1,
+            "y": 274,
+            "width": 26,
+            "height": 16
+        },
+    },
+    "remove": {
+        "right_lower": {
+            "delta": -2,
+            "y": 320,
+            "width": 28,
+            "height": 45
+        },
+        "left_lower": {
+            "delta": -3,
+            "y": 320,
+            "width": 28,
+            "height": 45
+        },
+        "lower": {
+            "delta": 0,
+            "y": 320,
+            "width": 28,
+            "height": 45
+        },
+        "lower_center": {
+            "delta": 3,
+            "y": 320,
+            "width": 20,
+            "height": 45
+        },
+        "right_upper": {
+            "delta": -2,
+            "y": 240,
+            "width": 28,
+            "height": 45
+        },
+        "left_upper": {
+            "delta": -3,
+            "y": 240,
+            "width": 28,
+            "height": 45
+        },
+        "upper": {
+            "delta": -1,
+            "y": 240,
+            "width": 28,
+            "height": 45
+        },
+        "upper_center": {
+            "delta": 2,
+            "y": 240,
+            "width": 22,
+            "height": 45
+        },
+    },
+    "caries": {
+        "right_lower": {
+            "delta": 5,
+            "y": 317,
+            "width": 18,
+            "height": 18
+        },
+        "left_lower": {
+            "delta": 4,
+            "y": 317,
+            "width": 18,
+            "height": 18
+        },
+        "lower": {
+            "delta": 5,
+            "y": 313,
+            "width": 18,
+            "height": 18
+        },
+        "lower_center": {
+            "delta": 7,
+            "y": 310,
+            "width": 13,
+            "height": 18
+        },
+        "right_upper": {
+            "delta": 5,
+            "y": 271,
+            "width": 18,
+            "height": 18
+        },
+        "left_upper": {
+            "delta": 4,
+            "y": 271,
+            "width": 18,
+            "height": 18
+        },
+        "upper": {
+            "delta": 5,
+            "y": 268,
+            "width": 18,
+            "height": 18
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 272,
+            "width": 18,
+            "height": 18
+        },
+    },
+    "periodont": {
+        "right_lower": {
+            "delta": 5,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "left_lower": {
+            "delta": 4,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "lower": {
+            "delta": 5,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "lower_center": {
+            "delta": 7,
+            "y": 374,
+            "width": 14,
+            "height": 13
+        },
+        "right_upper": {
+            "delta": 5,
+            "y": 216,
+            "width": 14,
+            "height": 13
+        },
+        "left_upper": {
+            "delta": 4,
+            "y": 216,
+            "width": 14,
+            "height": 13
+        },
+        "upper": {
+            "delta": 5,
+            "y": 213,
+            "width": 14,
+            "height": 13
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 213,
+            "width": 14,
+            "height": 13
+        },
+    },
+    "tab": {
+        "right_lower":
+            {
+                "delta": -1,
+                "y": 316,
+                "width": 28,
+                "height": 37
+            },
+        "left_lower": {
+            "delta": -4,
+            "y": 316,
+            "width": 28,
+            "height": 37
+        },
+        "lower": {
+            "delta": 5,
+            "y": 319,
+            "width": 18,
+            "height": 41
+        },
+        "lower_center": {
+            "delta": 7,
+            "y": 319,
+            "width": 12,
+            "height": 41
+        },
+        "right_upper":
+            {
+                "delta": -2,
+                "y": 248,
+                "width": 28,
+                "height": 37
+            },
+        "left_upper": {
+            "delta": -2,
+            "y": 248,
+            "width": 28,
+            "height": 37
+        },
+        "upper": {
+            "delta": 4,
+            "y": 237,
+            "width": 18,
+            "height": 41
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 237,
+            "width": 18,
+            "height": 41
+        },
+    },
+
+    "implant": {
+        "right_lower":
+            {
+                "delta": -3,
+                "y": 336,
+                "width": 32,
+                "height": 48
+            },
+        "left_lower": {
+            "delta": -3,
+            "y": 336,
+            "width": 32,
+            "height": 48
+        },
+        "lower": {
+            "delta": 4,
+            "y": 335,
+            "width": 20,
+            "height": 44
+        },
+        "lower_center": {
+            "delta": 5,
+            "y": 335,
+            "width": 17,
+            "height": 46
+        },
+        "right_upper":
+            {
+                "delta": -5,
+                "y": 216,
+                "width": 32,
+                "height": 53
+            },
+        "left_upper": {
+            "delta": -5,
+            "y": 216,
+            "width": 32,
+            "height": 53
+        },
+        "upper": {
+            "delta": 4,
+            "y": 220,
+            "width": 20,
+            "height": 44
+        },
+        "upper_center": {
+            "delta": 4,
+            "y": 220,
+            "width": 20,
+            "height": 44
+        },
+    },
     "fiberglass": {
         "right_lower":
             {
@@ -468,113 +468,113 @@ image_data = {
             "height": 57
         },
     },
-# "seal": {
-#         "right_lower":
-#             {
-#                 "delta": -9,
-#                 "y": 308,
-#                 "width": 45,
-#                 "height": 20
-#             },
-#         "left_lower": {
-#             "delta": -11,
-#             "y": 308,
-#             "width": 45,
-#             "height": 20
-#         },
-#         "lower": {
-#             "delta": 0,
-#             "y": 312,
-#             "width": 20,
-#             "height": 50
-#         },
-#         "lower_center": {
-#             "delta": 6,
-#             "y": 312,
-#             "width": 13,
-#             "height": 50
-#         },
-#         "right_upper":
-#             {
-#                 "delta": -10,
-#                 "y": 278,
-#                 "width": 45,
-#                 "height": 20
-#             },
-#         "left_upper": {
-#             "delta": -11,
-#             "y": 278,
-#             "width": 45,
-#             "height": 20
-#         },
-#         "upper": {
-#             "delta": -10,
-#             "y": 275,
-#             "width": 40,
-#             "height": 18
-#         },
-#         "upper_center": {
-#             "delta": 2,
-#             "y": 237,
-#             "width": 23,
-#             "height": 57
-#         },
-#     },
-    # "gutta": {
-    #     "lower":
-    #         {
-    #             "delta": 10,
-    #             "y": 337,
-    #             "width": 7,
-    #             "height": 41
-    #         },
-    #     "left_lower":
-    #         {
-    #             "delta": -2,
-    #             "y": 336,
-    #             "width": 29,
-    #             "height": 39
-    #         },
-    #     "right_lower":
-    #         {
-    #             "delta": -5,
-    #             "y": 336,
-    #             "width": 29,
-    #             "height": 39
-    #         },
-    #     "lower_center": {
-    #         "delta": 11,
-    #         "y": 336,
-    #         "width": 4,
-    #         "height": 41
-    #     },
-    #     "upper":
-    #         {
-    #             "delta": 10,
-    #             "y": 221,
-    #             "width": 7,
-    #             "height": 40
-    #         },
-    #     "left_upper":
-    #         {
-    #             "delta": -2,
-    #             "y": 229,
-    #             "width": 29,
-    #             "height": 39
-    #         },
-    #     "right_upper":
-    #         {
-    #             "delta": -5,
-    #             "y": 229,
-    #             "width": 29,
-    #             "height": 39
-    #         },
-    #     "upper_center": {
-    #         "delta": 11,
-    #         "y": 221,
-    #         "width": 4,
-    #         "height": 40
-    #     },
-    # }
+    "seal": {
+        "right_lower":
+            {
+                "delta": -9,
+                "y": 308,
+                "width": 45,
+                "height": 20
+            },
+        "left_lower": {
+            "delta": -11,
+            "y": 308,
+            "width": 45,
+            "height": 20
+        },
+        "lower": {
+            "delta": 0,
+            "y": 312,
+            "width": 20,
+            "height": 50
+        },
+        "lower_center": {
+            "delta": 6,
+            "y": 312,
+            "width": 13,
+            "height": 50
+        },
+        "right_upper":
+            {
+                "delta": -10,
+                "y": 278,
+                "width": 45,
+                "height": 20
+            },
+        "left_upper": {
+            "delta": -11,
+            "y": 278,
+            "width": 45,
+            "height": 20
+        },
+        "upper": {
+            "delta": -10,
+            "y": 275,
+            "width": 40,
+            "height": 18
+        },
+        "upper_center": {
+            "delta": 2,
+            "y": 237,
+            "width": 23,
+            "height": 57
+        },
+    },
+    "gutta": {
+        "lower":
+            {
+                "delta": 10,
+                "y": 337,
+                "width": 7,
+                "height": 41
+            },
+        "left_lower":
+            {
+                "delta": -2,
+                "y": 336,
+                "width": 29,
+                "height": 39
+            },
+        "right_lower":
+            {
+                "delta": -5,
+                "y": 336,
+                "width": 29,
+                "height": 39
+            },
+        "lower_center": {
+            "delta": 11,
+            "y": 336,
+            "width": 4,
+            "height": 41
+        },
+        "upper":
+            {
+                "delta": 10,
+                "y": 221,
+                "width": 7,
+                "height": 40
+            },
+        "left_upper":
+            {
+                "delta": -2,
+                "y": 229,
+                "width": 29,
+                "height": 39
+            },
+        "right_upper":
+            {
+                "delta": -5,
+                "y": 229,
+                "width": 29,
+                "height": 39
+            },
+        "upper_center": {
+            "delta": 11,
+            "y": 221,
+            "width": 4,
+            "height": 40
+        },
+    }
 
 }

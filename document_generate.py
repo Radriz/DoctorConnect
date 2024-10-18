@@ -7,6 +7,10 @@ from docx.shared import Pt
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
+from docx.shared import Inches, Pt
+from docx.oxml.ns import nsdecls
+
+
 def generate_plan(
         stages,
         data,
@@ -39,8 +43,20 @@ def generate_plan(
                     if key in edge_data:
                         element.set(qn(f'w:{key}'), str(edge_data[key]))
 
+    def set_column_widths(table):
+        # Устанавливаем ширины столбцов
+        table.columns[0].width = Inches(1)  # первый столбец (№)
+        table.columns[1].width = Inches(3)  # второй столбец (Услуга)
+        table.columns[2].width = Inches(1)  # третий столбец (Цена за ед.)
+        table.columns[3].width = Inches(1)  # четвертый столбец (Кол-во)
+        table.columns[4].width = Inches(1)  # пятый столбец (Всего)
+
     def create_table(doc, items):
         table = doc.add_table(rows=1, cols=5)
+
+        # Устанавливаем ширины для колонок
+        set_column_widths(table)
+
         hdr_cells = table.rows[0].cells
         headers = ['№', 'Услуга', 'Цена за ед.', 'Кол-во', 'Всего']
 
@@ -50,6 +66,7 @@ def generate_plan(
             run.bold = True
             run.font.size = Pt(14)
 
+            # Устанавливаем границы для ячеек
             set_cell_border(cell, top={"sz": 10, "val": "single", "color": "000000"},
                             bottom={"sz": 10, "val": "single", "color": "000000"},
                             start={"sz": 10, "val": "single", "color": "000000"},
@@ -62,11 +79,13 @@ def generate_plan(
             row_cells[2].text = f"{item['price_per_unit']} руб."
             row_cells[3].text = str(item['quantity'])
             row_cells[4].text = f"{item['total']} руб."
+
             for cell in row_cells:
                 for paragraph in cell.paragraphs:
                     for run in paragraph.runs:
                         run.font.size = Pt(14)
 
+                # Устанавливаем границы для ячеек
                 set_cell_border(cell, top={"sz": 10, "val": "single", "color": "000000"},
                                 bottom={"sz": 10, "val": "single", "color": "000000"},
                                 start={"sz": 10, "val": "single", "color": "000000"},

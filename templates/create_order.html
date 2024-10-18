@@ -31,7 +31,7 @@
         {% endfor %}
     </select><br><br>
 
-    <div id="order-container" class="order-block">
+    <div id="order-container-1" class="order-block">
         <button class="button-select" onclick="selectTopRow(this)">Выбрать верхний ряд</button>
         <div class="scroll-container">
             <div class="tooth-selection-container">
@@ -115,6 +115,14 @@
                     {% endfor %}
                 </select><br><br>
             </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label>Прикрепить фото</label>
+            <label class="input-file">
+                <input type="file" name="file" accept=".jpg, .jpeg, .png" multiple onchange="handleFileChange(event)">
+                <span class="input-file-btn">Выберите файл</span>
+                <span class="input-file-text">Максимум 50мб</span>
+            </label>
         </div>
         <div class="form-group">
             <label>Комментарии:</label>

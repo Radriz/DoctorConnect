@@ -57,10 +57,11 @@ def find_techniks():
 
 
 def create_order(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter, color_number):
-    cursor.execute(
+    id = cursor.execute(
         f"""insert into "order"(patient, formula, type, comment, fitting, deadline, to_user, from_user,color_letter,color_number) 
-        Values('{patient}','{formula}','{type}','{comment}','{fitting}','{deadline}',{technik},{doctor},'{color_letter}','{color_number}')""")
+        Values('{patient}','{formula}','{type}','{comment}','{fitting}','{deadline}',{technik},{doctor},'{color_letter}','{color_number}') returning id""").fetchone()
     connection.commit()
+    return id[0]
 
 
 def get_user(id):
@@ -300,3 +301,9 @@ def get_stages_plan_id(id):
         join user_procedure on template_procedure.user_procedure_id = user_procedure.id
         where treatment_plan.id = {id} and template_procedure.is_active = 1 order by plan_template.id""").fetchall()
     return stages
+
+def add_photo_to_order(order, photo):
+    cursor.execute(
+        f"""INSERT INTO Order_photos(order_id, photo) VALUES({order}, '{photo}')"""
+    )
+    connection.commit()
