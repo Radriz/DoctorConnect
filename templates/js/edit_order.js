@@ -1,5 +1,6 @@
 var buttonTooth=document.querySelectorAll('.button-tooth')
 var toothNumbers=[]
+var fileList = []
 var submitButton=document.getElementById('submit')
 submitButton.addEventListener('click', function() {
     var orderForm=document.getElementById('order_form');
@@ -27,6 +28,21 @@ buttonTooth.forEach(function(button) {
    });
 });
 
+function deletePhoto(photoName) {
+    event.preventDefault();
+    fetch(`/order/photo/delete/${photoName}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Failed to delete photo');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     buttonTooth.forEach(function(button) {
         console.log(button.style.backgroundColor);
@@ -35,6 +51,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+function handleFileChange(event){
+    const textFiles = document.querySelector('.input-file-text');
+    textFiles.innerHTML = '';
+    let size = 0
+    fileList = [];
+    Array.from(event.target.files).forEach((file) => {
+        fileList.push(file);
+        size += file.size / 1024 / 1024;
+	    textFiles.textContent += file.name + ", "
+    });
+    textFiles.textContent.slice(0, -1) + '.';
+    console.log(size)
+    if (size > 50){
+        textFiles.textContent = 'Превышен допустимый размер файлов(до 50мб) ';
+        fileList = [];
+    }
+}
 
 const today = new Date();
 const formattedDate = today.toISOString().split('T')[0];

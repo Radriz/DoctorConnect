@@ -22,7 +22,7 @@
     <h2>Добро пожаловать, {{fio}}!</h2>
     <div class="actions">
         <form method="get" action="/order/create" style="display: inline;">
-            <input type="submit" value="Создать заказ">
+            <input type="submit" value="Создать заказ технику">
         </form>
         <form method="get" action="/order/plan" style="display: inline;">
             <input type="submit" value="Создать план лечения">
@@ -65,7 +65,7 @@
                 <th>Изменить</th>
             </tr>
             {% for order in fitting_done %}
-            <tr>
+            <tr class="yellow">
                 <td>{{order[1]}}</td>
                 <td>{{order[7]}}</td>
                 <td>{{order[2]}}</td>
@@ -89,13 +89,13 @@
                 <th>Изменить</th>
             </tr>
             {% for order in done %}
-            <tr>
+            <tr class="green">
                 <td>{{order[1]}}</td>
                 <td>{{order[7]}}</td>
                 <td>{{order[2]}}</td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
-                <td><a href="/order/get/{{order[0]}}">Изменить</a></td>
+                <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
             </tr>
             {% endfor %}
         </table>

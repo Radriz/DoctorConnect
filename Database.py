@@ -307,3 +307,15 @@ def add_photo_to_order(order, photo):
         f"""INSERT INTO Order_photos(order_id, photo) VALUES({order}, '{photo}')"""
     )
     connection.commit()
+
+def get_photos_by_order_id(order_id):
+    get_photo = cursor.execute(
+        f""" SELECT * FROM Order_photos WHERE order_id = {order_id}"""
+    ).fetchall()
+    return get_photo
+
+def delete_photo_from_order(photo_name):
+    cursor.execute(
+        f""" DELETE FROM Order_photos WHERE photo = '{photo_name}'"""
+    )
+    connection.commit()

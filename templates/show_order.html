@@ -85,10 +85,22 @@
             <label>Цвет конструкции:</label>
             <input type="text" name="color" value="{{order[11]}}{{order[13]}}" readonly><br><br>
         </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label>Фотографии</label>
+            <div class="photos_container">
+                {% for photo in photos %}
+                <div class="photo_wrapper">
+                    <a href="/order/photo/show/{{photo[2]}}">
+                        <img src="/order/photo/show/{{photo[2]}}" alt="Photo" class="photo_thumbnail">
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
 
+        </div>
         <div class="form-group">
             <label>Комментарии:</label>
-            <input type="text" name="comment" value="{{order[8]}}" readonly><br><br>
+            <textarea name="comment" readonly>{{order[8]}}</textarea> <br><br>
         </div>
 
         <div class="form-group">
@@ -103,22 +115,30 @@
 
         <div class="form-group">
             <label for="doctor">Доктор:</label>
-            <input id="doctor" type="text" name="doctor" value="{{ doctor[1] }}{% if doctor[6] %} ({{ doctor[6] }}){% endif %}" readonly><br><br>
+            <input id="doctor" type="text" name="doctor"
+                   value="{{ doctor[1] }}{% if doctor[6] %} ({{ doctor[6] }}){% endif %}" readonly><br><br>
 
         </div>
 
     </div>
     <div class="button-group">
-            <form id="fitting_done_form" method="post" action="/order/done/fitting/{{order[0]}}">
+        <form id="fitting_done_form" method="post" action="/order/done/fitting/{{order[0]}}">
+            <label class="checkbox-wrapper">
                 <input type="checkbox" name="fitting_done" id="fitting_done" {% if order[12] %} checked {% endif %}>
-                <label class="button-action" for="fitting_done">Готова к примерке</label>
-            </form>
+                <span class="custom-checkbox"></span>
+                Готова к примерке
+            </label>
+        </form>
 
-            <form id="done_form" method="post" action="/order/done/{{order[0]}}">
+        <form id="done_form" method="post" action="/order/done/{{order[0]}}">
+            <label class="checkbox-wrapper">
                 <input type="checkbox" name="done" id="done" {% if order[9] %} checked {% endif %}>
-                <label class="button-action" for="done">Заказ выполнен</label>
-            </form>
-        </div>
+                <span class="custom-checkbox"></span>
+                Заказ выполнен
+            </label>
+        </form>
+    </div>
+
 </div>
 <!--<script src="/js/create_order.js"></script>-->
 <script src="/js/show_order.js"></script>

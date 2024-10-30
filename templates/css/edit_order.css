@@ -25,6 +25,8 @@ label {
     display: block;
     margin-bottom: 10px;
 }
+
+
 select {
     width: calc(100%);
     max-width:620px;
@@ -60,6 +62,49 @@ select {
     align-items: center;
 
 }
+
+.photos_container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.photo_wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 5px;
+    border: 1px solid black;
+}
+
+.photo_thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.delete_button {
+    position: absolute;
+    right: 5%;
+    background: none;
+    color: red;
+    border: none;
+    width: 20px;
+    height: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.delete_button:hover {
+    opacity: 1;
+}
+
+
+
 .procedure_block .right, .template_procedure_block .right {
     display: flex;
     align-items: center;
@@ -342,6 +387,60 @@ input[type="submit"]:hover {
     font-size: 30px;
 
 }
+.checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 35px; /* Чтобы было место для кастомного чекбокса */
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-checkbox {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #f4f4f9;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .custom-checkbox {
+    background-color: #28a745; /* Цвет для отмеченного чекбокса */
+    border-color: #28a745;
+}
+
+.custom-checkbox::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 8px;
+    top: 4px;
+    width: 9px;
+    height: 16px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .custom-checkbox::after {
+    display: block;
+}
+
+.checkbox-wrapper:hover .custom-checkbox {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
 
 @media screen and (min-width: 600px) {
 
@@ -470,7 +569,7 @@ input[type="submit"]:hover {
     }
 
     /* Adjust input sizes */
-    input[type="text"], input[type="number"], .modal-template-name {
+    input[type="text"], input[type="number"],textarea .modal-template-name {
         width: 94%; /* Full width inputs */
     }
 }
@@ -522,7 +621,7 @@ header form input:hover {
     font-weight: bold;
 }
 
-input[type="text"], input[type="date"], select {
+input[type="text"], input[type="date"],textarea, select {
     width: calc(100% - 20px);
     padding: 10px;
     border: 1px solid #ccc;
@@ -580,6 +679,63 @@ input[type="submit"]:hover {
     border-radius: 8px;
     margin-bottom: 20px;
     position: relative;
+}
+.input-file {
+	position: relative;
+	display: inline-block;
+}
+.input-file-btn {
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+	outline: none;
+	text-decoration: none;
+	font-size: 14px;
+	vertical-align: middle;
+	color: rgb(255 255 255);
+	text-align: center;
+	border-radius: 4px;
+	background-color: #4CAF50;
+	line-height: 22px;
+	height: 40px;
+	padding: 10px 20px;
+	box-sizing: border-box;
+	border: none;
+	margin: 0;
+	transition: background-color 0.2s;
+}
+.input-file-text {
+	padding: 0 10px;
+	line-height: 30px;
+	display: inline-block;
+	font-size: 14px;
+	font-weight: normal;
+}
+.input-file input[type=file] {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+	display: block;
+	width: 0;
+	height: 0;
+}
+
+/* Focus */
+.input-file input[type=file]:focus + .input-file-btn {
+	box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Hover/active */
+.input-file:hover .input-file-btn {
+	background-color: #59be6e;
+}
+.input-file:active .input-file-btn {
+	background-color: #2E703A;
+}
+
+/* Disabled */
+.input-file input[type=file]:disabled + .input-file-btn {
+	background-color: #eee;
 }
 
 

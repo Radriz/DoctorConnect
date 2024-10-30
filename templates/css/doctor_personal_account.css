@@ -20,7 +20,7 @@ header h1 {
     margin-left: 10%;
     display: flex;
     align-items: center;
-    font-size: 2.5vh;
+    font-size: 3vh;
 }
 header img {
     margin-right: 20px;
@@ -35,7 +35,7 @@ header form input[type="submit"] {
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 2vh;
+    font-size: 2.5vh;
 }
 
 .container {
@@ -65,7 +65,7 @@ h2 {
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 3vh;
+    font-size: 3.5vh;
     width: 100%;
     white-space: normal;
     text-align: center;

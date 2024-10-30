@@ -24,7 +24,8 @@ from Database import autorization, registration, find_techniks, get_user, create
     name_procedure, get_subtype_by_type, get_template_procedure, create_template_procedure, \
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
     update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
-    get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order
+    get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order, get_photos_by_order_id, \
+    delete_photo_from_order
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
@@ -36,6 +37,7 @@ app.mount("/css", StaticFiles(directory="templates/css"), name="css")
 app.mount("/js", StaticFiles(directory="templates/js"), name="js")
 app.mount("/images", StaticFiles(directory="templates/images"), name="images")
 app.mount("/plans", StaticFiles(directory="treatment_plans"), name="treatment_plan")
+app.mount("/order/photo/show", StaticFiles(directory="orders_photo"), name="orders_photo")
 templates = Jinja2Templates(directory="templates")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account")
 
@@ -267,6 +269,20 @@ async def add_order(request: Request, order: Order):
     )
     return {"order_id" : id}
 
+
+
+@app.delete("/order/photo/delete/{photo_name}")
+async def delete_photo(request: Request, photo_name: str):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
+    delete_photo_from_order(photo_name)
+    os.remove(os.path.join("orders_photo", photo_name))
+    return {"deleted_photo" : photo_name}
+
+
+
 @app.post("/order/photo/upload/{order_id}")
 async def upload_photos(request: Request, order_id: int, photos: List[UploadFile] = File(...)):
     uploaded_files = []
@@ -285,8 +301,7 @@ async def upload_photos(request: Request, order_id: int, photos: List[UploadFile
 @app.post("/order/update/{order_id}", response_class=HTMLResponse)
 async def update_order(request: Request, order_id: int, patient: str = Form(...), formula: str = Form(...),
                        type: str = Form(...), comment: str = Form(""), fitting: str = Form(...),
-                       deadline: str = Form(...), technik: str = Form(...), color_letter: str = Form(...),
-                       color_number: str = Form(...)):
+                       deadline: str = Form(...), technik: str = Form(...), color: str = Form(...)):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie) if session_cookie else None
     if user_id is None:
@@ -295,9 +310,10 @@ async def update_order(request: Request, order_id: int, patient: str = Form(...)
     techniks = find_techniks()
 
     update_order_by_id(patient, formula, type, comment, fitting, deadline, int(technik), doctor[0],
-                       color_letter, color_number, order_id)
+                       color[0], color[1:], order_id)
     order = get_order_by_id(order_id)
     selected_tooth = list(map(int, order[2].split(", ")))
+    photos = get_photos_by_order_id(order_id)
     return templates.TemplateResponse("edit_order.html", {
         "request": request,
         "success": True,
@@ -308,7 +324,8 @@ async def update_order(request: Request, order_id: int, patient: str = Form(...)
         "color_letter": color_letter,
         "color_number": color_number,
         "techniks": techniks,
-        "order": order
+        "order": order,
+        "photos": photos
     })
 
 
@@ -322,8 +339,9 @@ async def get_order(request: Request, order_id: int):
     if user_id is None:
         return RedirectResponse(url="/authorization")
     user = get_user(user_id)
+    photos = get_photos_by_order_id(order_id)
 
-    if user[5] == "doctor":
+    if user[5] == "doctor" and order[9] != 1:
         techniks = find_techniks()
         return templates.TemplateResponse("edit_order.html", {
             "request": request,
@@ -334,7 +352,19 @@ async def get_order(request: Request, order_id: int):
             "color_letter": color_letter,
             "color_number": color_number,
             "techniks": techniks,
-            "order": order
+            "order": order,
+            "photos": photos
+        })
+    elif  user[5] == "doctor":
+        technic = get_user(order[7])
+        return templates.TemplateResponse("show_order_doctor.html", {
+            "request": request,
+            "order": order,
+            "technic": technic,
+            "first_row": first_row,
+            "second_row": second_row,
+            "selected_tooth": selected_tooth,
+            "photos": photos
         })
     else:
         doctor = get_user(order[6])
@@ -344,7 +374,8 @@ async def get_order(request: Request, order_id: int):
             "doctor": doctor,
             "first_row": first_row,
             "second_row": second_row,
-            "selected_tooth": selected_tooth
+            "selected_tooth": selected_tooth,
+            "photos": photos
         })
 
 

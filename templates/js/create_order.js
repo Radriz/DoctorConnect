@@ -5,87 +5,113 @@ let fileList = {}
 fileList[counter] = [];
 
 async function submit() {
-    var orderBlocks = document.querySelectorAll('.order-block')
-    fio = document.getElementById('fio');
+    var orderBlocks = document.querySelectorAll('.order-block');
+    var fio = document.getElementById('fio');
+
     if (fio.value == "") {
         alert('Введите имя и фамилию пациента');
         return;
     }
-    orderBlocks.forEach( async function(orderBlock){
-        console.log(orderBlock)
-        var toothNumbers = []
-        buttonTooth = orderBlock.querySelectorAll('.button-tooth')
-        buttonTooth.forEach(function(button){
-            if(button.style.backgroundColor == "rgb(126, 247, 139)"){
-                toothNumbers.push(button.innerText.trim())
+
+    // Show loading overlay
+    document.getElementById('loading-overlay').style.display = 'flex';
+
+    var promises = [];
+
+    orderBlocks.forEach(function(orderBlock) {
+        var toothNumbers = [];
+        var buttonTooth = orderBlock.querySelectorAll('.button-tooth');
+
+        buttonTooth.forEach(function(button) {
+            if (button.style.backgroundColor == "rgb(126, 247, 139)") {
+                toothNumbers.push(button.innerText.trim());
             }
         });
-        tooths = toothNumbers.join(", ");
-        tech = document.getElementById('technik');
-        type = orderBlock.querySelector('#type');
-        color_letter = orderBlock.querySelector('#color_letter');
-        color_number = orderBlock.querySelector('#color_number');
-        text = orderBlock.querySelector('#text');
-        date_fitting = orderBlock.querySelector('#date_fitting');
-        date_deadline = orderBlock.querySelector('#date_deadline');
-        data = {
-         "patient" : fio.value,
-         "formula" : tooths,
-         "type" : type.value,
-         "comment" : text.value,
-         "fitting" : date_fitting.value,
-         "deadline" : date_deadline.value,
-         "technik" : tech.value,
-         "color_letter" : color_letter.value,
-         "color_number" : color_number.value,
-        }
-        console.log(data)
-        try{
-            const response = await fetch("/order/create", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            });
 
+        var tooths = toothNumbers.join(", ");
+        var tech = document.getElementById('technik');
+        var type = orderBlock.querySelector('#type');
+        var color_letter = orderBlock.querySelector('#color_letter');
+        var color_number = orderBlock.querySelector('#color_number');
+        var text = orderBlock.querySelector('#text');
+        var date_fitting = orderBlock.querySelector('#date_fitting');
+        var date_deadline = orderBlock.querySelector('#date_deadline');
+
+        var data = {
+            "patient": fio.value,
+            "formula": tooths,
+            "type": type.value,
+            "comment": text.value,
+            "fitting": date_fitting.value,
+            "deadline": date_deadline.value,
+            "technik": tech.value,
+            "color_letter": color_letter.value,
+            "color_number": color_number.value
+        };
+
+        console.log(data);
+
+        var orderPromise = fetch("/order/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+        .then(async response => {
+            if (!response.ok) throw new Error('Failed to create order');
             const result = await response.json();
             console.log("Success:", result);
             const order_id = result.order_id;
-            console.log("Order ID:", order_id, fileList[orderBlock.id]);
-            if (fileList[orderBlock.id]){
 
+            if (fileList[orderBlock.id]) {
                 const formData = new FormData();
-
                 for (let i = 0; i < fileList[orderBlock.id].length; i++) {
                     formData.append('photos', fileList[orderBlock.id][i]);
                 }
+
                 console.log(formData);
 
-                try {
-                    const response = await fetch(`/order/photo/upload/${order_id}`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        console.log('Upload successful:', result);
-                    } else {
-                        console.error('Upload failed:', response.statusText);
+                return fetch(`/order/photo/upload/${order_id}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(uploadResponse => {
+                    if (!uploadResponse.ok) {
+                        throw new Error('Upload failed');
                     }
-                } catch (error) {
-                    console.error('Error uploading photos:', error);
-                }
+                    return uploadResponse.json();
+                })
+                .then(uploadResult => {
+                    console.log('Upload successful:', uploadResult);
+                })
+                .catch(uploadError => {
+                    console.error('Error uploading photos:', uploadError);
+                });
             }
+        })
+        .catch(orderError => {
+            console.error("Error:", orderError);
+        });
 
-        } catch (error) {
-            console.error("Error:", error);
-        }
+        promises.push(orderPromise);
     });
-    alert("Заказ отправлен успешно")
-    window.location.href = "/account"
+
+    Promise.all(promises)
+    .then(() => {
+        document.getElementById('loading-overlay').style.display = 'none';
+        alert("Заказ отправлен успешно");
+        window.location.href = "/account";
+    })
+    .catch(error => {
+        console.error("Error in processing orders:", error);
+    })
+    .finally(() => {
+        // Hide loading overlay
+        document.getElementById('loading-overlay').style.display = 'none';
+    });
 }
+
 
 submitButton.addEventListener('click', submit);
 
@@ -188,4 +214,5 @@ function handleFileChange(event){
         fileList[orderBlock.id] = [];
     }
 }
+
 

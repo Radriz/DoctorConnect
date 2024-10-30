@@ -2,44 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Создание заказа</title>
+    <title>Просмотр заказа</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/create_order.css">
+    <link rel="stylesheet" href="/css/edit_order.css">
     <link rel="stylesheet" href="/css/tooth.css">
     <link rel="icon" href="/images/tooth.png" type="image/png">
 </head>
 
 <body>
 
-<div id="loading-overlay" style="display: none;">
-    <div class="loading-content">
-        <img src="/images/gear.gif" alt="Loading">
-        <p>Отправка...</p>
-    </div>
-</div>
-
-<h1>Создание заказа</h1>
+<h1>Просмотр заказа</h1>
 <div class="plan" id="procedure_form">
     <form method="get" action="/account">
         <input class="personal" type="submit" value="Личный кабинет">
     </form>
     <label class="label">ФИО пациента:</label>
-    <input list="options" id="fio" class="fio" name="patient" required>
-    <datalist id="options">
-        <option value=""></option>
-        {% for patient in patients %}
-        <option value="{{patient[1]}}">{{patient[1]}}</option>
-        {% endfor %}
-    </datalist>
-    <label for="technik">Выберите техника:</label>
-    <select id="technik" name="technik">
-        {% for technik in techniks %}
-        <option value="{{technik.id}}">{{technik.name}}</option>
-        {% endfor %}
-    </select><br><br>
+    <input value="{{order[1]}}" id="fio" class="fio" name="patient" required readonly><br>
+    <div class="form-group">
+        <label for="doctor">Техник:</label>
+        <input id="doctor" type="text" name="doctor"
+               value="{{ technic[1] }}" readonly><br><br>
 
-    <div id="order-container-1" class="order-block">
-        <button class="button-select" onclick="selectTopRow(this)">Выбрать верхний ряд</button>
+    </div>
+    <div id="order-container" class="order-block">
         <div class="scroll-container">
             <div class="tooth-selection-container">
                 <div class="tooth-selection" id="top-tooth">
@@ -97,66 +82,47 @@
                 </div>
             </div>
         </div>
-        <button class="button-select" style="margin-bottom: 20px" onclick="selectBottomRow(this)">Выбрать нижний
-            ряд
-        </button>
         <div class="form-group">
             <label>Вид работы:</label>
-            <select id="type" name="type">
-                {% for type in job_types %}
-                <option value="{{type}}">{{type}}</option>
-                {% endfor %}
-            </select><br><br>
+            <input type="text" name="type" value="{{order[3]}}" readonly><br><br>
         </div>
+
         <div class="form-group">
             <label>Цвет конструкции:</label>
-            <div class="color">
-                <select id="color_letter" name="color_letter" class="color_letter">
-                    {% for color in color_letter %}
-                    <option value="{{color}}">{{color}}</option>
-                    {% endfor %}
-                </select>
-                <select id="color_number" name="color_number" class="color_number">
-                    {% for number in color_number %}
-                    <option value="{{number}}">{{number}}</option>
-                    {% endfor %}
-                </select><br><br>
-            </div>
+            <input type="text" name="color" value="{{order[11]}}{{order[13]}}" readonly><br><br>
         </div>
         <div class="form-group" style="margin-bottom: 20px;">
-            <label>Прикрепить фото</label>
-            <label class="input-file">
-                <input type="file" name="file" accept=".jpg, .jpeg, .png" multiple onchange="handleFileChange(event)">
-                <span class="input-file-btn">Выберите файл</span>
-                <span class="input-file-text">Максимум 50мб</span>
-            </label>
+            <label>Фотографии</label>
+            <div class="photos_container">
+                    {% for photo in photos %}
+                    <div class="photo_wrapper">
+                        <a href="/order/photo/show/{{photo[2]}}">
+                            <img src="/order/photo/show/{{photo[2]}}" alt="Photo" class="photo_thumbnail">
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
         </div>
         <div class="form-group">
             <label>Комментарии:</label>
-            <textarea id="text" name="comment"> </textarea> <br><br>
+            <textarea name="comment" readonly>{{order[8]}}</textarea> <br><br>
         </div>
+
         <div class="form-group">
             <label>Дата примерка:</label>
-            <input id="date_fitting" type="date" onclick="this.showPicker()" name="fitting"><br><br>
+            <input type="date" name="fitting" value="{{order[4]}}" readonly><br><br>
         </div>
+
         <div class="form-group">
             <label>Дата сдачи работы:</label>
-            <input id="date_deadline" type="date" onclick="this.showPicker()" name="deadline" required><br><br>
+            <input type="date" name="deadline" value="{{order[5]}}" readonly><br><br>
         </div>
-        <div class="delete-button">
-            <button class="delete-btn" onclick="deleteOrderBlock(this)">×</button>
-        </div>
+
     </div>
 
-
-    <div id="add-order" class="add-procedure-button">
-        <button onclick="addOrderBlock()">Добавить работу</button>
-    </div>
-
-    <input id="submit" type="submit" value="Создать" class="personal">
 </div>
 <!--<script src="/js/create_order.js"></script>-->
-<script src="/js/create_order.js"></script>
+<script src="/js/show_order.js"></script>
 
 </body>
 </html>
