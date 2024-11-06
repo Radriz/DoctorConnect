@@ -72,6 +72,26 @@ h2 {
     height: 20vh;
     font-weight: bold;
 }
+.price-button{
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+	outline: none;
+	text-decoration: none;
+	font-size: 14px;
+	vertical-align: middle;
+	color: rgb(255 255 255);
+	text-align: center;
+	border-radius: 4px;
+	background-color: #4CAF50;
+	line-height: 22px;
+	height: 40px;
+	padding: 10px 20px;
+	box-sizing: border-box;
+	border: none;
+	margin: 0;
+	transition: background-color 0.2s;
+}
 
 @media (min-width: 768px) {
     .actions input[type="submit"] {

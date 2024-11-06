@@ -27,19 +27,21 @@ label {
 }
 select {
     width: calc(100%);
-    max-width:620px;
-    padding: 10px;
+    max-width: 478px;
+    padding: 12px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 .fio{
     width: calc(100% - 20px);
-    padding: 10px;
+    max-width: 478px;
+    padding: 12px;
     margin-bottom: 30px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 18px;
+    height: auto;
 }
 
 .procedure_block, .template_procedure_block {

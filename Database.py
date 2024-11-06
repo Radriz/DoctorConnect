@@ -319,3 +319,27 @@ def delete_photo_from_order(photo_name):
         f""" DELETE FROM Order_photos WHERE photo = '{photo_name}'"""
     )
     connection.commit()
+
+def add_technik_service(technik_id,name,price):
+    cursor.execute(
+        f"""INSERT INTO technik_services(technik_id, name, price) VALUES({technik_id}, '{name}', {price})"""
+    )
+    connection.commit()
+
+def update_technik_service(id,name,price):
+    cursor.execute(
+        f"""UPDATE technik_services SET name = '{name}', price = {price} WHERE id = {id}"""
+    )
+    connection.commit()
+
+def delete_technik_service(id):
+    cursor.execute(
+        f"""DELETE FROM technik_services WHERE id = {id}"""
+    )
+    connection.commit()
+
+def get_all_technik_services(technik_id):
+    get_services = cursor.execute(
+        f""" SELECT * FROM technik_services WHERE technik_id = {technik_id}"""
+    ).fetchall()
+    return get_services

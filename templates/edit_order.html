@@ -97,16 +97,26 @@
             </div>
             <div class="form-group" style="margin-bottom: 20px;">
                 <label>Фотографии</label>
-                <div class="photos_container">
-                    {% for photo in photos %}
+                <div class="photo_container">
+                    {% for media in photos %}
+                    {% if media[2].endswith('.mp4') or media[2].endswith('.webm') or media[2].endswith('.MOV') or
+                    media[2].endswith('.mov') %}
+                    <!-- Если это видео -->
+                    <a href="/order/photo/show/{{ media[2] }}">
+                        <img src="/order/photo/show/{{ media[2] }}" alt="Video" class="photo_thumbnail">
+                    </a>
+                    {% else %}
                     <div class="photo_wrapper">
-                        <a href="/order/photo/show/{{photo[2]}}">
-                            <img src="/order/photo/show/{{photo[2]}}" alt="Photo" class="photo_thumbnail">
+                        <!-- Если это фото -->
+                        <a href="/order/photo/show/{{ media[2] }}">
+                            <img src="/order/photo/show/{{ media[2] }}" alt="Photo" class="photo_thumbnail">
                         </a>
-                        <button type="button" class="delete_button" onclick="deletePhoto('{{photo[2]}}')">x</button>
+                        {% endif %}
+                        <button type="button" class="delete_button" onclick="deleteMedia('{{ media[2] }}')">x</button>
                     </div>
                     {% endfor %}
                 </div>
+
                 <label class="input-file">
                     <input type="file" name="file" accept=".jpg, .jpeg, .png" multiple
                            onchange="handleFileChange(event)">

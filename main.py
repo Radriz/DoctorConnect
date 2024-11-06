@@ -25,7 +25,8 @@ from Database import autorization, registration, find_techniks, get_user, create
     delete_template_procedure_by_id, add_procedure_to_template, edit_user_procedure, delete_user_procedure, \
     update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
     get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order, get_photos_by_order_id, \
-    delete_photo_from_order
+    delete_photo_from_order, add_technik_service, update_technik_service, delete_technik_service, \
+    get_all_technik_services
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
@@ -469,6 +470,7 @@ async def save_done_order(request: Request, order_id: int, done: str = Form('off
     return RedirectResponse(url="/account")
 
 
+
 @app.post("/order/done/fitting/{order_id}")
 async def save_done_fitting_order(request: Request, order_id: int, fitting_done: str = Form('off')):
     fitting_done = 1 if fitting_done == 'on' else 0
@@ -480,6 +482,58 @@ async def save_done_fitting_order(request: Request, order_id: int, fitting_done:
 async def delete_order(request: Request, order_id: int):
     delete_order_by_id(order_id)
     return RedirectResponse(url="/account")
+
+@app.get("/technik/service/show")
+async def get_technik_services(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    services = get_all_technik_services(user_id)
+    return templates.TemplateResponse("technik_services.html", {
+        "request": request,
+        "services": services
+    })
+
+
+class Technik_service(BaseModel):
+    id: int
+    name: str
+    price: int
+@app.post("/technik/service/edit")
+async def add_service(request: Request, technik_service: Technik_service):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    if str(technik_service.id) == "-1":
+        add_technik_service(user_id, technik_service.name, technik_service.price)
+    else:
+        update_technik_service(technik_service.id, technik_service.name, technik_service.price)
+    return {"result": "done"}
+
+@app.delete("/technik/service/delete/{id}")
+async def delete_service(request: Request, id: int):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    delete_technik_service(id)
+    return {"result": "done"}
+
+@app.get("/technik/service/list")
+async def get_services(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    services = get_all_technik_services(user_id)
+    return {"services": [{"id": service[0], "name" : service[2], "price" : service[3] } for service in services]}
+
+@app.get("/technik/service/get/{technik_id}")
+async def get_services(request: Request,technik_id: int):
+    services = get_all_technik_services(technik_id)
+    return {"services": [{"id": service[0], "name" : service[2], "price" : service[3] } for service in services]}
 
 
 @app.get("/logout")

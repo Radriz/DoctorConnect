@@ -215,4 +215,61 @@ function handleFileChange(event){
     }
 }
 
+$(document).ready(function() {
+  $('#technik').select2({
+    placeholder: 'Выберите техника',
+    allowClear: true
+  }).val(null).trigger('change');
+  // Применение стиля к select2
+  $('.select2-selection').css({
+    'width': '100%',
+    'max-width': '500px',
+    'padding': '10px',
+    'border': '1px solid #ccc',
+    'border-radius': '5px',
+    'font-size': '18px',
+    'box-sizing': 'border-box',
+    'height':'auto'
+  });
+
+  $('.select2-container').css({
+    'width': '100%',
+    'max-width': '500px'
+  });
+  $('.select2-selection__arrow').css({
+    'height': '100%',
+    'display': 'flex',
+    'align-items': 'center',
+    'justify-content': 'center'
+  });
+  $('#technik').on('select2:open', function() {
+    $('.select2-search__field').css({
+      'font-size': '20px',
+      'padding': '10px'
+    });
+  });
+  $('#technik').on('change', function() {
+    const selectedValue = $(this).val();
+    console.log('Выбранное значение:', selectedValue);
+    fetch('/technik/service/get/'+ selectedValue, {
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        $('#type').empty();
+        data.services.forEach(service => {
+            $('#type').append(new Option(`${service.name} - ${service.price} руб.`, service.id ))
+        })
+        $('#type').append(new Option('Другое - цена договорная', -1 ))
+
+        console.log(data);
+    })
+    .catch(error => {
+        console.error("Ошибка:", error);
+    });
+  });
+});
 

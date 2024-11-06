@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    font-family: Georgia, serif;
+}
+
+header {
+    background-color: white;
+    color: #333;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    font-family: Georgia, serif;
+}
+
+header h1 {
+    margin-left: 10%;
+    display: flex;
+    align-items: center;
+    font-size: 2.5vh;
+}
+
+header img {
+    margin-right: 20px;
+}
+
+header form {
+    margin-right: 10%;
+}
+
+header form input[type="submit"] {
+    background-color: white;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 2vh;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: black;
+}
+
+.actions {
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: column;
+    max-width: 300px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 15px;
+}
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.service-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+.service-item input[type="number"] {
+    width: 15%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+.service-item input[type="text"]{
+    width: 55%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.service-item .delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 37px;
+    margin-left: 10px;
+}
+
+@media (min-width: 768px) {
+    .actions input[type="button"],
+    .actions input[type="submit"] {
+        font-size: 2vh;
+    }
+}
