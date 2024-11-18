@@ -43,7 +43,20 @@
 
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
-                <td>{{order[2]}}</td>
+                 <td style="padding: 0px;">
+                    <table class="tooth-formula">
+                        <tr>
+                            <!-- Верхние челюсти -->
+                            <td>{{ order[2]|filter_tooth(1) }}</td>
+                            <td>{{ order[2]|filter_tooth(2) }}</td>
+                        </tr>
+                        <tr>
+                            <!-- Нижние челюсти -->
+                            <td>{{ order[2]|filter_tooth(3) }}</td>
+                            <td>{{ order[2]|filter_tooth(4) }}</td>
+                        </tr>
+                    </table>
+                </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
                 <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
@@ -66,7 +79,20 @@
             <tr class="yellow" data-doctor-id="{{order[6].id}}">
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
-                <td>{{order[2]}}</td>
+                 <td style="padding: 0px;">
+                    <table class="tooth-formula">
+                        <tr>
+                            <!-- Верхние челюсти -->
+                            <td>{{ order[2]|filter_tooth(1) }}</td>
+                            <td>{{ order[2]|filter_tooth(2) }}</td>
+                        </tr>
+                        <tr>
+                            <!-- Нижние челюсти -->
+                            <td>{{ order[2]|filter_tooth(3) }}</td>
+                            <td>{{ order[2]|filter_tooth(4) }}</td>
+                        </tr>
+                    </table>
+                </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
                 <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
@@ -89,7 +115,20 @@
             <tr class="green" data-doctor-id="{{order[6].id}}">
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
-                <td>{{order[2]}}</td>
+                <td style="padding: 0px;">
+                    <table class="tooth-formula">
+                        <tr>
+                            <!-- Верхние челюсти -->
+                            <td>{{ order[2]|filter_tooth(1) }}</td>
+                            <td>{{ order[2]|filter_tooth(2) }}</td>
+                        </tr>
+                        <tr>
+                            <!-- Нижние челюсти -->
+                            <td>{{ order[2]|filter_tooth(3) }}</td>
+                            <td>{{ order[2]|filter_tooth(4) }}</td>
+                        </tr>
+                    </table>
+                </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
                 <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>

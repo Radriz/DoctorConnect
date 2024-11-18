@@ -36,11 +36,13 @@ async function submit() {
         var text = orderBlock.querySelector('#text');
         var date_fitting = orderBlock.querySelector('#date_fitting');
         var date_deadline = orderBlock.querySelector('#date_deadline');
-
+        type_and_price = type.value.split('|')
+        console.log(type_and_price)
         var data = {
             "patient": fio.value,
             "formula": tooths,
-            "type": type.value,
+            "type": type_and_price[0],
+            "price": type_and_price[1],
             "comment": text.value,
             "fitting": date_fitting.value,
             "deadline": date_deadline.value,
@@ -100,7 +102,6 @@ async function submit() {
     Promise.all(promises)
     .then(() => {
         document.getElementById('loading-overlay').style.display = 'none';
-        alert("Заказ отправлен успешно");
         window.location.href = "/account";
     })
     .catch(error => {
@@ -261,7 +262,7 @@ $(document).ready(function() {
     .then(data => {
         $('#type').empty();
         data.services.forEach(service => {
-            $('#type').append(new Option(`${service.name} - ${service.price} руб.`, service.id ))
+            $('#type').append(new Option(`${service.name} - ${service.price} руб.`, `${service.name}|${service.price}` ))
         })
         $('#type').append(new Option('Другое - цена договорная', -1 ))
 

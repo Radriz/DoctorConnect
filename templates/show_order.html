@@ -119,6 +119,23 @@
                    value="{{ doctor[1] }}{% if doctor[6] %} ({{ doctor[6] }}){% endif %}" readonly><br><br>
 
         </div>
+        {% if order[9] %}
+            {% if order[14] != -1%}
+              <div class="form-group">
+                <label>Цена (руб.):</label>
+                <input type="number" value="{{order[14]}}" readonly><br><br>
+              </div>
+            {% endif %}
+        {% else %}
+         {% if order[14] != -1%}
+              <div class="form-group">
+                <label>Цена (руб.):</label>
+                <input type="number" id="price" value="{{order[14]}}"><br><br>
+                <button class="personal" type="button" name="update_price"  onclick="update_price()" >Обновить цену</button>
+              </div>
+            {% endif %}
+        {% endif %}
+
 
     </div>
     <div class="button-group">

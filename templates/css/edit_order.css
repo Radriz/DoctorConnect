@@ -621,7 +621,7 @@ header form input:hover {
     font-weight: bold;
 }
 
-input[type="text"], input[type="date"],textarea, select {
+input[type="text"], input[type="date"], input[type="number"], textarea, select {
     width: calc(100% - 20px);
     padding: 10px;
     border: 1px solid #ccc;

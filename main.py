@@ -8,7 +8,7 @@ from typing import Optional, List
 import fitz
 from docx2pdf import convert
 import pypandoc
-from fastapi import FastAPI, Form, Depends, HTTPException, Request, UploadFile, File
+from fastapi import FastAPI, Form, Depends, HTTPException, Request, UploadFile, File, Body, Query
 from fastapi.openapi.models import Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -26,7 +26,7 @@ from Database import autorization, registration, find_techniks, get_user, create
     update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
     get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order, get_photos_by_order_id, \
     delete_photo_from_order, add_technik_service, update_technik_service, delete_technik_service, \
-    get_all_technik_services
+    get_all_technik_services, set_new_order_price
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
@@ -45,6 +45,20 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account")
 SECRET_KEY = "your-secret-key"
 serializer = URLSafeSerializer(SECRET_KEY)
 
+# Зарегистрируем кастомный фильтр для Jinja2
+def filter_tooth(tooth_string, quarter):
+    teeth = [int(num.strip()) for num in tooth_string.split(',')]
+    quarters = {
+        1: range(11, 19),  # Верхняя правая
+        2: range(21, 29),  # Верхняя левая
+        3: range(41, 49),  # Нижняя левая
+        4: range(31, 39)   # Нижняя правая
+    }
+    quarter_teeth = [str(tooth) for tooth in teeth if tooth in quarters[quarter]]
+    return ', '.join(quarter_teeth)
+
+# Добавим кастомный фильтр в Jinja2
+templates.env.filters["filter_tooth"] = filter_tooth
 
 class UserAuthorization(BaseModel):
     email: str
@@ -55,12 +69,14 @@ class Order(BaseModel):
     patient: str
     formula: str
     type: str
+    price: str
     comment: str
     fitting: str
     deadline: str
     technik: str
     color_letter: str
     color_number: str
+
 
 
 class TemplateProcedure(BaseModel):
@@ -134,12 +150,14 @@ async def account(request: Request):
                     data = orders[i][5].split("-")
                     orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
                 doctor = get_user(orders[i][6])
-                selected_doctors.append({"id" : doctor[0], "name" : ""})
+
                 if doctor[6] is not None:
-                    selected_doctors[-1]["name"] = f"{doctor[1]} ({doctor[6]})"
+                    doctor_name = f"{doctor[1]} ({doctor[6]})"
                 else:
-                    selected_doctors[-1]["name"] = f"{doctor[1]}"
-                orders[i][6] =  selected_doctors[-1]
+                    doctor_name = f"{doctor[1]}"
+                orders[i][6] = {"id": doctor[0], "name": doctor_name}
+                if {"id" : doctor[0], "name" : doctor_name} not in selected_doctors:
+                    selected_doctors.append({"id": doctor[0], "name": doctor_name})
 
         done = [order for order in orders if order[9] == 1]
         fitting_done = [order for order in orders if order[9] == 0 and order[12] == 1]
@@ -266,10 +284,19 @@ async def add_order(request: Request, order: Order):
         int(order.technik),
         doctor[0],
         order.color_letter,
-        order.color_number
+        order.color_number,
+        int(order.price) * len(order.formula.split(", ")),
     )
     return {"order_id" : id}
 
+@app.put("/order/price/{order_id}")
+async def update_order_price(request: Request, order_id: int, price: int = Query(...)):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
+    set_new_order_price(order_id, price)
+    return {"updated_price" : price}
 
 
 @app.delete("/order/photo/delete/{photo_name}")

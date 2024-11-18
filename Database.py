@@ -56,12 +56,17 @@ def find_techniks():
     return technik_objects
 
 
-def create_order(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter, color_number):
+def create_order(patient, formula, type, comment, fitting, deadline, technik, doctor, color_letter, color_number,price):
     id = cursor.execute(
-        f"""insert into "order"(patient, formula, type, comment, fitting, deadline, to_user, from_user,color_letter,color_number) 
-        Values('{patient}','{formula}','{type}','{comment}','{fitting}','{deadline}',{technik},{doctor},'{color_letter}','{color_number}') returning id""").fetchone()
+        f"""insert into "order"(patient, formula, type, comment, fitting, deadline, to_user, from_user,color_letter,color_number,price) 
+        Values('{patient}','{formula}','{type}','{comment}','{fitting}','{deadline}',{technik},{doctor},'{color_letter}','{color_number}','{price}') returning id""").fetchone()
     connection.commit()
     return id[0]
+
+def set_new_order_price(order_id, price):
+    cursor.execute(
+        f"""update "order" set price = {price} where id = {order_id}""")
+    connection.commit()
 
 
 def get_user(id):

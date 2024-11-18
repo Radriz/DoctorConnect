@@ -89,7 +89,7 @@ document.getElementById('submit').addEventListener('click', async (event) => {
     const stages = document.getElementById('stage');
     const procedureBlocks = stages.querySelectorAll('.procedure-block');
     let planId = null;
-
+    document.getElementById('loading-overlay').style.display = 'block';
     try {
         // Create the plan
         const planResponse = await fetch('/plan/create', {
@@ -114,6 +114,7 @@ document.getElementById('submit').addEventListener('click', async (event) => {
             const stageI = procedureBlock_i.id.split('-').at(-1);
             if (stageName == "") {
             alert('Отсутствует название этапа №' + stageI);
+            document.getElementById('loading-overlay').style.display = 'none';
             return;
             }
             let currentTooth = [];
@@ -191,12 +192,13 @@ document.getElementById('submit').addEventListener('click', async (event) => {
             }).then(data => {
                 downloadFile('/plans/' + data.document_word, data.document_word);
                 downloadFile('/plans/' + data.document_pdf, data.document_pdf);
-            })
+            }).then(response => {document.getElementById('loading-overlay').style.display = 'none';})
 
 
     } catch (error) {
         console.error(error);
         alert('Произошла ошибка при создании плана или услуг');
+        document.getElementById('loading-overlay').style.display = 'none';
     }
 });
 

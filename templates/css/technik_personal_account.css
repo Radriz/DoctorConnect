@@ -119,9 +119,6 @@ th {
     background-color: #00CED1;
     color: white;
 }
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
 tr:hover {
     background-color: #f1f1f1;
 }
@@ -146,4 +143,33 @@ select {
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+.tooth-formula {
+    border-collapse: collapse;
+    table-layout: auto; /* Подстраиваем ширину под содержимое */
+    text-align: center;
+}
+
+.tooth-formula td {
+    padding: 0px;
+    vertical-align: middle;
+    height: 40px;
+    white-space: nowrap; /* Запрещаем переносы */
+    border-right: 2px solid #333; /* Правые границы */
+    border-bottom: 2px solid #333; /* Нижние границы */
+    min-width: 200px;
+}
+
+/* Убираем правую и нижнюю границы для последней ячейки в строках */
+.tooth-formula tr td:last-child { border-right: none; }
+.tooth-formula tr:last-child td { border-bottom: none; }
+
+/* Выровнять первый столбец по правому краю, второй по левому */
+.tooth-formula td:first-child {
+    text-align: right;
+    padding-right: 10px;
+}
+.tooth-formula td:last-child {
+    text-align: left;
+    padding-left: 10px;
 }
