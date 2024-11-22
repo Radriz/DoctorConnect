@@ -112,7 +112,7 @@
                             <img src="/order/photo/show/{{ media[2] }}" alt="Photo" class="photo_thumbnail">
                         </a>
                         {% endif %}
-                        <button type="button" class="delete_button" onclick="deleteMedia('{{ media[2] }}')">x</button>
+                        <button type="button" class="delete_button" onclick="deletePhoto('{{ media[2] }}')">x</button>
                     </div>
                     {% endfor %}
                 </div>
@@ -126,7 +126,7 @@
             </div>
             <div class="form-group">
                 <label>Комментарии:</label>
-                <textarea name="comment" readonly>{{order[8]}}</textarea> <br><br>
+                <textarea name="comment" >{{order[8]}}</textarea> <br><br>
             </div>
 
             <div class="form-group">
@@ -138,6 +138,45 @@
                 <label>Дата сдачи работы:</label>
                 <input type="date" onclick="this.showPicker()" name="deadline" value="{{order[5]}}"><br><br>
             </div>
+
+            {% if order[14] != -1%}
+            <div class="form-group">
+                <label>Цена (руб.):</label>
+                <input type="number" value="{{order[14]}}" readonly><br><br>
+            </div>
+            {% endif %}
+            {% if technik_files %}
+            <div class="form-group" style="margin-bottom: 20px;">
+            <label>Файлы от техника</label>
+            <div class="photo_container">
+                {% for media in technik_files %}
+                {% if media[2].endswith('.mp4') or media[2].endswith('.webm') or media[2].endswith('.MOV') or
+                media[2].endswith('.mov') %}
+                <!-- Если это видео -->
+                <a href="/order/technik/file/show/{{ media[2] }}">
+                    <img src="/order/photo/show/{{ media[2] }}" alt="Video" class="photo_thumbnail">
+                </a>
+                {% elif media[2].endswith('.jpg') or media[2].endswith('.png') or media[2].endswith('.jpeg') %}
+                <div class="photo_wrapper">
+                    <!-- Если это фото -->
+                    <a href="/order/technik/file/show/{{ media[2] }}">
+                        <img src="/order/technik/file/show/{{ media[2] }}" alt="Photo" class="photo_thumbnail">
+                    </a>
+                </div>
+                {%else%}
+                <a href="/order/technik/file/show/{{ media[2] }}">{{ media[2] }} </a>
+                  {% endif %}
+                {% endfor %}
+            </div>
+            </div>
+            {% endif %}
+
+         {% if order[15] %}
+        <div class="form-group">
+            <label>Пожелания от техника:</label>
+            <textarea id="technik_comment" readonly>{{ order[15] }}</textarea> <br><br>
+        </div>
+            {% endif %}
 
         </div>
         <div class="button-group">

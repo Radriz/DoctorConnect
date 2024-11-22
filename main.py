@@ -26,7 +26,8 @@ from Database import autorization, registration, find_techniks, get_user, create
     update_amount_procedure_template, update_template_name, update_sticker_name, create_plan_db, create_service_db, \
     get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order, get_photos_by_order_id, \
     delete_photo_from_order, add_technik_service, update_technik_service, delete_technik_service, \
-    get_all_technik_services, set_new_order_price
+    get_all_technik_services, set_new_order_price, delete_file_from_technik_files, add_file_to_technik_files, \
+    get_technik_files_by_order_id, set_new_order_technik_comment
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from parameters import first_row, second_row, types, color_letter, color_number
@@ -39,6 +40,7 @@ app.mount("/js", StaticFiles(directory="templates/js"), name="js")
 app.mount("/images", StaticFiles(directory="templates/images"), name="images")
 app.mount("/plans", StaticFiles(directory="treatment_plans"), name="treatment_plan")
 app.mount("/order/photo/show", StaticFiles(directory="orders_photo"), name="orders_photo")
+app.mount("/order/technik/file/show", StaticFiles(directory="technik_files"), name="technik_files")
 templates = Jinja2Templates(directory="templates")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account")
 
@@ -290,12 +292,14 @@ async def add_order(request: Request, order: Order):
     return {"order_id" : id}
 
 @app.put("/order/price/{order_id}")
-async def update_order_price(request: Request, order_id: int, price: int = Query(...)):
+async def update_order_price(request: Request, order_id: int, price: int = Query(...), comment: str = Query(...)):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie)
     if user_id is None:
         return RedirectResponse(url="/authorization")
     set_new_order_price(order_id, price)
+    if comment:
+        set_new_order_technik_comment(order_id, comment)
     return {"updated_price" : price}
 
 
@@ -324,6 +328,32 @@ async def upload_photos(request: Request, order_id: int, photos: List[UploadFile
             file.write(content)
         uploaded_files.append(photo.filename)
         add_photo_to_order(order_id,unique_filename)
+
+    return {"uploaded_files": uploaded_files}
+
+@app.delete("/order/technik/file/delete/{file_name}")
+async def delete_photo(request: Request, file_name: str):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return RedirectResponse(url="/authorization")
+    delete_file_from_technik_files(file_name)
+    os.remove(os.path.join("technik_files", file_name))
+    return {"deleted_file" : file_name}
+
+@app.post("/order/technik/file/upload/{order_id}")
+async def upload_photos(request: Request, order_id: int, files: List[UploadFile] = File(...)):
+    uploaded_files = []
+
+    for file in files:
+        extension = os.path.splitext(file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{extension}"
+        file_path = os.path.join("technik_files", unique_filename)
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        uploaded_files.append(file.filename)
+        add_file_to_technik_files(order_id,unique_filename)
 
     return {"uploaded_files": uploaded_files}
 @app.post("/order/update/{order_id}", response_class=HTMLResponse)
@@ -368,6 +398,8 @@ async def get_order(request: Request, order_id: int):
         return RedirectResponse(url="/authorization")
     user = get_user(user_id)
     photos = get_photos_by_order_id(order_id)
+    files = get_technik_files_by_order_id(order_id)
+
 
     if user[5] == "doctor" and order[9] != 1:
         techniks = find_techniks()
@@ -381,7 +413,8 @@ async def get_order(request: Request, order_id: int):
             "color_number": color_number,
             "techniks": techniks,
             "order": order,
-            "photos": photos
+            "photos": photos,
+            "technik_files": files
         })
     elif  user[5] == "doctor":
         technic = get_user(order[7])
@@ -392,7 +425,8 @@ async def get_order(request: Request, order_id: int):
             "first_row": first_row,
             "second_row": second_row,
             "selected_tooth": selected_tooth,
-            "photos": photos
+            "photos": photos,
+            "technik_files": files
         })
     else:
         doctor = get_user(order[6])
@@ -403,7 +437,8 @@ async def get_order(request: Request, order_id: int):
             "first_row": first_row,
             "second_row": second_row,
             "selected_tooth": selected_tooth,
-            "photos": photos
+            "photos": photos,
+            "technik_files": files
         })
 
 

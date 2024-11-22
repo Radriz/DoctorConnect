@@ -67,6 +67,10 @@ def set_new_order_price(order_id, price):
     cursor.execute(
         f"""update "order" set price = {price} where id = {order_id}""")
     connection.commit()
+def set_new_order_technik_comment(order_id, comment):
+    cursor.execute(
+        f"""update "order" set technik_comment = '{comment}' where id = {order_id}""")
+    connection.commit()
 
 
 def get_user(id):
@@ -313,15 +317,31 @@ def add_photo_to_order(order, photo):
     )
     connection.commit()
 
+def add_file_to_technik_files(order, file):
+    cursor.execute(
+        f"""INSERT INTO technik_files(order_id, file) VALUES({order}, '{file}')"""
+    )
+    connection.commit()
 def get_photos_by_order_id(order_id):
     get_photo = cursor.execute(
         f""" SELECT * FROM Order_photos WHERE order_id = {order_id}"""
     ).fetchall()
     return get_photo
 
+def get_technik_files_by_order_id(order_id):
+    get_file = cursor.execute(
+        f""" SELECT * FROM technik_files WHERE order_id = {order_id}"""
+    ).fetchall()
+    return get_file
+
 def delete_photo_from_order(photo_name):
     cursor.execute(
         f""" DELETE FROM Order_photos WHERE photo = '{photo_name}'"""
+    )
+    connection.commit()
+def delete_file_from_technik_files(file_name):
+    cursor.execute(
+        f""" DELETE FROM technik_files WHERE file = '{file_name}'"""
     )
     connection.commit()
 

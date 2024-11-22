@@ -85,6 +85,7 @@
             <label>Цвет конструкции:</label>
             <input type="text" name="color" value="{{order[11]}}{{order[13]}}" readonly><br><br>
         </div>
+        {% if photos %}
         <div class="form-group" style="margin-bottom: 20px;">
             <label>Фотографии</label>
             <div class="photos_container">
@@ -98,6 +99,7 @@
             </div>
 
         </div>
+        {% endif %}
         <div class="form-group">
             <label>Комментарии:</label>
             <textarea name="comment" readonly>{{order[8]}}</textarea> <br><br>
@@ -120,23 +122,58 @@
 
         </div>
         {% if order[9] %}
-            {% if order[14] != -1%}
-              <div class="form-group">
-                <label>Цена (руб.):</label>
-                <input type="number" value="{{order[14]}}" readonly><br><br>
-              </div>
-            {% endif %}
-        {% else %}
-         {% if order[14] != -1%}
-              <div class="form-group">
-                <label>Цена (руб.):</label>
-                <input type="number" id="price" value="{{order[14]}}"><br><br>
-                <button class="personal" type="button" name="update_price"  onclick="update_price()" >Обновить цену</button>
-              </div>
-            {% endif %}
+        {% if order[14] != -1%}
+        <div class="form-group">
+            <label>Цена (руб.):</label>
+            <input type="number" value="{{order[14]}}" readonly><br><br>
+        </div>
         {% endif %}
+        {% else %}
+        {% if order[14] != -1%}
+        <div class="form-group">
+            <label>Цена (руб.):</label>
+            <input type="number" id="price" value="{{order[14]}}"><br><br>
 
+        </div>
+        {% endif %}
+        {% endif %}
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label>Файлы для доктора</label>
+            <div class="photo_container">
+                {% for media in technik_files %}
+                {% if media[2].endswith('.mp4') or media[2].endswith('.webm') or media[2].endswith('.MOV') or
+                media[2].endswith('.mov') %}
+                <!-- Если это видео -->
+                <a href="/order/technik/file/show/{{ media[2] }}">
+                    <img src="/order/photo/show/{{ media[2] }}" alt="Video" class="photo_thumbnail">
+                </a>
+                {% elif media[2].endswith('.jpg') or media[2].endswith('.png') or media[2].endswith('.jpeg') %}
+                <div class="photo_wrapper">
+                    <!-- Если это фото -->
+                    <a href="/order/technik/file/show/{{ media[2] }}">
+                        <img src="/order/technik/file/show/{{ media[2] }}" alt="Photo" class="photo_thumbnail">
+                    </a>
 
+                    <button type="button" class="delete_button" onclick="deleteFile('{{ media[2] }}')">x</button>
+                </div>
+                {%else%}
+                <a href="/order/technik/file/show/{{ media[2] }}">{{ media[2] }} </a>
+                  {% endif %}
+                {% endfor %}
+            </div>
+
+            <label class="input-file" style="margin-top: 10px;">
+                <input type="file" name="file" multiple
+                       onchange="handleFileChange(event)">
+                <span class="input-file-btn">Выберите файл</span>
+                <span class="input-file-text">Максимум 50мб</span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label>Пожелания:</label>
+            <textarea id="technik_comment">{% if order[15] %}{{ order[15] }}{% else %}{% endif %}</textarea> <br><br>
+        </div>
+        <button class="personal" type="button" name="update_price" onclick="update_price()">Сохранить изменения</button>
     </div>
     <div class="button-group">
         <form id="fitting_done_form" method="post" action="/order/done/fitting/{{order[0]}}">

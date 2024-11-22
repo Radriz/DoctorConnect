@@ -68,7 +68,32 @@ function handleFileChange(event){
         fileList = [];
     }
 }
+function savePhotos(){
+    const order_id = window.location.href.split('/').filter(Boolean).pop();
+    const formData = new FormData();
+    for (let i = 0; i < fileList.length; i++) {
+        formData.append('photos', fileList[i]);
+    }
 
+    console.log(formData);
+
+    return fetch(`/order/photo/upload/${order_id}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(uploadResponse => {
+        if (!uploadResponse.ok) {
+            throw new Error('Upload failed');
+        }
+        return uploadResponse.json();
+    })
+    .then(uploadResult => {
+        console.log('Upload successful:', uploadResult);
+    })
+    .catch(uploadError => {
+        console.error('Error uploading photos:', uploadError);
+    });
+}
 const today = new Date();
 const formattedDate = today.toISOString().split('T')[0];
 document.getElementById('date_fitting').setAttribute('min', formattedDate);
