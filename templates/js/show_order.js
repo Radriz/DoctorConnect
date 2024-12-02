@@ -10,7 +10,13 @@ document.getElementById('done_form').submit();
 });
 
 async function update_price() {
-    var price = document.getElementById('price').value;
+    var price = document.getElementById('price');
+    if (price == null){
+        price = 0;
+    }
+    else{
+        price = parseInt(price.value);
+    }
     var comment = document.getElementById('technik_comment').value;
     console.log(comment);
     try {

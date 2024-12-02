@@ -15,17 +15,48 @@ submitButton.addEventListener('click', function() {
 
 buttonTooth.forEach(function(button) {
     button.addEventListener('click', function(event) {
+        img = this.querySelector('img');
+
         if(this.style.backgroundColor == "rgb(126, 247, 139)"){
             this.style.backgroundColor = "transparent";
-            const index = toothNumbers.indexOf(this.innerText.trim());
+            tooth_number = this.innerText.trim()
+            if (img.src.includes('/images/missing_tooth.png')){
+                tooth_number = "0"+tooth_number;
+            }
+            const index = toothNumbers.indexOf(tooth_number);
             toothNumbers.splice(index,1);
         } else{
             this.style.backgroundColor = "#7ef78b";
-            toothNumbers.push(this.innerText.trim())
+            tooth_number = this.innerText.trim()
+            if (img.src.includes('/images/missing_tooth.png')){
+                tooth_number = "0"+tooth_number;
+            }
+            toothNumbers.push(tooth_number);
         }
         console.log(toothNumbers);
         event.preventDefault();
    });
+    button.addEventListener('dblclick', function(event) {
+       img = this.querySelector('img');
+       tooth_number = parseInt(this.textContent)
+       console.log(img.src, tooth_number);
+
+       if(!img.src.includes('/images/missing_tooth.png') ){
+             img.src = "/images/missing_tooth.png";
+            const index = toothNumbers.indexOf(tooth_number);
+            toothNumbers.splice(index,1);
+            toothNumbers.push("0"+tooth_number);
+       } else if(tooth_number % 10 > 0 && tooth_number % 10 <6 ) {
+             img.src = "/images/incisor.png";
+             const index = toothNumbers.indexOf("0"+tooth_number);
+            toothNumbers.splice(index,1);
+            toothNumbers.push(tooth_number);
+       } else {
+             img.src = "/images/tooth.png";
+             const index = toothNumbers.indexOf("0"+tooth_number);
+            toothNumbers.splice(index,1);
+            toothNumbers.push(tooth_number);
+       }})
 });
 
 function deletePhoto(photoName) {
@@ -47,7 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
     buttonTooth.forEach(function(button) {
         console.log(button.style.backgroundColor);
         if (button.style.backgroundColor == "rgb(126, 247, 139)"){
-         toothNumbers.push(button.innerText.trim())
+            img = button.querySelector('img');
+            tooth_number = button.innerText.trim()
+            if (img.src.includes('/images/missing_tooth.png')){
+                tooth_number = "0"+tooth_number;
+            }
+            toothNumbers.push(tooth_number)
         }
     });
 });

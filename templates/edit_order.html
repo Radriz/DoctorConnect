@@ -36,9 +36,11 @@
                         {% if tooth == 21 %}
                         <div class="separator"></div>
                         {% endif %}
-                        {% if tooth in selected_tooth %}
+                        {% if tooth | string in selected_tooth  or "0" + (tooth | string) in selected_tooth %}
                         <button style="background-color:#7ef78b" class="button-tooth">
-                            {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                            {% if "0" + (tooth | string) in selected_tooth %}
+                            <img src="/images/missing_tooth.png" alt="Tooth"><br>
+                            {% elif tooth % 10 > 0 and tooth % 10 < 6 %}
                             <img src="/images/incisor.png" alt="Tooth"><br>
                             {% else %}
                             <img src="/images/tooth.png" alt="Tooth"><br>
@@ -63,9 +65,11 @@
                         {% if tooth == 31 %}
                         <div class="separator"></div>
                         {% endif %}
-                        {% if tooth in selected_tooth %}
+                        {% if tooth | string in selected_tooth  or "0" + (tooth | string) in selected_tooth %}
                         <button style="background-color:#7ef78b" class="button-tooth">
-                            {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                            {% if "0" + (tooth | string) in selected_tooth %}
+                            <img src="/images/missing_tooth.png" alt="Tooth"><br>
+                            {% elif tooth % 10 > 0 and tooth % 10 < 6 %}
                             <img src="/images/incisor.png" alt="Tooth"><br>
                             {% else %}
                             <img src="/images/tooth.png" alt="Tooth"><br>

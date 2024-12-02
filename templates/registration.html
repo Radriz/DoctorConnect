@@ -8,12 +8,23 @@
     <link rel="icon" href="/images/tooth.png" type="image/png">
 </head>
 <body>
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p class="input-confirm"> Введите код подтверждения из почты</p>
+        <div class="modal-input-container">
+            <input type="text" id="confirmationCode" placeholder="Код подтверждения">
+            <button id="confirmButton">Подтвердить</button>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid">
     <div class="background" style="{% if comment %}height:130vh{% endif %}">
         <div class="register-container" style="{% if comment %}margin-top:100px{% endif %}">
             <img src="/images/logo.png" alt="Logo">
             <h1>Регистрация</h1>
-            <form method="post" action="/registration">
+            <form id="formReg" method="post" action="/registration">
                 <label for="fio">ФИО:</label>
                 <input type="text" id="fio" name="fio" required>
 

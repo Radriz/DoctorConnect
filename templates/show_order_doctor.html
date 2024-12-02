@@ -32,9 +32,11 @@
                     {% if tooth == 21 %}
                     <div class="separator"></div>
                     {% endif %}
-                    {% if tooth in selected_tooth %}
+                    {% if tooth | string in selected_tooth or "0" + (tooth | string) in selected_tooth %}
                     <button style="background-color:#7ef78b" class="button-tooth">
-                        {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                        {% if "0" + (tooth | string) in selected_tooth %}
+                        <img src="/images/missing_tooth.png" alt="Tooth"><br>
+                        {% elif tooth % 10 > 0 and tooth % 10 < 6 %}
                         <img src="/images/incisor.png" alt="Tooth"><br>
                         {% else %}
                         <img src="/images/tooth.png" alt="Tooth"><br>
@@ -59,9 +61,11 @@
                     {% if tooth == 31 %}
                     <div class="separator"></div>
                     {% endif %}
-                    {% if tooth in selected_tooth %}
+                    {% if tooth | string in selected_tooth or "0" + (tooth | string) in selected_tooth %}
                     <button style="background-color:#7ef78b" class="button-tooth">
-                        {% if tooth % 10 > 0 and tooth % 10 < 6 %}
+                        {% if "0" + (tooth | string) in selected_tooth %}
+                        <img src="/images/missing_tooth.png" alt="Tooth"><br>
+                        {% elif tooth % 10 > 0 and tooth % 10 < 6 %}
                         <img src="/images/incisor.png" alt="Tooth"><br>
                         {% else %}
                         <img src="/images/tooth.png" alt="Tooth"><br>
@@ -95,14 +99,14 @@
         <div class="form-group" style="margin-bottom: 20px;">
             <label>Фотографии</label>
             <div class="photos_container">
-                    {% for photo in photos %}
-                    <div class="photo_wrapper">
-                        <a href="/order/photo/show/{{photo[2]}}">
-                            <img src="/order/photo/show/{{photo[2]}}" alt="Photo" class="photo_thumbnail">
-                        </a>
-                    </div>
-                    {% endfor %}
+                {% for photo in photos %}
+                <div class="photo_wrapper">
+                    <a href="/order/photo/show/{{photo[2]}}">
+                        <img src="/order/photo/show/{{photo[2]}}" alt="Photo" class="photo_thumbnail">
+                    </a>
                 </div>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
         <div class="form-group">
@@ -119,14 +123,14 @@
             <label>Дата сдачи работы:</label>
             <input type="date" name="deadline" value="{{order[5]}}" readonly><br><br>
         </div>
-         {% if order[14] != -1%}
-            <div class="form-group">
-                <label>Цена (руб.):</label>
-                <input type="number" value="{{order[14]}}" readonly><br><br>
-            </div>
-            {% endif %}
-            {% if technik_files %}
-            <div class="form-group" style="margin-bottom: 20px;">
+        {% if order[14] != -1%}
+        <div class="form-group">
+            <label>Цена (руб.):</label>
+            <input type="number" value="{{order[14]}}" readonly><br><br>
+        </div>
+        {% endif %}
+        {% if technik_files %}
+        <div class="form-group" style="margin-bottom: 20px;">
             <label>Файлы от техника</label>
             <div class="photo_container">
                 {% for media in technik_files %}
@@ -145,18 +149,18 @@
                 </div>
                 {%else%}
                 <a href="/order/technik/file/show/{{ media[2] }}">{{ media[2] }} </a>
-                  {% endif %}
+                {% endif %}
                 {% endfor %}
             </div>
-            </div>
-            {% endif %}
+        </div>
+        {% endif %}
 
-         {% if order[15] %}
+        {% if order[15] %}
         <div class="form-group">
             <label>Пожелания от техника:</label>
             <textarea id="technik_comment" readonly>{{ order[15] }}</textarea> <br><br>
         </div>
-            {% endif %}
+        {% endif %}
 
     </div>
 

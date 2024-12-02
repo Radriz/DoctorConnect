@@ -30,7 +30,10 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_technik_files_by_order_id, set_new_order_technik_comment
 from add_image import image_to_pdf
 from document_generate import generate_plan
+from email_conformation import send_email_conformation
 from parameters import first_row, second_row, types, color_letter, color_number
+from dotenv import dotenv_values
+config = dotenv_values() # {'LOGIN' : 123}
 
 app = FastAPI()
 
@@ -44,20 +47,26 @@ app.mount("/order/technik/file/show", StaticFiles(directory="technik_files"), na
 templates = Jinja2Templates(directory="templates")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account")
 
-SECRET_KEY = "your-secret-key"
+SECRET_KEY = config["SECRET_KEY"]
 serializer = URLSafeSerializer(SECRET_KEY)
 
 # Зарегистрируем кастомный фильтр для Jinja2
 def filter_tooth(tooth_string, quarter):
-    teeth = [int(num.strip()) for num in tooth_string.split(',')]
+    teeth = [num.strip() for num in tooth_string.split(',')]
+    multiplier = {
+        1: -1,
+        2: 1,
+        3: -1,
+        4: 1,
+    }
     quarters = {
         1: range(11, 19),  # Верхняя правая
         2: range(21, 29),  # Верхняя левая
         3: range(41, 49),  # Нижняя левая
         4: range(31, 39)   # Нижняя правая
     }
-    quarter_teeth = [str(tooth) for tooth in teeth if tooth in quarters[quarter]]
-    return ', '.join(quarter_teeth)
+    quarter_teeth = [tooth if tooth[0] != "0" else "0" for tooth in sorted(teeth, key=lambda x: multiplier[quarter]*int(x)) if int(tooth) in quarters[quarter]]
+    return ' '.join(quarter_teeth)
 
 # Добавим кастомный фильтр в Jinja2
 templates.env.filters["filter_tooth"] = filter_tooth
@@ -110,6 +119,11 @@ def read_session(session_cookie: str):
         return data.get("user_id")
     except BadSignature:
         return None
+
+@app.post("/send/email/code")
+async def send_email(request: Request, email: str = Query(...)):
+    code = send_email_conformation(email)
+    return {"code": code}
 
 
 @app.get("/authorization", response_class=HTMLResponse)
@@ -370,7 +384,7 @@ async def update_order(request: Request, order_id: int, patient: str = Form(...)
     update_order_by_id(patient, formula, type, comment, fitting, deadline, int(technik), doctor[0],
                        color[0], color[1:], order_id)
     order = get_order_by_id(order_id)
-    selected_tooth = list(map(int, order[2].split(", ")))
+    selected_tooth = order[2].split(", ")
     photos = get_photos_by_order_id(order_id)
     return templates.TemplateResponse("edit_order.html", {
         "request": request,
@@ -390,7 +404,7 @@ async def update_order(request: Request, order_id: int, patient: str = Form(...)
 @app.get("/order/get/{order_id}", response_class=HTMLResponse)
 async def get_order(request: Request, order_id: int):
     order = get_order_by_id(order_id)
-    selected_tooth = list(map(int, order[2].split(", ")))
+    selected_tooth = order[2].split(", ")
 
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie) if session_cookie else None

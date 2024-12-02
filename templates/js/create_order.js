@@ -24,7 +24,12 @@ async function submit() {
 
         buttonTooth.forEach(function(button) {
             if (button.style.backgroundColor == "rgb(126, 247, 139)") {
-                toothNumbers.push(button.innerText.trim());
+                tooth_number = button.innerText.trim();
+                img = button.querySelector('img');
+                if (img.src.includes('/images/missing_tooth.png')){
+                    tooth_number = "0"+tooth_number;
+                }
+                toothNumbers.push(tooth_number);
             }
         });
 
@@ -134,6 +139,18 @@ function setTooth(buttonTooth){
             }
             event.preventDefault();
        });
+       button.addEventListener('dblclick', function(event) {
+       img = this.querySelector('img');
+       tooth_number = parseInt(this.textContent)
+       console.log(img.src, tooth_number);
+
+       if(!img.src.includes('/images/missing_tooth.png') ){
+             img.src = "/images/missing_tooth.png";
+       } else if(tooth_number % 10 > 0 && tooth_number % 10 <6 ) {
+             img.src = "/images/incisor.png";
+       } else {
+             img.src = "/images/tooth.png";
+       }})
     });
 }
 
