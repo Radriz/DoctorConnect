@@ -14,7 +14,7 @@ types = [
 ]
 color_letter = ["A", "B", "C", "D"]
 color_number = ["1", "2", "3", "3.5", "4"]
-tooth_priority = ["gutta", "tab", "implant", "seal", "crown", "periodont", "bracket", "tooth"]
+tooth_priority = ["gutta", "tab","fiberglass","implant", "seal", "crown", "periodont", "bracket", "tooth"]
 
 tooth_data = {
     36: {"x": 459, "name": "molar", "type": "left_lower"},

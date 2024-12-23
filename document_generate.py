@@ -76,9 +76,9 @@ def generate_plan(
             row_cells = table.add_row().cells
             row_cells[0].text = str(item['no'])
             row_cells[1].text = item['service'] + "  "
-            row_cells[2].text = f"{item['price_per_unit']} руб."
+            row_cells[2].text = f"{item['price_per_unit']:,} руб.".replace(",", " ")
             row_cells[3].text = str(item['quantity'])
-            row_cells[4].text = f"{item['total']} руб."
+            row_cells[4].text = f"{item['total']:,} руб.".replace(",", " ")
 
             for cell in row_cells:
                 for paragraph in cell.paragraphs:
@@ -102,19 +102,20 @@ def generate_plan(
     document = Document(buffer)
 
     for stage in stages:
-        title = document.add_paragraph()
-        ts = title.add_run(f"-" * 132)
-        ts = title.add_run(f"Этап №{stage['number']} – {stage['stage']}")
-        ts.font.size = Pt(14)
-        title = document.add_paragraph()
-        for stage_template in stage['templates'].values():
-            ts = title.add_run(f"{stage_template['name']} — {stage['tooth']}" + " " + ("зуб" if ',' not in stage['tooth'] else "зубы"))
-            ts.font.size = Pt(14)
-            create_table(document, stage_template['items'])
+        if stage['templates']:
             title = document.add_paragraph()
-            title.paragraph_format.space_before = Pt(13)
-        ts = title.add_run(f"Общая стоимость за этап {stage['stage'].lower()}: {stage['total_price']} руб.")
-        ts.font.size = Pt(14)
+            ts = title.add_run(f"-" * 132)
+            ts = title.add_run(f"Этап №{stage['number']} – {stage['stage']}")
+            ts.font.size = Pt(14)
+            title = document.add_paragraph()
+            for stage_template in stage['templates'].values():
+                ts = title.add_run(f"{stage_template['name']} — {stage['tooth'].replace(',',', ')}" + " " + ("зуб" if ',' not in stage['tooth'] else "зубы"))
+                ts.font.size = Pt(14)
+                create_table(document, stage_template['items'])
+                title = document.add_paragraph()
+                title.paragraph_format.space_before = Pt(13)
+            ts = title.add_run(f"Общая стоимость за этап {stage['stage'].lower()}: {stage['total_price']:,} руб.".replace(",", " "))
+            ts.font.size = Pt(14)
 
     title = document.add_paragraph()
     ts = title.add_run(f"-" * 132)
@@ -123,13 +124,18 @@ def generate_plan(
     ts = title.add_run("ОБЩАЯ СТОИМОСТЬ ЗА ПЛАН ЛЕЧЕНИЯ: ")
     ts.bold = True
     ts.font.size = Pt(14)
-    ts = title.add_run(f"{total_price} руб.")
+    ts = title.add_run(f"{total_price:,} руб.".replace(",", " "))
     ts.bold = True
     ts.font.size = Pt(18)
 
     # Загружаем дополнительный шаблон и добавляем его к основному документу
     doc_end = Document(add_template_path)
+    fio = data["fio"].split(" ") # "Ivanov Ivan Ivanovich"
+    for i in range(1,len(fio)): # ["Ivanov", "Ivan", "Ivanovich"] -> ["Ivanov", "I.", "I."]
+        fio[i] = f"{fio[i][0]}."
 
+
+    doc_end  = fill_docx_template(doc_end, {"fio":" ".join(fio)})
     for element in doc_end.element.body:
         document.element.body.append(element)
 

@@ -113,9 +113,9 @@ document.getElementById('submit').addEventListener('click', async (event) => {
             const stageName = procedureBlock_i.querySelector('#stage-name').value;
             const stageI = procedureBlock_i.id.split('-').at(-1);
             if (stageName == "") {
-            alert('Отсутствует название этапа №' + stageI);
-            document.getElementById('loading-overlay').style.display = 'none';
-            return;
+                alert('Отсутствует название этапа №' + stageI);
+                document.getElementById('loading-overlay').style.display = 'none';
+                return;
             }
             let currentTooth = [];
             const buttons = procedureBlock_i.querySelectorAll('.tooth-selection button');
@@ -127,6 +127,7 @@ document.getElementById('submit').addEventListener('click', async (event) => {
             console.log(currentTooth)
             if (currentTooth.length == 0) {
                 alert(`Не выбран ни один зуб на этапе \"${stageName}\"` );
+                document.getElementById('loading-overlay').style.display = 'none';
                 return;
             }
 
@@ -144,6 +145,7 @@ document.getElementById('submit').addEventListener('click', async (event) => {
             }
             if (selectedProcedure == false){
                 alert(`Не выбрана ни одна медицинская услуга на этапе \"${stageName}\"`);
+                document.getElementById('loading-overlay').style.display = 'none';
                 return;
             }
             for (let tpb of templateProcedureBlocks) {

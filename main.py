@@ -27,11 +27,12 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_all_patient, get_patient_data_plan_by_id, get_stages_plan_id, add_photo_to_order, get_photos_by_order_id, \
     delete_photo_from_order, add_technik_service, update_technik_service, delete_technik_service, \
     get_all_technik_services, set_new_order_price, delete_file_from_technik_files, add_file_to_technik_files, \
-    get_technik_files_by_order_id, set_new_order_technik_comment
+    get_technik_files_by_order_id, set_new_order_technik_comment, get_all_technik_invoices, delete_technik_invoice, \
+    get_not_paid_not_invoice_orders_technik
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from email_conformation import send_email_conformation
-from parameters import first_row, second_row, types, color_letter, color_number
+from parameters import first_row, second_row, types, color_letter, color_number, tooth_priority
 from dotenv import dotenv_values
 config = dotenv_values() # {'LOGIN' : 123}
 
@@ -226,6 +227,9 @@ async def regist(request: Request, fio: str = Form(...),
         return templates.TemplateResponse("registration.html", {"request": request,"comment": comment})
     else:
         return templates.TemplateResponse("authorization.html", {"request": request})
+@app.get("/forgot", response_class=HTMLResponse)
+async def forgot(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request})
 
 
 @app.get("/order/create", response_class=HTMLResponse)
@@ -571,6 +575,19 @@ async def get_technik_services(request: Request):
         "services": services
     })
 
+@app.get("/technik/invoice/show")
+async def get_technik_services(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    invoices = get_all_technik_invoices(user_id)
+    print(invoices)
+    return templates.TemplateResponse("technik_invoices.html", {
+        "request": request,
+        "invoices": invoices
+    })
+
 
 class Technik_service(BaseModel):
     id: int
@@ -596,6 +613,84 @@ async def delete_service(request: Request, id: int):
         return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
     delete_technik_service(id)
     return {"result": "done"}
+
+@app.delete("/technik/invoice/delete/{id}")
+async def delete_service(request: Request, id: int):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    delete_technik_invoice(id)
+    return {"result": "done"}
+
+@app.get("/technik/invoice/create")
+async def create_invoice_page(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is not None:
+        user = get_user(user_id)
+        if user[5] == "doctor":
+           return RedirectResponse(url="/account")
+        selected_doctors = []
+        orders = get_not_paid_not_invoice_orders_technik(user[0])
+        for i in range(len(orders)):
+            orders[i] = list(orders[i])
+            if orders[i][5]:
+                data = orders[i][5].split("-")
+                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
+            doctor = get_user(orders[i][6])
+
+            if doctor[6] is not None:
+                doctor_name = f"{doctor[1]} ({doctor[6]})"
+            else:
+                doctor_name = f"{doctor[1]}"
+            orders[i][6] = {"id": doctor[0], "name": doctor_name}
+            if {"id": doctor[0], "name": doctor_name} not in selected_doctors:
+                selected_doctors.append({"id": doctor[0], "name": doctor_name})
+        return templates.TemplateResponse(
+            "create_invoice.html",
+            {
+                "request": request,
+                'fio': user[1],
+                'orders': orders,
+                "doctors": selected_doctors,
+            })
+
+    return RedirectResponse(url="/authorization")
+@app.post("/technik/invoice/create")
+async def create_invoice(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie) if session_cookie else None
+    if user_id is not None:
+        user = get_user(user_id)
+        if user[5] == "doctor":
+           return RedirectResponse(url="/account")
+        selected_doctors = []
+        orders = get_not_paid_not_invoice_orders_technik(user[0])
+        for i in range(len(orders)):
+            orders[i] = list(orders[i])
+            if orders[i][5]:
+                data = orders[i][5].split("-")
+                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
+            doctor = get_user(orders[i][6])
+
+            if doctor[6] is not None:
+                doctor_name = f"{doctor[1]} ({doctor[6]})"
+            else:
+                doctor_name = f"{doctor[1]}"
+            orders[i][6] = {"id": doctor[0], "name": doctor_name}
+            if {"id": doctor[0], "name": doctor_name} not in selected_doctors:
+                selected_doctors.append({"id": doctor[0], "name": doctor_name})
+        return templates.TemplateResponse(
+            "create_invoice.html",
+            {
+                "request": request,
+                'fio': user[1],
+                'orders': orders,
+                "doctors": selected_doctors,
+            })
+
+    return RedirectResponse(url="/authorization")
 
 @app.get("/technik/service/list")
 async def get_services(request: Request):
@@ -664,24 +759,24 @@ async def get_document(request: Request, plan_id: int):
     done_stages = []
     for stage in get_stages:
         if (stage[0], stage[1]) in done_stages:
-            stage_i = done_stages.index((stage[0],stage[1]))
-            if stage[2] not in stages[stage_i]['templates']:
-                stages[stage_i]['templates'][stage[2]] = {'name' : stage[3], 'items' : []}
-                stages[stage_i]['sticker'].append(stage[4])
-            stages[stage_i]['templates'][stage[2]]["items"].append({
-                "no": len(stages[stage_i]['templates'][stage[2]]["items"]) + 1,
-                "service": stage[5],
-                "price_per_unit": stage[6],
-                "quantity":  stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(",")),
-                "total":  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
-            })
-            stages[stage_i]['total_price'] +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
-
+            if int(stage[9]):
+                stage_i = done_stages.index((stage[0],stage[1]))
+                if stage[2] not in stages[stage_i]['templates']:
+                    stages[stage_i]['templates'][stage[2]] = {'name' : stage[3], 'items' : []}
+                    stages[stage_i]['sticker'].append(stage[4])
+                stages[stage_i]['templates'][stage[2]]["items"].append({
+                    "no": len(stages[stage_i]['templates'][stage[2]]["items"]) + 1,
+                    "service": stage[5],
+                    "price_per_unit": stage[6],
+                    "quantity":  stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(",")),
+                    "total":  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
+                })
+                stages[stage_i]['total_price'] +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
         else:
             stages.append({
-                "number": len(done_stages) + 1,
+                "number": len([stages for stage in stages if stage["templates"]]) + 1  if int(stage[9]) else -1,
                 "stage": stage[0],
-                'total_price' : (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
+                'total_price' : (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6] if int(stage[9]) else 0,
                 'tooth' : stage[1],
                 'sticker' : [stage[4]],
                 "templates": {
@@ -694,24 +789,28 @@ async def get_document(request: Request, plan_id: int):
                             "total": (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6],
                         }
                     ]}
-                }
+                } if int(stage[9]) else {}
             })
             done_stages.append((stage[0],stage[1]))
-        total_price +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6]
+        total_price +=  (stage[7] if stage[8] == 0 else stage[7] * len(stage[1].split(","))) * stage[6] if int(stage[9]) else 0
     print(stages)
     file_name = f'{data["fio"].replace(" ", "_")}_{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}'
     output_path =  os.getcwd() +f'/treatment_plans/{file_name}'
     generate_plan(stages, data,total_price,
                   output_path=output_path + ".docx")
+    # -------------WINDOWS--------------------
     # convert(output_path + ".docx", output_path + "no_icons.pdf")
+    # ---------------LINUX------------------
     original_directory = os.getcwd()
     os.chdir('treatment_plans')
     subprocess.run(['libreoffice', '--headless', '--convert-to', 'pdf:writer_pdf_Export', output_path + ".docx"], check=True)
     os.chdir(original_directory)
     default_pdf_name = os.path.splitext(output_path + ".docx")[0] + ".pdf"
     os.rename(default_pdf_name, output_path + "no_icons.pdf")
+    # ---------------------------------------
     file_handle = fitz.open(output_path + "no_icons.pdf")
     page = file_handle[0]
+    tooth_images = {} # {17: ['gutta', '']}
     for stage in stages:
         images = stage["sticker"]
         tooths = stage["tooth"].split(",")
@@ -719,7 +818,14 @@ async def get_document(request: Request, plan_id: int):
             if image == "tooth":
                 continue
             for tooth in tooths:
-                image_to_pdf(image, int(tooth), page)
+                tooth = int(tooth)
+                if tooth not in tooth_images:
+                    tooth_images[tooth] = []
+                tooth_images[tooth].append(image)
+    for tooth, images in tooth_images.items():
+        images.sort(key=lambda image: tooth_priority.index(image))
+        for image in images:
+            image_to_pdf(image, int(tooth), page)
     file_handle.save(output_path + ".pdf")
     file_handle.close()
     os.remove(output_path + "no_icons.pdf")

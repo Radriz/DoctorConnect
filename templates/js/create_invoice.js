@@ -1,18 +1,48 @@
+// Получаем элементы DOM
+const checkboxes = document.querySelectorAll('input[name="orders"]');
+const totalPriceElement = document.getElementById('total_price');
+
+// Функция для пересчёта стоимости
+function updateTotalPrice() {
+    let total = 0;
+
+    // Проходим по всем чекбоксам
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            // Получаем строку таблицы, соответствующую чекбоксу
+            const row = checkbox.closest('tr');
+            // Ищем ячейку с ценой
+            const priceCell = row.querySelector('td:nth-child(6)');
+            if (priceCell) {
+                // Извлекаем цену и добавляем к общей стоимости
+                const price = parseFloat(priceCell.textContent.replace(/[^\d.]/g, ''));
+                if (!isNaN(price)) {
+                    total += price;
+                }
+            }
+        }
+    });
+
+    // Обновляем итоговую стоимость
+    totalPriceElement.textContent = total;
+}
+
+// Добавляем обработчики событий на чекбоксы
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateTotalPrice);
+});
+
 function filters(){
     // Получаем выбранного врача
     const selectedDoctor = document.getElementById('doctor').value;
-    const text = document.getElementById("client").value.toLowerCase();
     console.log(text)
     // Фильтруем заказы для каждой таблицы
     filterOrdersByDoctor('not-done-orders', selectedDoctor, text);
-    filterOrdersByDoctor('fitting-done-orders', selectedDoctor, text);
-    filterOrdersByDoctor('done-orders', selectedDoctor, text);
 }
 
-document.getElementById('doctor').addEventListener('change', () => filters());
-document.getElementById("client").addEventListener("input", () => filters());
 
-// Функция фильтрации заказов по идентификатору врача
+document.getElementById('doctor').addEventListener('change', () => filters());
+
 function filterOrdersByDoctor(tableId, selectedDoctor, text) {
     // Получаем таблицу
     const table = document.getElementById(tableId);

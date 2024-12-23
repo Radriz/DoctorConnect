@@ -302,13 +302,13 @@ def get_patient_data_plan_by_id(id,user_id):
 def get_stages_plan_id(id):
     stages = cursor.execute(
         f"""SELECT stage, tooth, template.id, template.name, template.stick, 
-        user_procedure.name, user_procedure.price, template_procedure.amount,template.tooth_depend
+        user_procedure.name, user_procedure.price, template_procedure.amount,template.tooth_depend, template_procedure.is_active
         FROM plan_template
         join treatment_plan on plan_template.plan_id = treatment_plan.id
         join template on plan_template.template_id = template.id
         join template_procedure on template.id = template_procedure.template_id
         join user_procedure on template_procedure.user_procedure_id = user_procedure.id
-        where treatment_plan.id = {id} and template_procedure.is_active = 1 order by plan_template.id""").fetchall()
+        where treatment_plan.id = {id} order by plan_template.id""").fetchall()
     return stages
 
 def add_photo_to_order(order, photo):
@@ -368,3 +368,20 @@ def get_all_technik_services(technik_id):
         f""" SELECT * FROM technik_services WHERE technik_id = {technik_id}"""
     ).fetchall()
     return get_services
+
+def get_all_technik_invoices(technik_id):
+    get_invoices = cursor.execute(
+        f""" SELECT Invoice.id,Invoice.creation_date,user.fio,technik_id,paid,total_price FROM Invoice inner join user on Invoice.doctor_id = user.id WHERE technik_id = {technik_id}"""
+    ).fetchall()
+    return get_invoices
+
+def delete_technik_invoice(id):
+    cursor.execute(
+        f""" DELETE FROM Invoice WHERE id = {id}"""
+    )
+    connection.commit()
+
+def get_not_paid_not_invoice_orders_technik(id):
+    order = cursor.execute(
+        f"""select * from "order" where to_user = {id} and paid = 0 and invoice is NULL""").fetchall()
+    return order

@@ -19,14 +19,23 @@
 </header>
 <div class="container">
     <h2>Добро пожаловать, {{fio}}!</h2>
-    <button type="button" class="price-button" onclick="window.location.href='/technik/service/show'">Прайс-лист</button><br/><br/>
-    <label for="doctor">Выберите врача:</label>
+    <button type="button" class="price-button" onclick="window.location.href='/technik/service/show'">Прайс-лист
+    </button>
+     <button type="button" class="price-button" onclick="window.location.href='/technik/invoice/show'">Счета
+    </button>
+    <br/><br/>
     <select id="doctor" name="doctor">
-        <option value="None" selected>Все врачи</option>
+        <option value="None" disabled selected hidden>Выберите врача</option>
+        <option value="None">Все врачи</option>
         {% for doctor in doctors %}
         <option value="{{doctor.id}}">{{doctor.name}}</option>
         {% endfor %}
-    </select><br><br>
+    </select><br>
+    <div class="search-client">
+        <input id="client" type="text" placeholder="Поиск пациента">
+        <button type="button" class="search-button" onclick="searchPatients()">🔍</button>
+        <br/>
+    </div>
     <div class="table-container">
         <h2>Невыполненные заказы</h2>
         <table id="not-done-orders">
@@ -43,7 +52,7 @@
 
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
-                 <td style="padding: 0px;">
+                <td style="padding: 0px;">
                     <table class="tooth-formula">
                         <tr>
                             <!-- Верхние челюсти -->
@@ -63,6 +72,7 @@
             </tr>
             {% endfor %}
         </table>
+        <div class="toggle-button" onclick="toggleTable(this)"><img src="/images/down_arrow.png"></div>
     </div>
     <div class="table-container">
         <h2>Отправлены на примерку</h2>
@@ -79,7 +89,7 @@
             <tr class="yellow" data-doctor-id="{{order[6].id}}">
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
-                 <td style="padding: 0px;">
+                <td style="padding: 0px;">
                     <table class="tooth-formula">
                         <tr>
                             <!-- Верхние челюсти -->
@@ -99,6 +109,7 @@
             </tr>
             {% endfor %}
         </table>
+        <div class="toggle-button" onclick="toggleTable(this)"><img src="/images/down_arrow.png"></div>
     </div>
     <div class="table-container">
         <h2>Выполненные заказы</h2>
@@ -131,12 +142,17 @@
                 </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
-                <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
+                <td><a href="/order/get/{{order[0]}}">Подробнее</a> {% if order[16]==0 %}<span
+                        style="color:#DC143C; margin-left:5px; font-size:20px">₽</span>{%
+                    endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>
+        <div class="toggle-button" onclick="toggleTable(this)"><img src="/images/down_arrow.png"></div>
     </div>
 </div>
 <script src="/js/technik_personal_account.js"></script>
+<script src="/js/arrow_button.js"></script>
 </body>
 </html>

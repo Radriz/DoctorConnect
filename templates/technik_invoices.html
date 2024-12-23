@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прайс-лист</title>
+    <link rel="stylesheet" href="/css/technik_invoices.css">
+    <link rel="icon" href="/images/tooth.png" type="image/png">
+</head>
+<body>
+<header>
+    <h1>
+        <img src="/images/logo.png" alt="Логотип" width="100" height="65">
+    </h1>
+    <form method="get" action="/logout">
+        <input type="submit" value="Выход">
+    </form>
+</header>
+<div class="container">
+    <form method="get" action="/account">
+        <input class="personal" type="submit" value="Личный кабинет">
+    </form>
+    <h2>Счета</h2>
+    <button type="button" class="personal" onclick="window.location.href='/technik/invoice/create'">Создать счет
+    </button>
+    <div class="table-container">
+        <table id="invoices">
+            <tr>
+                <th>Дата</th>
+                <th>Врач</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Удаление</th>
+            </tr>
+            {% for invoice in invoices %}
+            <tr data-invoice-id="{{invoice[0]}}">
+
+                <td>{{invoice[1]}}</td>
+                <td>{{invoice[2]}}</td>
+                <td>{{invoice[5]}}</td>
+                <td>{{invoice[4]}}</td>
+                <td><a href="#" onclick="delete_invoice({{invoice[0]}})">Удалить</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+<script src="/js/technik_invoices.js"></script>
+</body>
+</html>

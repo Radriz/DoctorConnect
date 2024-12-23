@@ -145,3 +145,16 @@ a:hover {
     text-align: left;
     padding-left: 10px;
 }
+
+.toggle-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-color: transparent;
+    margin-top: 10px;
+}
+.toggle-button img {
+    width:auto;
+    height: 20px;
+}
