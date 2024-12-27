@@ -31,19 +31,26 @@ function updateTotalPrice() {
 checkboxes.forEach(checkbox => {
     checkbox.addEventListener('change', updateTotalPrice);
 });
+// Функция для снятия выделения со всех чекбоксов
+function clearAllCheckboxes() {
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
 
 function filters(){
     // Получаем выбранного врача
     const selectedDoctor = document.getElementById('doctor').value;
-    console.log(text)
     // Фильтруем заказы для каждой таблицы
-    filterOrdersByDoctor('not-done-orders', selectedDoctor, text);
+    filterOrdersByDoctor('not-done-orders', selectedDoctor);
+    clearAllCheckboxes();
+     updateTotalPrice()
 }
 
 
 document.getElementById('doctor').addEventListener('change', () => filters());
 
-function filterOrdersByDoctor(tableId, selectedDoctor, text) {
+function filterOrdersByDoctor(tableId, selectedDoctor) {
     // Получаем таблицу
     const table = document.getElementById(tableId);
 
@@ -55,17 +62,69 @@ function filterOrdersByDoctor(tableId, selectedDoctor, text) {
     // Проходим по всем строкам
     rows.forEach(row => {
         const doctorId = row.getAttribute('data-doctor-id'); // Получаем id врача из атрибута строки
-        const clientName = row.cells[1]?.textContent.toLowerCase() || ""; // Проверка на null
 
         // Условие отображения строки
         const matchesDoctor = selectedDoctor === "None" || doctorId === selectedDoctor;
-        const matchesClient = text === "" || clientName.includes(text);
 
         // Показываем или скрываем родительские строки
-        if (matchesDoctor && matchesClient) {
+        if (matchesDoctor) {
             row.style.display = ""; // Показываем строку
         } else {
             row.style.display = "none"; // Скрываем строку
         }
     });
 }
+
+document.getElementById('create_invoice').addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    // Получаем выбранного врача
+    const doctorSelect = document.getElementById('doctor');
+    const doctorId = doctorSelect.value;
+
+    if (!doctorId || doctorId === "None") {
+        alert("Пожалуйста, выберите врача.");
+        return;
+    }
+
+    // Собираем выбранные заказы
+    const selectedOrders = Array.from(document.querySelectorAll('input[name="orders"]:checked')).map(input => input.value);
+
+    if (selectedOrders.length === 0) {
+        alert("Пожалуйста, выберите хотя бы один заказ.");
+        return;
+    }
+
+    // Создаем тело запроса
+    const requestBody = {
+        doctor_id: parseInt(doctorId),
+        orders: selectedOrders.map(Number),
+    };
+
+    try {
+        // Выполняем POST-запрос
+        const response = await fetch('/technik/invoice/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+            // Перенаправляем на страницу /technik/invoice/show
+            window.location.href = '/technik/invoice/show';
+        } else {
+            const errorMessage = await response.text();
+            alert(`Ошибка создания счета: ${errorMessage}`);
+        }
+    } catch (error) {
+        console.error('Ошибка при создании счета:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    filters();
+});

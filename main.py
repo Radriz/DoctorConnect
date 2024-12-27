@@ -28,7 +28,8 @@ from Database import autorization, registration, find_techniks, get_user, create
     delete_photo_from_order, add_technik_service, update_technik_service, delete_technik_service, \
     get_all_technik_services, set_new_order_price, delete_file_from_technik_files, add_file_to_technik_files, \
     get_technik_files_by_order_id, set_new_order_technik_comment, get_all_technik_invoices, delete_technik_invoice, \
-    get_not_paid_not_invoice_orders_technik
+    get_not_paid_not_invoice_orders_technik, add_invoice, add_invoice_order, get_technik_invoice_orders, \
+    delete_invoice_order
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from email_conformation import send_email_conformation
@@ -71,6 +72,11 @@ def filter_tooth(tooth_string, quarter):
 
 # Добавим кастомный фильтр в Jinja2
 templates.env.filters["filter_tooth"] = filter_tooth
+
+
+class CreateInvoice(BaseModel):
+    doctor_id: int
+    orders: List[int]
 
 class UserAuthorization(BaseModel):
     email: str
@@ -621,6 +627,7 @@ async def delete_service(request: Request, id: int):
     if user_id is None:
         return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
     delete_technik_invoice(id)
+    delete_invoice_order(id)
     return {"result": "done"}
 
 @app.get("/technik/invoice/create")
@@ -658,40 +665,24 @@ async def create_invoice_page(request: Request):
 
     return RedirectResponse(url="/authorization")
 @app.post("/technik/invoice/create")
-async def create_invoice(request: Request):
+async def create_invoice(request: Request,create_invoice: CreateInvoice):
     session_cookie = request.cookies.get("session")
     user_id = read_session(session_cookie) if session_cookie else None
     if user_id is not None:
         user = get_user(user_id)
         if user[5] == "doctor":
-           return RedirectResponse(url="/account")
-        selected_doctors = []
-        orders = get_not_paid_not_invoice_orders_technik(user[0])
-        for i in range(len(orders)):
-            orders[i] = list(orders[i])
-            if orders[i][5]:
-                data = orders[i][5].split("-")
-                orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
-            doctor = get_user(orders[i][6])
-
-            if doctor[6] is not None:
-                doctor_name = f"{doctor[1]} ({doctor[6]})"
-            else:
-                doctor_name = f"{doctor[1]}"
-            orders[i][6] = {"id": doctor[0], "name": doctor_name}
-            if {"id": doctor[0], "name": doctor_name} not in selected_doctors:
-                selected_doctors.append({"id": doctor[0], "name": doctor_name})
-        return templates.TemplateResponse(
-            "create_invoice.html",
-            {
-                "request": request,
-                'fio': user[1],
-                'orders': orders,
-                "doctors": selected_doctors,
-            })
-
-    return RedirectResponse(url="/authorization")
-
+           return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+        current_time = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+        orders = []
+        for order_id in create_invoice.orders:
+            orders.append(get_order_by_id(order_id))
+        total_price = 0
+        for order in orders:
+            total_price += order[14]
+        invoice_id = add_invoice(current_time, create_invoice.doctor_id, user_id,total_price)
+        for order in orders:
+            add_invoice_order(invoice_id, order[0])
+    # return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
 @app.get("/technik/service/list")
 async def get_services(request: Request):
     session_cookie = request.cookies.get("session")
@@ -701,6 +692,21 @@ async def get_services(request: Request):
     services = get_all_technik_services(user_id)
     return {"services": [{"id": service[0], "name" : service[2], "price" : service[3] } for service in services]}
 
+@app.get("/technik/invoice/{id}/orders")
+async def get_orders(request: Request,id: int):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    orders = get_technik_invoice_orders(id)
+    return {"orders": [{
+        "id": order[0],
+        "doctor":f"{order[-2]} {f'({order[-1]})' if order[-1] is not None else ''}".strip(),
+        "patient": order[2],
+        "formula": order[3],
+        "type": order[4],
+        "price": order[5]
+    } for order in orders]}
 @app.get("/technik/service/get/{technik_id}")
 async def get_services(request: Request,technik_id: int):
     services = get_all_technik_services(technik_id)

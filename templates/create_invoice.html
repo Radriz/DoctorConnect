@@ -22,8 +22,6 @@
     </form>
     <h2>Создание счета</h2>
     <select id="doctor" name="doctor">
-        <option value="None" disabled selected hidden>Выберите врача</option>
-        <option value="None">Все врачи</option>
         {% for doctor in doctors %}
         <option value="{{doctor.id}}">{{doctor.name}}</option>
         {% endfor %}

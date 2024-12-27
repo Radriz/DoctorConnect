@@ -381,7 +381,32 @@ def delete_technik_invoice(id):
     )
     connection.commit()
 
+def delete_invoice_order(invoice_id):
+    cursor.execute(
+        f""" UPDATE "order" SET invoice = NULL WHERE invoice = {invoice_id}"""
+    )
+    connection.commit()
+
 def get_not_paid_not_invoice_orders_technik(id):
     order = cursor.execute(
         f"""select * from "order" where to_user = {id} and paid = 0 and invoice is NULL""").fetchall()
+    return order
+
+def add_invoice(current_time,doctor_id,technik_id,total_price):
+    cursor.execute(
+        f"""INSERT INTO Invoice(creation_date, doctor_id, technik_id, total_price) VALUES('{current_time}', {doctor_id}, {technik_id}, {total_price})"""
+    )
+    connection.commit()
+    return cursor.lastrowid
+
+def add_invoice_order(invoice_id, order_id):
+    cursor.execute(
+        f"""update "order" set invoice = {invoice_id} where id = {order_id}""")
+    connection.commit()
+
+def get_technik_invoice_orders(invoice_id):
+    order = cursor.execute(
+        f"""SELECT "order".id, "order".from_user, "order".patient, "order".formula, "order".type,"order".price, user.fio,user.clinic FROM "order" 
+        join user on "order".from_user = user.id WHERE invoice = {invoice_id}"""
+    ).fetchall()
     return order

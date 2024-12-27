@@ -33,18 +33,23 @@
                 <th>Удаление</th>
             </tr>
             {% for invoice in invoices %}
-            <tr data-invoice-id="{{invoice[0]}}">
-
+            <tr data-invoice-id="{{invoice[0]}}" onclick="showDetails({{invoice[0]}})">
                 <td>{{invoice[1]}}</td>
                 <td>{{invoice[2]}}</td>
                 <td>{{invoice[5]}}</td>
                 <td>{{invoice[4]}}</td>
-                <td><a href="#" onclick="delete_invoice({{invoice[0]}})">Удалить</a></td>
+                <td>{% if invoice[4] == "Неоплачено" %}<a href="#" onclick="delete_invoice({{invoice[0]}}); event.stopPropagation();">Удалить</a>{%endif%}</td>
+            </tr>
+            <tr id="details-{{invoice[0]}}" class="details-container">
+                <td colspan="5">
+                    <div class="details-content">
+                        <p>Загрузка данных...</p>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </table>
     </div>
-
 </div>
 <script src="/js/technik_invoices.js"></script>
 </body>
