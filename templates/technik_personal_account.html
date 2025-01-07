@@ -44,11 +44,12 @@
                 <th>ФИО пациента</th>
                 <th>Зубная формула</th>
                 <th>Вид работы</th>
-                <th>Дата сдачи работы</th>
+                <th>Сдача работы</th>
+                <th>Оплата</th>
                 <th>Подробнее</th>
             </tr>
             {% for order in not_done %}
-            <tr data-doctor-id="{{order[6].id}}">
+            <tr data-user-id="{{order[6].id}}">
 
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
@@ -68,6 +69,11 @@
                 </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
+                <td style="font-size:25px; text-align:center;">{% if order[16]==1 %}
+                    ✔️
+                    {% else %}
+                    ✖️
+                    {%endif %}</td>
                 <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
             </tr>
             {% endfor %}
@@ -82,11 +88,12 @@
                 <th>ФИО пациента</th>
                 <th>Зубная формула</th>
                 <th>Вид работы</th>
-                <th>Дата сдачи работы</th>
+                <th>Cдача работы</th>
+                <th>Оплата</th>
                 <th>Подробнее</th>
             </tr>
             {% for order in fitting_done %}
-            <tr class="yellow" data-doctor-id="{{order[6].id}}">
+            <tr class="yellow" data-user-id="{{order[6].id}}">
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
                 <td style="padding: 0px;">
@@ -105,6 +112,11 @@
                 </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
+                <td style="font-size:25px; text-align:center;">{% if order[16]==1 %}
+                    ✔️
+                    {% else %}
+                    ✖️
+                    {%endif %}</td>
                 <td><a href="/order/get/{{order[0]}}">Подробнее</a></td>
             </tr>
             {% endfor %}
@@ -119,11 +131,12 @@
                 <th>ФИО пациента</th>
                 <th>Зубная формула</th>
                 <th>Вид работы</th>
-                <th>Дата сдачи работы</th>
+                <th>Сдача работы</th>
+                <th>Оплата</th>
                 <th>Подробнее</th>
             </tr>
             {% for order in done %}
-            <tr class="green" data-doctor-id="{{order[6].id}}">
+            <tr class="green" data-user-id="{{order[6].id}}">
                 <td>{{order[6].name}}</td>
                 <td>{{order[1]}}</td>
                 <td style="padding: 0px;">
@@ -142,9 +155,12 @@
                 </td>
                 <td>{{order[3]}}</td>
                 <td>{{order[5]}}</td>
-                <td><a href="/order/get/{{order[0]}}">Подробнее</a> {% if order[16]==0 %}<span
-                        style="color:#DC143C; margin-left:5px; font-size:20px">₽</span>{%
-                    endif %}
+                <td style="font-size:25px; text-align:center;">{% if order[16]==1 %}
+                    ✔️
+                    {% else %}
+                    ✖️
+                    {%endif %}</td>
+                <td><a href="/order/get/{{order[0]}}">Подробнее</a>
                 </td>
             </tr>
             {% endfor %}
@@ -152,7 +168,7 @@
         <div class="toggle-button" onclick="toggleTable(this)"><img src="/images/down_arrow.png"></div>
     </div>
 </div>
-<script src="/js/technik_personal_account.js"></script>
+<script src="/js/filter_in_personal_account.js"></script>
 <script src="/js/arrow_button.js"></script>
 </body>
 </html>

@@ -29,7 +29,7 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_all_technik_services, set_new_order_price, delete_file_from_technik_files, add_file_to_technik_files, \
     get_technik_files_by_order_id, set_new_order_technik_comment, get_all_technik_invoices, delete_technik_invoice, \
     get_not_paid_not_invoice_orders_technik, add_invoice, add_invoice_order, get_technik_invoice_orders, \
-    delete_invoice_order
+    delete_invoice_order, get_invoice_by_id, get_all_doctor_invoices, pay_doctor_invoice, pay_invoice_order
 from add_image import image_to_pdf
 from document_generate import generate_plan
 from email_conformation import send_email_conformation
@@ -155,6 +155,7 @@ async def account(request: Request):
     if user_id is not None:
         user = get_user(user_id)
         if user[5] == "doctor":
+            selected_techniks = []
             orders = get_orders_doctor(user[0])
             for i in range(len(orders)):
                 orders[i] = list(orders[i])
@@ -162,7 +163,9 @@ async def account(request: Request):
                     data = orders[i][5].split("-")
                     orders[i][5] = f"{data[2]}.{data[1]}.{data[0]}"
                 technik = get_user(orders[i][7])
-                orders[i][7] = technik[1]
+                orders[i][7] = {"id" : technik[0], "name" : technik[1]}
+                if {"id" : technik[0], "name" : technik[1]} not in selected_techniks:
+                    selected_techniks.append({"id": technik[0], "name":technik[1]})
 
         else:
             selected_doctors = []
@@ -188,13 +191,14 @@ async def account(request: Request):
 
         if user[5] == "doctor":
             return templates.TemplateResponse("doctor_personal_account.html",
-                                              {
-                                                  "request": request,
-                                                  'fio': user[1],
-                                                  "done": done,
-                                                  "fitting_done": fitting_done,
-                                                  "not_done": not_done
-                                              })
+                      {
+                          "request": request,
+                          'fio': user[1],
+                          "done": done,
+                          "fitting_done": fitting_done,
+                          "not_done": not_done,
+                          "techniks": selected_techniks
+                      })
         else:
 
             return templates.TemplateResponse(
@@ -206,6 +210,7 @@ async def account(request: Request):
                     "fitting_done": fitting_done,
                     "not_done": not_done,
                     "doctors": selected_doctors,
+
                 })
 
     return RedirectResponse(url="/authorization")
@@ -593,6 +598,18 @@ async def get_technik_services(request: Request):
         "request": request,
         "invoices": invoices
     })
+@app.get("/doctor/invoice/show")
+async def get_doctor_services(request: Request):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    invoices = get_all_doctor_invoices(user_id)
+    print(invoices)
+    return templates.TemplateResponse("doctor_invoices.html", {
+        "request": request,
+        "invoices": invoices
+    })
 
 
 class Technik_service(BaseModel):
@@ -626,8 +643,25 @@ async def delete_service(request: Request, id: int):
     user_id = read_session(session_cookie)
     if user_id is None:
         return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    invoice = get_invoice_by_id(id)
+    if invoice[4] == "Оплачено":
+        return Response(content="Удаление данного счета невозможно!", status_code=400, type="application/text")
     delete_technik_invoice(id)
     delete_invoice_order(id)
+
+    return {"result": "done"}
+@app.post("/doctor/invoice/pay/{id}")
+async def pay_invoice(request: Request, id: int):
+    session_cookie = request.cookies.get("session")
+    user_id = read_session(session_cookie)
+    if user_id is None:
+        return Response(content="Ошибка авторизации!", status_code=401, type="application/text")
+    invoice = get_invoice_by_id(id)
+    if invoice[4] == "Оплачено":
+        return Response(content="Оплата данного счета невозможна!", status_code=400, type="application/text")
+    pay_doctor_invoice(id)
+    pay_invoice_order(id)
+
     return {"result": "done"}
 
 @app.get("/technik/invoice/create")

@@ -410,3 +410,28 @@ def get_technik_invoice_orders(invoice_id):
         join user on "order".from_user = user.id WHERE invoice = {invoice_id}"""
     ).fetchall()
     return order
+
+def get_invoice_by_id(id):
+    invoice = cursor.execute(
+        f"""select * from "invoice" where id = {id}"""
+    ).fetchone()
+    return invoice
+
+
+def get_all_doctor_invoices(doctor_id):
+    get_invoices = cursor.execute(
+        f""" SELECT Invoice.id,Invoice.creation_date,user.fio,doctor_id,paid,total_price FROM Invoice inner join user on Invoice.technik_id = user.id WHERE doctor_id = {doctor_id}"""
+    ).fetchall()
+    return get_invoices
+
+def pay_doctor_invoice(id):
+    cursor.execute(
+        f"""UPDATE Invoice SET paid = 'Оплачено' WHERE id = {id}"""
+    )
+    connection.commit()
+def pay_invoice_order(id):
+    cursor.execute(
+        f"""UPDATE "order" SET paid = 1 WHERE invoice = {id}"""
+    )
+    connection.commit()
+

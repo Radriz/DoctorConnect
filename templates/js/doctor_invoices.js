@@ -1,7 +1,7 @@
 
-function delete_invoice(id){
-    fetch(`/technik/invoice/delete/${id}`, {
-        method: 'DELETE',
+function pay_invoice(id){
+    fetch(`/doctor/invoice/pay/${id}`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         }
@@ -12,7 +12,7 @@ function delete_invoice(id){
         window.location.reload();
     })
     .catch(error => {
-        alert("Не удалось удалить счет на оплату, возможно он уже был оплачен")
+        alert("Не удалось оплатить счет, возможно он уже был оплачен")
         console.error("Ошибка:", error);
     });
 }
@@ -81,11 +81,7 @@ function filterTooth(toothString, quarter) {
         3: Array.from({ length: 8 }, (_, i) => 41 + i), // Нижняя левая
         4: Array.from({ length: 8 }, (_, i) => 31 + i), // Нижняя правая
     };
-
-    const quarterTeeth = teeth
-        .filter(tooth => quarters[quarter].includes(parseInt(tooth, 10))) // Фильтрация по четверти
-        .sort((a, b) => multiplier[quarter] * (parseInt(a, 10) - parseInt(b, 10))) // Сортировка
-        .map(tooth => (tooth.startsWith("0") ? "0" : tooth)); // Замена числа, если оно начинается с 0
-
+    const quarterTeeth = teeth.filter(tooth => quarters[quarter].includes(parseInt(tooth, 10)))
+                              .sort((a, b) => multiplier[quarter] * (parseInt(a, 10) - parseInt(b, 10)));
     return quarterTeeth.join(' ');
 }

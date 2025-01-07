@@ -17,25 +17,43 @@ function filterOrdersByDoctor(tableId, selectedDoctor, text) {
     // Получаем таблицу
     const table = document.getElementById(tableId);
 
-    // Получаем все строки таблицы на первом уровне
-    const rows = table.querySelectorAll('tr[data-doctor-id]'); // Только родительские строки с атрибутом
+    let clientColumnIndex = -1;
 
-    console.log(selectedDoctor);
+    const headers = table.querySelectorAll('th');
+    headers.forEach((header, index) => {
+        console.log(header.textContent);
+        if (header.textContent.trim() === "ФИО пациента") {
+            clientColumnIndex = index;
+        }
+    });
+
+    // Проверка, нашли ли мы нужный столбец
+    if (clientColumnIndex === -1) {
+        console.error("Не найден столбец с заголовком 'ФИО пациента'.");
+        return;
+    }
+
+    // Получаем все строки таблицы на первом уровне
+    const rows = table.querySelectorAll('tr[data-user-id]'); // Только родительские строки с атрибутом
+
 
     // Проходим по всем строкам
     rows.forEach(row => {
-        const doctorId = row.getAttribute('data-doctor-id'); // Получаем id врача из атрибута строки
-        const clientName = row.cells[1]?.textContent.toLowerCase() || ""; // Проверка на null
+        const doctorId = row.getAttribute('data-user-id'); // Получаем id врача из атрибута строки
+        const clientName = row.cells[clientColumnIndex]?.textContent.toLowerCase() || ""; // Проверка на null
 
         // Условие отображения строки
         const matchesDoctor = selectedDoctor === "None" || doctorId === selectedDoctor;
         const matchesClient = text === "" || clientName.includes(text);
-
+        row.style.display = "";
         // Показываем или скрываем родительские строки
         if (matchesDoctor && matchesClient) {
-            row.style.display = ""; // Показываем строку
+            row.classList.remove("not-match-search"); // Показываем строку
         } else {
-            row.style.display = "none"; // Скрываем строку
+            row.classList.add("not-match-search"); // Скрываем строку
         }
     });
+    console.log("Фильтрация завершена, вызываем showButton.");
+    window.showButton();
 }
+
