@@ -29,14 +29,16 @@ from Database import autorization, registration, find_techniks, get_user, create
     get_all_technik_services, set_new_order_price, delete_file_from_technik_files, add_file_to_technik_files, \
     get_technik_files_by_order_id, set_new_order_technik_comment, get_all_technik_invoices, delete_technik_invoice, \
     get_not_paid_not_invoice_orders_technik, add_invoice, add_invoice_order, get_technik_invoice_orders, \
-    delete_invoice_order, get_invoice_by_id, get_all_doctor_invoices, pay_doctor_invoice, pay_invoice_order
+    delete_invoice_order, get_invoice_by_id, get_all_doctor_invoices, pay_doctor_invoice, pay_invoice_order, \
+    update_tg_to_user
 from add_image import image_to_pdf
+from crypto_cipher import URLSafeEncryptor
 from document_generate import generate_plan
 from email_conformation import send_email_conformation
 from parameters import first_row, second_row, types, color_letter, color_number, tooth_priority
 from dotenv import dotenv_values
 config = dotenv_values() # {'LOGIN' : 123}
-
+encryptor = URLSafeEncryptor(password=config['CRYPTO_TELEGRAM_BOT'])
 app = FastAPI()
 
 
@@ -113,6 +115,10 @@ class Procedure(BaseModel):
     template_id: int
     amount: int
     is_active: bool
+
+class User_tg(BaseModel):
+    cipher_id: str
+    tg_id: int
 
 
 
@@ -191,16 +197,16 @@ async def account(request: Request):
 
         if user[5] == "doctor":
             return templates.TemplateResponse("doctor_personal_account.html",
-                      {
-                          "request": request,
-                          'fio': user[1],
-                          "done": done,
-                          "fitting_done": fitting_done,
-                          "not_done": not_done,
-                          "techniks": selected_techniks
-                      })
+                  {
+                      "request": request,
+                      'fio': user[1],
+                      "done": done,
+                      "fitting_done": fitting_done,
+                      "not_done": not_done,
+                      "techniks": selected_techniks,
+                      "cipher_id": encryptor.encrypt(str(user[0]))
+                  })
         else:
-
             return templates.TemplateResponse(
                 "technik_personal_account.html",
                 {
@@ -210,6 +216,7 @@ async def account(request: Request):
                     "fitting_done": fitting_done,
                     "not_done": not_done,
                     "doctors": selected_doctors,
+                    "cipher_id": encryptor.encrypt(str(user[0]))
 
                 })
 
@@ -242,6 +249,16 @@ async def regist(request: Request, fio: str = Form(...),
 async def forgot(request: Request):
     return templates.TemplateResponse("forgot_password.html", {"request": request})
 
+@app.post("/user/tg")
+async def add_tg_to_user(request: Request, user_tg: User_tg):
+    cipher_id = user_tg.cipher_id
+    tg_id = user_tg.tg_id
+    user_id = encryptor.decrypt(cipher_id)
+    user= get_user(user_id)
+    if user is None:
+        return {"status": "error", "message": "Пользователь не найден"}
+    update_tg_to_user(user_id, tg_id)
+    return {"status":"success", "fio": user[1]}
 
 @app.get("/order/create", response_class=HTMLResponse)
 async def create_order_form(request: Request):

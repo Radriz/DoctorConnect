@@ -17,10 +17,14 @@
          <button type="button" class="price-button" onclick="window.location.href='/doctor/invoice/show'">Счета
     </button>
     </h1>
+    <div class="header_div">
+     <img class="telegram" width="50px" src='/images/telegram.png' onclick="window.location.href='https://t.me/Doctor_Link_Bot?start=auth_{{cipher_id}}'">
+
 
     <form method="get" action="/logout">
         <input type="submit" value="Выход">
     </form>
+    </div>
 </header>
 <div class="container">
     <h2>Добро пожаловать, {{fio}}!</h2>

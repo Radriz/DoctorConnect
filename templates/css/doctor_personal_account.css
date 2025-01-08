@@ -25,8 +25,14 @@ header h1 {
 header img {
     margin-right: 20px;
 }
-header form {
+header .header_div {
+    align-items: center;
+    display: flex;
     margin-right: 10%;
+}
+header .telegram{
+    margin-right: 30px;
+
 }
 header form input[type="submit"] {
     background-color: white;

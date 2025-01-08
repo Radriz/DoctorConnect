@@ -435,3 +435,8 @@ def pay_invoice_order(id):
     )
     connection.commit()
 
+def update_tg_to_user(user_id,tg_id):
+    cursor.execute(
+        f"""UPDATE user SET tg_id = {tg_id} WHERE id = {user_id}"""
+    )
+    connection.commit()
